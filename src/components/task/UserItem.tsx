@@ -7,7 +7,7 @@ interface Props {
   selectedUser: UserState | null;
   onSelect: (client: UserState) => void;
 }
-const ClientItem = ({ user, selectedUser, onSelect }: Props) => {
+const UserItem = ({ user, selectedUser, onSelect }: Props) => {
   return (
     <div className='flex flex-row items-center w-full mb-2' onClick={() => onSelect(user)}>
       {selectedUser !== null ? <CheckIcon checked={selectedUser.user_id === user.user_id} /> : <CheckIcon checked={false} />}
@@ -16,4 +16,4 @@ const ClientItem = ({ user, selectedUser, onSelect }: Props) => {
   );
 };
 
-export default ClientItem;
+export default UserItem;

@@ -7,7 +7,7 @@ interface Props {
   selectedTask: TaskState | null;
   onSelect: (client: TaskState) => void;
 }
-const ClientItem = ({ task, selectedTask, onSelect }: Props) => {
+const TaskItem = ({ task, selectedTask, onSelect }: Props) => {
   return (
     <div className='flex flex-row items-center w-full mb-2' onClick={() => onSelect(task)}>
       {selectedTask !== null ? <CheckIcon checked={selectedTask.task_id === task.task_id} /> : <CheckIcon checked={false} />}
@@ -16,4 +16,4 @@ const ClientItem = ({ task, selectedTask, onSelect }: Props) => {
   );
 };
 
-export default ClientItem;
+export default TaskItem;

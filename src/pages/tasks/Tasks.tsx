@@ -1,37 +1,61 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
-import Modal from 'react-modal';
-import { accountState, AccountState } from '../../modules/user';
+import ReactModal from 'react-modal';
+import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { sendGetMyClients } from '../../lib/api/auth';
+import { getUserAll, getUserTasks, sendGetMyClients } from '../../lib/api/auth';
 import ClientItem from '../../components/task/ClientItem';
 import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
+import { TaskState } from '../../modules/task';
+import TaskItem from '../../components/task/TaskItem';
+import UserItem from '../../components/task/UserItem';
 
-Modal.setAppElement('#root');
+ReactModal.setAppElement('#root');
 
 function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [type, setType] = useState('');
   const [clientList, setClientList] = useState<ClientState[]>([]);
+  const [taskList, setTaskList] = useState<TaskState[]>([]);
+  const [users, getUsers] = React.useState<UserState[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
+  const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
 
   const account = useRecoilValue<AccountState | null>(accountState);
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
+  const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
+  const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
+
   React.useEffect(() => {
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
+
+    const creator_id = account?.user.user_id;
+    creator_id && _getUserTasks(creator_id);
+
+    _getUserAll();
   }, []);
   React.useEffect(() => {
     if (getMyClientsRes) {
-      // console.log(getMyClientsRes);
-
       setClientList(getMyClientsRes.clients);
     }
   }, [getMyClientsRes]);
+
+  React.useEffect(() => {
+    if (getUserTasksRes) {
+      setTaskList(getUserTasksRes.task);
+    }
+  }, [getUserTasksRes]);
+  React.useEffect(() => {
+    if (getUserAllRes) {
+      getUsers(getUserAllRes);
+    }
+  }, [getUserAllRes]);
 
   const onSelectDay = (cloneDay: Date, dayStr: string) => {
     // console.log('clicked!', cloneDay, dayStr);
@@ -43,8 +67,25 @@ function Tasks(): JSX.Element {
     setType('client');
     setShowModal(!showModal);
   };
+  const openTasks = () => {
+    setType('task');
+    setShowModal(!showModal);
+  };
+  const openUsers = () => {
+    setType('user');
+    setShowModal(!showModal);
+  };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
+    setShowModal(false);
+  };
+  const onSelectTask = (task: TaskState) => {
+    setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
+    setShowModal(false);
+  };
+  const onSelectUser = (user: UserState) => {
+    setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
+    setShowModal(false);
   };
 
   return (
@@ -58,6 +99,7 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>Client :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
+          <div className='border-dashed text-rouge-blue px-2'>{selectedClient?.client_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
@@ -72,7 +114,8 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>Task :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='border-dashed text-rouge-blue px-2'>{selectedTask?.task_name}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
@@ -86,7 +129,8 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>Who :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='border-dashed text-rouge-blue px-2'>{selectedUser?.display_name}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openUsers}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
@@ -159,24 +203,32 @@ function Tasks(): JSX.Element {
         </div>
       </div>
 
-      {showModal && (
-        <>
-          <div className='z-10 absolute top-0 left-0 w-full h-full opacity-50 bg-black' onClick={() => setShowModal(false)} />
-          <div className='absolute top-0 left-0 w-screen h-screen flex items-center justify-center'>
-            <div className='z-20 w-2/3 h-1/2'>
-              <div className='bg-white p-4 flex flex-col items-center rounded-sm w-full max-h-full'>
-                {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
-                <div className='h-full flex flex-col items-center w-full overflow-auto p-2'>
-                  {type === 'client' &&
-                    clientList.map((client, index) => (
-                      <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-                    ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <ReactModal
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        id={type}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
+        {type === 'task' && <div className='text-lg font-bold'>Tasks</div>}
+        {type === 'user' && <div className='text-lg font-bold'>Users</div>}
+        {type === 'client' &&
+          clientList.map((client, index) => (
+            <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+          ))}
+        {type === 'task' &&
+          taskList.map((task, index) => <TaskItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
+        {type === 'user' &&
+          users.map((user, index) => <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />)}
+      </ReactModal>
     </div>
   );
 }
