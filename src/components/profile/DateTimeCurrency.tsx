@@ -4,7 +4,6 @@ import { AccountState, accountState } from '../../modules/user';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import CheckBox from '../../components/common/CheckBox';
 import {
-  DateTimeCurrencyType,
   sendDateTimeCurrencyCreate,
   sendDateTimeCurrencyUpdate,
   sendGetDateTimeCurrency,
@@ -16,6 +15,7 @@ import { toast } from 'react-toastify';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
 import { CurrencyOption, currencyOption, DateFormatOption, dateFormatOptions } from '../../modules/setting';
 import { dropDownThumbnail } from '../../assets/images';
+import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
 
 const DropdownIndicator = (props: DropdownIndicatorProps<any, true>) => {
   return (

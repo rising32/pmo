@@ -4,19 +4,18 @@ import { AccountState, accountState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import {
-  ClientState,
   getUserTasks,
   sendCreateClient,
   sendCreateTask,
   sendGetMyClients,
   sendRegisterMyClient,
   sendUpdateByClient,
-  TaskState,
   updateByTask,
 } from '../../lib/api/auth';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';
+import { TaskState } from '../../modules/task';
 
 const ManageTask = () => {
   const [isEdit, setIsEdit] = React.useState(false);

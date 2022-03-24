@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
-import WeekCalender from '../../components/task/WeekCalender';
 import Modal from 'react-modal';
 import { accountState, AccountState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { ClientState, sendGetMyClients } from '../../lib/api/auth';
+import { sendGetMyClients } from '../../lib/api/auth';
 import ClientItem from '../../components/task/ClientItem';
+import TaskCalender from '../../components/task/TaskCalender';
+import { ClientState } from '../../modules/client';
 
 Modal.setAppElement('#root');
 
@@ -14,7 +15,6 @@ function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [type, setType] = useState('');
-  const [checked, setChecked] = useState(false);
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
 
@@ -29,121 +29,7 @@ function Tasks(): JSX.Element {
     if (getMyClientsRes) {
       // console.log(getMyClientsRes);
 
-      // setClientList(getMyClientsRes.clients);
-      setClientList([
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-        {
-          client_address: null,
-          client_detail: null,
-          client_id: 5,
-          client_name: 'asd',
-          is_active: 1,
-        },
-      ]);
+      setClientList(getMyClientsRes.clients);
     }
   }, [getMyClientsRes]);
 
@@ -163,7 +49,7 @@ function Tasks(): JSX.Element {
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
-      <WeekCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
+      <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
         <span className='text-white'>On time: 90%</span>
@@ -277,13 +163,15 @@ function Tasks(): JSX.Element {
         <>
           <div className='z-10 absolute top-0 left-0 w-full h-full opacity-50 bg-black' onClick={() => setShowModal(false)} />
           <div className='absolute top-0 left-0 w-screen h-screen flex items-center justify-center'>
-            <div className='z-20 bg-white p-4 flex flex-col items-center rounded-sm w-2/3 h-1/2'>
-              {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
-              <div className='h-full flex flex-col items-center w-full'>
-                {type === 'client' &&
-                  clientList.map((client, index) => (
-                    <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-                  ))}
+            <div className='z-20 w-2/3 h-1/2'>
+              <div className='bg-white p-4 flex flex-col items-center rounded-sm w-full max-h-full'>
+                {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
+                <div className='h-full flex flex-col items-center w-full overflow-auto p-2'>
+                  {type === 'client' &&
+                    clientList.map((client, index) => (
+                      <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+                    ))}
+                </div>
               </div>
             </div>
           </div>

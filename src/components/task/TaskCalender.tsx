@@ -6,7 +6,7 @@ interface Props {
   selectedDate: Date;
   onSelectDay: (cloneDay: Date, dayStr: string) => void;
 }
-const WeekCalender = ({ selectedDate, onSelectDay }: Props) => {
+const TaskCalender = ({ selectedDate, onSelectDay }: Props) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const changeWeekHandle = (btnType: string) => {
@@ -89,4 +89,4 @@ const WeekCalender = ({ selectedDate, onSelectDay }: Props) => {
   return <div className=' w-full'>{renderCells()}</div>;
 };
 
-export default WeekCalender;
+export default TaskCalender;

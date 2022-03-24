@@ -31,6 +31,8 @@ module.exports = {
       'main-back': '#14477E',
       'card-gray': '#6A798D',
       yellow: '#FFFF00',
+      'rouge-blue': '#DD0000',
+      'menu-back': '#365B9D',
     },
   },
   plugins: [],

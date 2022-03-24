@@ -1,7 +1,5 @@
 import React from 'react';
 import { CheckSvg, CrossSvg } from '../../assets/svg';
-import { ClientState } from '../../lib/api/auth';
-
 interface Props {
   checked: boolean;
   toggle?: () => void;

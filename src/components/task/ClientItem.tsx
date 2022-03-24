@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClientState } from '../../lib/api/auth';
+import { ClientState } from '../../modules/client';
 import CheckIcon from './CheckIcon';
 
 interface Props {

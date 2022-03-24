@@ -7,7 +7,7 @@ function Statistics(): JSX.Element {
   const [statusValue, setStatusValue] = useState(0);
   const [isWeekTableLoading, setIsWeekTableLoading] = useState(false);
 
-  const weekColumns: Array<Column<any>> = React.useMemo(
+  const weekColumns: Array<Column<any>> = useMemo(
     () => [
       {
         Header: 'WEEKS',
@@ -52,7 +52,7 @@ function Statistics(): JSX.Element {
     ],
     [],
   );
-  const weekData: Array<any> = React.useMemo(
+  const weekData: Array<any> = useMemo(
     () => [
       {
         week: 'Σ',
@@ -108,7 +108,7 @@ function Statistics(): JSX.Element {
     ],
     [],
   );
-  const monthColumns: Array<Column<any>> = React.useMemo(
+  const monthColumns: Array<Column<any>> = useMemo(
     () => [
       {
         Header: 'MONTHS',
@@ -153,7 +153,7 @@ function Statistics(): JSX.Element {
     ],
     [],
   );
-  const monthData: Array<any> = React.useMemo(
+  const monthData: Array<any> = useMemo(
     () => [
       {
         month: 'Σ',

@@ -6,9 +6,10 @@ import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
 import useRequest from '../../lib/hooks/useRequest';
-import { addMember, getTeamMembers, getUserAll, TeamMemberState } from '../../lib/api/auth';
+import { addMember, getTeamMembers, getUserAll } from '../../lib/api/auth';
 import { EmailSelectOption, UserSelectOption } from '../../modules/setting';
 import { toast } from 'react-toastify';
+import { TeamMemberState } from '../../modules/team';
 
 const ManageTeam = () => {
   const [isEdit, setIsEdit] = React.useState(false);
