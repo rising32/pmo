@@ -18,6 +18,7 @@ ReactModal.setAppElement('#root');
 function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [type, setType] = useState('');
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [taskList, setTaskList] = useState<TaskState[]>([]);
@@ -71,6 +72,10 @@ function Tasks(): JSX.Element {
   const openTasks = () => {
     setType('task');
     setShowModal(!showModal);
+  };
+  const openCalendar = () => {
+    setType('calendar');
+    setShowCalendar(!showCalendar);
   };
   const openUsers = () => {
     setType('user');
@@ -138,13 +143,15 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>When :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openCalendar}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        <div className='flex justify-between items-center mb-2 bg-white'>
-          <CustomCalender />
-        </div>
+        {type === 'calendar' && showCalendar && (
+          <div className='flex justify-between items-center mb-2 bg-white'>
+            <CustomCalender />
+          </div>
+        )}
         <div className='flex items-center justify-end'>
           <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl'>
             <img src={plusThumbnail} className='h-5 w-auto' />
