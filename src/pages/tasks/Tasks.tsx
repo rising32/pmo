@@ -11,6 +11,7 @@ import { ClientState } from '../../modules/client';
 import { TaskState } from '../../modules/task';
 import TaskItem from '../../components/task/TaskItem';
 import UserItem from '../../components/task/UserItem';
+import CustomCalender from '../../components/common/CustomCalender';
 
 ReactModal.setAppElement('#root');
 
@@ -140,6 +141,9 @@ function Tasks(): JSX.Element {
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
+        </div>
+        <div className='flex justify-between items-center mb-2 bg-white'>
+          <CustomCalender />
         </div>
         <div className='flex items-center justify-end'>
           <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl'>

@@ -15,3 +15,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.testdfdf {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC\
+  9zdmciIHdpZHRoPSI2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgNiAxNiI+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iT\
+  TYgMkwwIDhsNiA2VjJ6Ii8+PC9zdmc+");
+}
