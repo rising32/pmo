@@ -12,6 +12,7 @@ import { TaskState } from '../../modules/task';
 import TaskItem from '../../components/task/TaskItem';
 import UserItem from '../../components/task/UserItem';
 import CustomCalender from '../../components/common/CustomCalender';
+import { Moment } from 'moment';
 
 ReactModal.setAppElement('#root');
 
@@ -26,6 +27,7 @@ function Tasks(): JSX.Element {
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
+  const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
 
   const account = useRecoilValue<AccountState | null>(accountState);
 
@@ -93,6 +95,12 @@ function Tasks(): JSX.Element {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
     setShowModal(false);
   };
+  const onSelectDate = (moment: Moment) => {
+    console.log('selected date is ', moment.format('YYYY-MM-DD'));
+    setSelectedMoment(moment);
+    setType('');
+    setShowCalendar(false);
+  };
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
@@ -143,13 +151,14 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>When :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
+          <div className='border-dashed text-rouge-blue px-2'>{selectedMoment?.format('YYYY-MM-DD')}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openCalendar}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         {type === 'calendar' && showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
-            <CustomCalender />
+            <CustomCalender onSelect={onSelectDate} selectedMoment={selectedMoment} />
           </div>
         )}
         <div className='flex items-center justify-end'>
