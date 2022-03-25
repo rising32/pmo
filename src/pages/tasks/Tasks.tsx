@@ -4,7 +4,7 @@ import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } fr
 import ReactModal from 'react-modal';
 import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserAll, getUserTasks, sendGetMyClients } from '../../lib/api/auth';
+import { getUserAll, getUserTasks, sendGetMyClients, sendMyProject } from '../../lib/api/auth';
 import ClientItem from '../../components/task/ClientItem';
 import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
@@ -13,6 +13,8 @@ import TaskItem from '../../components/task/TaskItem';
 import UserItem from '../../components/task/UserItem';
 import CustomCalender from '../../components/common/CustomCalender';
 import { Moment } from 'moment';
+import { ProjectState } from '../../modules/project';
+import ProjectItem from '../../components/task/ProjectItem';
 
 ReactModal.setAppElement('#root');
 
@@ -22,9 +24,11 @@ function Tasks(): JSX.Element {
   const [showCalendar, setShowCalendar] = useState(false);
   const [type, setType] = useState('');
   const [clientList, setClientList] = useState<ClientState[]>([]);
+  const [projectList, setProjectList] = useState<ProjectState[]>([]);
   const [taskList, setTaskList] = useState<TaskState[]>([]);
   const [users, getUsers] = React.useState<UserState[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
   const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
@@ -34,6 +38,7 @@ function Tasks(): JSX.Element {
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
+  const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -41,6 +46,7 @@ function Tasks(): JSX.Element {
 
     const creator_id = account?.user.user_id;
     creator_id && _getUserTasks(creator_id);
+    creator_id && _sendMyProject(creator_id);
 
     _getUserAll();
   }, []);
@@ -49,7 +55,11 @@ function Tasks(): JSX.Element {
       setClientList(getMyClientsRes.clients);
     }
   }, [getMyClientsRes]);
-
+  React.useEffect(() => {
+    if (sendMyProjectRes) {
+      setProjectList(sendMyProjectRes.res);
+    }
+  }, [sendMyProjectRes]);
   React.useEffect(() => {
     if (getUserTasksRes) {
       setTaskList(getUserTasksRes.task);
@@ -71,6 +81,10 @@ function Tasks(): JSX.Element {
     setType('client');
     setShowModal(!showModal);
   };
+  const openProjects = () => {
+    setType('project');
+    setShowModal(!showModal);
+  };
   const openTasks = () => {
     setType('task');
     setShowModal(!showModal);
@@ -85,6 +99,10 @@ function Tasks(): JSX.Element {
   };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
+    setShowModal(false);
+  };
+  const onSelectProject = (project: ProjectState) => {
+    setSelectedProject(preSelectedProject => (preSelectedProject?.project_id === project?.project_id ? null : project));
     setShowModal(false);
   };
   const onSelectTask = (task: TaskState) => {
@@ -120,7 +138,8 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>Project :</span>
           <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='border-dashed text-rouge-blue px-2'>{selectedProject?.project_name}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openProjects}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
@@ -237,11 +256,16 @@ function Tasks(): JSX.Element {
         }}
       >
         {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
+        {type === 'project' && <div className='text-lg font-bold'>Projects</div>}
         {type === 'task' && <div className='text-lg font-bold'>Tasks</div>}
         {type === 'user' && <div className='text-lg font-bold'>Users</div>}
         {type === 'client' &&
           clientList.map((client, index) => (
             <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+          ))}
+        {type === 'project' &&
+          projectList.map((project, index) => (
+            <ProjectItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         {type === 'task' &&
           taskList.map((task, index) => <TaskItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
