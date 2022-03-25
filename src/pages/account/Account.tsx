@@ -17,7 +17,7 @@ import {
   uroSimbalThumbnail,
   workSettingThumbnail,
 } from '../../assets/images';
-import { getUserTasks, sendGetMyClients, signOut } from '../../lib/api/auth';
+import { getUserTasks, sendGetMyClients, sendMyProject, signOut } from '../../lib/api/auth';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 
@@ -25,11 +25,13 @@ const Account = () => {
   const navigate = useNavigate();
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
   const [clientNum, setClientNum] = React.useState(0);
+  const [projectNum, setProjectNum] = React.useState(0);
   const [taskNum, setTaskNum] = React.useState(0);
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendSignOut, signOuting, signOutRes, , resetSignOut] = useRequest(signOut);
+  const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
 
   React.useEffect(() => {
     if (signOutRes && signOutRes.user_id) {
@@ -60,6 +62,9 @@ const Account = () => {
   React.useEffect(() => {
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
+
+    const creator_id = account?.user.user_id;
+    creator_id && _sendMyProject(creator_id);
   }, []);
   React.useEffect(() => {
     if (getMyClientsRes) {
@@ -67,6 +72,12 @@ const Account = () => {
       setClientNum(getMyClientsRes.clients.length);
     }
   }, [getMyClientsRes]);
+  React.useEffect(() => {
+    if (sendMyProjectRes) {
+      // console.log('sendMyProjectRes = ', sendMyProjectRes);
+      setProjectNum(sendMyProjectRes.res.length);
+    }
+  }, [sendMyProjectRes]);
 
   React.useEffect(() => {
     const creator_id = account?.user.user_id;
@@ -185,7 +196,7 @@ const Account = () => {
           <div className='w-10 h-6 flex items-center justify-center'>
             <img src={projectRougeThumbnail} className='h-4 w-auto' />
           </div>
-          <div className='text-base text-black font-normal mr-4'>{'4' + ' Projects'}</div>
+          <div className='text-base text-black font-normal mr-4'>{projectNum + ' Projects'}</div>
         </div>
         <div className='flex flex-row py-2 pr-4 items-center' onClick={() => navigate('/account/manage-task')}>
           <div className='w-10 h-6 flex items-center justify-center'>

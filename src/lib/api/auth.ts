@@ -1,5 +1,6 @@
 import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
+import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
@@ -64,3 +65,11 @@ export interface ResponseMembers {
 }
 export const addMember = (params: TeamMemberState) => apiClient.post<TeamMemberState>('/team/add_member', params);
 export const getTeamMembers = (owner_id: number) => apiClient.post<ResponseMembers>('/team/get_team_members', { owner_id });
+
+export const sendCreateProject = (params: ProjectState) => apiClient.post<ProjectState>('/project/create', params);
+
+export interface ResponseProjectList {
+  res: ProjectState[];
+}
+export const sendMyProject = (creator_id: number) => apiClient.post<ResponseProjectList>('/project/get_user_projects', { creator_id });
+export const sendUpdateByUser = (params: ProjectState) => apiClient.post<ProjectState>('/project/update', params);

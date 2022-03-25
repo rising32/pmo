@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { AccountState, accountState } from '../../modules/user';
-import { rightArrowThumbnail } from '../../assets/images';
+import { documentThumbnail, rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import { sendCreateClient, sendGetMyClients, sendRegisterMyClient, sendUpdateByClient } from '../../lib/api/auth';
+import {
+  sendCreateClient,
+  sendCreateProject,
+  sendGetMyClients,
+  sendMyProject,
+  sendRegisterMyClient,
+  sendUpdateByClient,
+  sendUpdateByUser,
+} from '../../lib/api/auth';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
-import { ClientState } from '../../modules/client';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import { ProjectState } from '../../modules/project';
 import CustomCalender from '../../components/common/CustomCalender';
 import { CalenderSvg } from '../../assets/svg';
@@ -27,8 +34,46 @@ const ManageProject = () => {
   const [actualStartMoment, setActualStartMoment] = useState<Moment | null>(null);
   const [actualEndMoment, setActualEndMoment] = useState<Moment | null>(null);
   const [dateType, setDateType] = useState('ps');
-  const account = useRecoilValue<AccountState | null>(accountState);
 
+  const account = useRecoilValue<AccountState | null>(accountState);
+  const [_sendCreateProject, , sendCreateProjectRes] = useRequest(sendCreateProject);
+  const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
+  const [_sendUpdateByUser, , sendUpdateByUserRes] = useRequest(sendUpdateByUser);
+
+  React.useEffect(() => {
+    const creator_id = account?.user.user_id;
+    creator_id && _sendMyProject(creator_id);
+  }, []);
+  React.useEffect(() => {
+    if (sendMyProjectRes) {
+      console.log('sendMyProjectRes = ', sendMyProjectRes);
+      getDataList(sendMyProjectRes.res);
+    }
+  }, [sendMyProjectRes]);
+  React.useEffect(() => {
+    if (sendUpdateByUserRes) {
+      console.log('sendUpdateByUserRes = ', sendUpdateByUserRes);
+      const updateProject: ProjectState = {
+        project_id: sendUpdateByUserRes.project_id,
+        creator_id: sendUpdateByUserRes.creator_id,
+        project_name: sendUpdateByUserRes.project_name,
+        planned_start_date: sendUpdateByUserRes.planned_start_date,
+        planned_end_date: sendUpdateByUserRes.planned_end_date,
+        actual_start_date: sendUpdateByUserRes.actual_start_date,
+        actual_end_date: sendUpdateByUserRes.actual_end_date,
+        description: sendUpdateByUserRes.description,
+      };
+      const newDataList = dataList.map(item => {
+        if (item.project_id === updateProject.project_id) {
+          return updateProject;
+        } else {
+          return item;
+        }
+      });
+      getDataList(newDataList);
+      closeEdit();
+    }
+  }, [sendUpdateByUserRes]);
   const onCreateProject = () => {
     setPopTitle('Create Project');
     setActionTitle('Create');
@@ -38,10 +83,17 @@ const ManageProject = () => {
     setSelectedItem(project);
     setPopTitle('Edit Project');
     setActionTitle('Save');
+    setPlanedStartMoment(moment(project.planned_start_date));
+    setPlanedEndMoment(moment(project.planned_end_date));
+    setActualStartMoment(moment(project.actual_start_date));
+    setActualEndMoment(moment(project.actual_end_date));
     setProjectName(project.project_name);
     setIsEdit(true);
   };
   const onCreateUpdateClient = () => {
+    if (!planedStarMoment || !planedEndMoment || !actualStartMoment || !actualEndMoment) {
+      return;
+    }
     if (planedStarMoment?.isSameOrAfter(planedEndMoment)) {
       console.log('kkkkkk');
       toast.error('plan start time is after end time');
@@ -52,12 +104,54 @@ const ManageProject = () => {
       toast.error('actual start time is after end time');
       return;
     }
+    if (!account) {
+      return;
+    }
     if (selectedItem) {
-      console.log('edit');
+      const params: ProjectState = {
+        project_id: selectedItem.project_id,
+        creator_id: selectedItem.creator_id,
+        project_name: projectName,
+        planned_start_date: planedStarMoment.toDate(),
+        planned_end_date: planedEndMoment.toDate(),
+        actual_start_date: actualStartMoment.toDate(),
+        actual_end_date: actualEndMoment.toDate(),
+        description: projectDec,
+      };
+      _sendUpdateByUser(params);
     } else {
-      console.log('create');
+      const params: ProjectState = {
+        project_id: null,
+        creator_id: account.user.user_id,
+        project_name: projectName,
+        planned_start_date: planedStarMoment.toDate(),
+        planned_end_date: planedEndMoment.toDate(),
+        actual_start_date: actualStartMoment.toDate(),
+        actual_end_date: actualEndMoment.toDate(),
+        description: projectDec,
+      };
+      _sendCreateProject(params);
     }
   };
+  React.useEffect(() => {
+    if (sendCreateProjectRes) {
+      console.log('sendCreateProjectRes = ', sendCreateProjectRes);
+      const updateProject: ProjectState = {
+        project_id: sendCreateProjectRes.project_id,
+        creator_id: sendCreateProjectRes.creator_id,
+        project_name: sendCreateProjectRes.project_name,
+        planned_start_date: sendCreateProjectRes.planned_start_date,
+        planned_end_date: sendCreateProjectRes.planned_end_date,
+        actual_start_date: sendCreateProjectRes.actual_start_date,
+        actual_end_date: sendCreateProjectRes.actual_end_date,
+        description: sendCreateProjectRes.description,
+      };
+      const newDataList = dataList;
+      newDataList.unshift(updateProject);
+      toast.success('client updated successfully');
+      closeEdit();
+    }
+  }, [sendCreateProjectRes]);
   const handleProjectNameChange = (event: React.FormEvent<HTMLInputElement>) => {
     setProjectName(event.currentTarget.value);
   };
@@ -131,7 +225,8 @@ const ManageProject = () => {
               className='flex flex-row p-4 mb-2 items-center justify-between bg-light-gray'
               onClick={() => onEditProject(project)}
             >
-              <div className='text-sm text-black font-normal pr-3 flex-1'>{project.project_name}</div>
+              <img src={documentThumbnail} className='h-6 w-auto' />
+              <div className='text-lg text-black font-bold pr-3 flex-1 pl-2'>{project.project_name}</div>
             </div>
           ))}
         </div>
