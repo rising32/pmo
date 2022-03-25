@@ -18,8 +18,32 @@ import Core from './containers/base/Core';
 import SignUp from './pages/auth/SignUp';
 import Statistics from './pages/statistics/Statistics';
 import Terms from './pages/other/Terms';
+import useRequest from './lib/hooks/useRequest';
+import { loginWithToken } from './lib/api/auth';
+import { useRecoilState } from 'recoil';
+import { accountState, AccountState } from './modules/user';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 function App(): JSX.Element {
+  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const [_loginWithToken, loading, loginWithTokenRes, loginWithTokenErr] = useRequest(loginWithToken);
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    const token = localStorage.getItem('user_token') || null;
+    // console.log('user_token = ', token);
+    if (token) {
+      _loginWithToken(token);
+    }
+  }, []);
+  React.useEffect(() => {
+    if (loginWithTokenRes && loginWithTokenRes.login_id) {
+      localStorage.setItem('user_token', loginWithTokenRes.token);
+      setAccount(loginWithTokenRes);
+      toast.success('login successed!');
+      navigate('/tasks');
+    }
+  }, [loginWithTokenRes]);
   return (
     <>
       <Routes>

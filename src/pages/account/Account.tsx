@@ -55,7 +55,7 @@ const Account = () => {
       is_project_manager: 0,
       registration_time: '2022-03-18T01:07:13.000Z',
     },
-    team_num: 2,
+    team_num: '',
   };
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -63,7 +63,7 @@ const Account = () => {
   }, []);
   React.useEffect(() => {
     if (getMyClientsRes) {
-      console.log(getMyClientsRes);
+      // console.log(getMyClientsRes);
       setClientNum(getMyClientsRes.clients.length);
     }
   }, [getMyClientsRes]);
@@ -74,16 +74,10 @@ const Account = () => {
   }, []);
   React.useEffect(() => {
     if (getUserTasksRes) {
-      console.log(getUserTasksRes.task);
+      // console.log(getUserTasksRes.task);
       setTaskNum(getUserTasksRes.task.length);
     }
   }, [getUserTasksRes]);
-  React.useEffect(() => {
-    console.log('Component mounted', account?.user.email);
-    return () => {
-      // console.log('Component will be unmount');
-    };
-  }, []);
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
@@ -178,7 +172,7 @@ const Account = () => {
           <div className='w-10 h-6 flex items-center justify-center'>
             <img src={personRougeThumbnail} className='h-4 w-auto' />
           </div>
-          <div className='text-base text-black font-normal mr-4'>{account?.user.display_name}</div>
+          <div className='text-base text-black font-normal mr-4 truncate'>{account?.user.display_name}</div>
           <div className='text-base text-rouge-blue font-normal truncate'>{account?.user.email}</div>
         </div>
         <div className='flex flex-row py-2 pr-4 items-center' onClick={() => navigate('/account/manage-client')}>

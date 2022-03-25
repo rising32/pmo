@@ -14,6 +14,7 @@ export interface UserState {
 }
 export interface AccountState {
   login_id: number;
+  token: string;
   user: UserState;
 }
 

@@ -22,6 +22,7 @@ const OrganizationUpdate = ({ isEditOrganization, onClose }: Props) => {
     if (profileRes && profileRes.user_id && account) {
       const updateAccount: AccountState = {
         login_id: account.login_id,
+        token: account.token,
         user: profileRes,
       };
       setAccount(updateAccount);

@@ -96,7 +96,6 @@ function Tasks(): JSX.Element {
     setShowModal(false);
   };
   const onSelectDate = (moment: Moment) => {
-    console.log('selected date is ', moment.format('YYYY-MM-DD'));
     setSelectedMoment(moment);
     setType('');
     setShowCalendar(false);

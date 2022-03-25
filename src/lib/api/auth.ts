@@ -10,6 +10,7 @@ export const sendAuthEmailPassword = (email: string, password: string) =>
     email,
     password,
   });
+export const loginWithToken = (token: string) => apiClient.post<AccountState>('/user/login/token', { token });
 
 export const sendSignUp = (email: string, phone_number: string, password: string, display_name: string) =>
   apiClient.post<AccountState>('/user/signUp', {

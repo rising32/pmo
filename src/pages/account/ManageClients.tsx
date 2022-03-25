@@ -142,7 +142,7 @@ const ManageClients = () => {
         </div>
         <BottomUpAnimatedView
           title={title}
-          actionTitle={name ? 'Save' : 'Create'}
+          actionTitle={title === 'Edit Client' ? 'Save' : 'Create'}
           isOpen={isEdit}
           onClose={() => setIsEdit(false)}
           onSave={onCreateUpdateClient}
