@@ -4,6 +4,7 @@ import { ProjectState, StatisticState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
+import { PriorityState } from '../../modules/weekPriority';
 import apiClient from './apiClient';
 
 export const sendAuthEmailPassword = (email: string, password: string) =>
@@ -78,3 +79,13 @@ export const sendWeekProduct = (user_id: number) =>
   apiClient.post<{ data: StatisticState[] }>('/project/get_real_workdays/week/client', { user_id });
 export const sendMonthProduct = (user_id: number) =>
   apiClient.post<{ data: StatisticState[] }>('/project/get_real_workdays/month/client', { user_id });
+
+export interface ResponsePriorityList {
+  user_id: number;
+  priority: PriorityState[];
+}
+export const sendPriorityByWeek = (user_id: number, week: number) =>
+  apiClient.post<ResponsePriorityList>('/priority/get/userid/week', { user_id, week });
+
+export const sendPriorityByBeforeWeek = (user_id: number, week: number) =>
+  apiClient.post<ResponsePriorityList>('/priority/get/userid/week/before', { user_id, week });

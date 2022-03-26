@@ -31,6 +31,7 @@ function Statistics(): JSX.Element {
     }
   }, []);
   React.useEffect(() => {
+    console.log('+++++', sendWeekProductRes);
     if (sendWeekProductRes && sendWeekProductRes.data.length > 0) {
       const newHeader = weekTableHeader;
       const newData = weekTableData;
@@ -69,9 +70,10 @@ function Statistics(): JSX.Element {
       sendWeekProductRes.data.map(item => {
         const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
         let sumValue = 0;
-        item.realWorkdays.map((cell: WeekWorkDay) => {
-          sumValue += cell.work_days;
-        });
+        item.realWorkdays.length > 0 &&
+          item.realWorkdays.map((cell: WeekWorkDay) => {
+            sumValue += cell.work_days;
+          });
         ItemsSum[`${dataKey}`] = sumValue;
       });
       let total = 0;
@@ -85,9 +87,13 @@ function Statistics(): JSX.Element {
       for (let i = 0; i <= 52; i++) {
         const tableDataItem: any = {};
         sendWeekProductRes.data.map(item => {
-          const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
-          tableDataItem['week'] = i === 0 ? 'Σ' : i;
-          tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
+          if (item.realWorkdays.length > 0) {
+            const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+            tableDataItem['week'] = i === 0 ? 'Σ' : i;
+            tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
+          } else {
+            tableDataItem['week'] = i === 0 ? 'Σ' : i;
+          }
         });
         let totaItem = 0;
         let deltaItem = 0;
@@ -98,8 +104,22 @@ function Statistics(): JSX.Element {
         }
         deltaItem = tableDataItem['available'] - totaItem;
 
-        tableDataItem['delta'] = i === 0 ? delta : deltaItem;
-        tableDataItem['total'] = i === 0 ? total : totaItem;
+        if (i === 0) {
+          if (delta !== 0) {
+            tableDataItem['delta'] = delta;
+          }
+          if (total) {
+            tableDataItem['total'] = total;
+          }
+          if (!delta && !total) {
+            tableDataItem['delta'] = delta;
+            tableDataItem['total'] = total;
+          }
+        } else {
+          tableDataItem['delta'] = deltaItem;
+          tableDataItem['total'] = totaItem;
+        }
+
         newData.push(tableDataItem);
       }
       setWeekTableData(newData);

@@ -7,9 +7,6 @@ interface Props {
   isCompleted: number | null;
 }
 const DocumentCheckIcon = ({ isCompleted }: Props) => {
-  if (isCompleted === null) {
-    return <div />;
-  }
   return (
     <div className='w-6 h-6 mr-2 flex items-center justify-center relative'>
       <img src={documentThumbnail} className='h-6 w-auto' />
@@ -20,7 +17,7 @@ const DocumentCheckIcon = ({ isCompleted }: Props) => {
       )}
       {isCompleted === 1 && (
         <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
-          <CrossSvg stroke='red' strokeWidth={4} className='w-4 h-4' />
+          <CheckSvg stroke='red' strokeWidth={4} className='w-4 h-4' />
         </div>
       )}
     </div>

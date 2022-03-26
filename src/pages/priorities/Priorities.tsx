@@ -3,30 +3,50 @@ import { useRecoilValue } from 'recoil';
 import { plusThumbnail } from '../../assets/images';
 import { accountState, AccountState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { sendGetMyClients } from '../../lib/api/auth';
+import { sendPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api/auth';
 import PrioritiesCalender from '../../components/task/PrioritiesCalender';
-import { prioritiesFakeData, prioritiesNotAchievedFakeData, prioritiesPastFakeData } from '../../modules/weekPriority';
+import { prioritiesFakeData, prioritiesNotAchievedFakeData, PriorityState } from '../../modules/weekPriority';
 import PriorityItem from '../../components/priority/PriorityItem';
 import Tag from '../../components/common/Tag';
-import PastPriorityItem from '../../components/priority/PastPriorityItem';
 import { getWeek } from 'date-fns';
 import PastPriorityView from '../../containers/priority/PastPriorityView';
 import { PrioritiesTab } from '../../modules/tab';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
-  const [selectedWeek, setSelectedWeek] = useState(0);
-  const [weeklyPriorities, setWeeklyPriorities] = useState(prioritiesFakeData);
+  const [selectedWeek, setSelectedWeek] = useState(thisWeek);
+  const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
+  const [beforeWeeklyPriorities, setBeforWeeklyPriorities] = useState<PriorityState[]>([]);
 
   const account = useRecoilValue<AccountState | null>(accountState);
 
+  const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
+  const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
+
+  React.useEffect(() => {
+    requestWeelyPriorities(selectedWeek);
+  }, []);
+  React.useEffect(() => {
+    if (sendPriorityByWeekRes) {
+      // console.log('---', sendPriorityByWeekRes);
+      setWeeklyPriorities(sendPriorityByWeekRes.priority);
+    }
+  }, [sendPriorityByWeekRes]);
+  React.useEffect(() => {
+    if (sendPriorityByBeforeWeekRes) {
+      console.log('---', sendPriorityByBeforeWeekRes);
+      setBeforWeeklyPriorities(sendPriorityByBeforeWeekRes.priority);
+    }
+  }, [sendPriorityByBeforeWeekRes]);
+  const requestWeelyPriorities = (week: number) => {
+    const user_id = account?.user.user_id;
+    // console.log('+++++', user_id, week);
+    _sendPriorityByWeek(user_id, week);
+    _sendPriorityByBeforeWeek(user_id, week);
+  };
   const onSelectWeek = (currentWeek: number) => {
     setSelectedWeek(currentWeek);
-    if (thisWeek > currentWeek) {
-      setWeeklyPriorities(prioritiesPastFakeData);
-    } else if (thisWeek === currentWeek) {
-      setWeeklyPriorities(prioritiesFakeData);
-    }
+    requestWeelyPriorities(currentWeek);
   };
 
   return (
@@ -73,7 +93,7 @@ function Priorities(): JSX.Element {
         <span className='text-white font-bold truncate'>Past priorities not achieved</span>
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
-        <PastPriorityView priorities={prioritiesNotAchievedFakeData} selectedWeek={selectedWeek} />
+        <PastPriorityView priorities={beforeWeeklyPriorities} />
       </div>
     </div>
   );

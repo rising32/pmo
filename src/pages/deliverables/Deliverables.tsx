@@ -73,7 +73,7 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold truncate'>Remember your weekly priorities</span>
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
-        <PastPriorityView priorities={weeklyPriorities} selectedWeek={selectedWeek} />
+        <PastPriorityView priorities={weeklyPriorities} />
       </div>
     </div>
   );
