@@ -1,224 +1,201 @@
 import React, { useState, useMemo } from 'react';
 import { Column } from 'react-table';
 import Table from '../../components/common/Table';
+import { sendMonthProduct, sendWeekProduct } from '../../lib/api/auth';
+import useRequest from '../../lib/hooks/useRequest';
+import { useRecoilValue } from 'recoil';
+import { accountState, AccountState } from '../../modules/user';
+import { defaultHeaderColum, TableHeader } from '../../modules/statistic';
+import { WeekWorkDay } from '../../modules/project';
 
 function Statistics(): JSX.Element {
   const [isWeek, setIsWeek] = useState(true);
   const [statusValue, setStatusValue] = useState(0);
-  const [isWeekTableLoading, setIsWeekTableLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [weekTableHeader, setWeekTableHeader] = useState<TableHeader[]>([]);
+  const [weekTableData, setWeekTableData] = useState<any[]>([]);
+  const [monthTableHeader, setMonthTableHeader] = useState<TableHeader[]>([]);
+  const [monthTableData, setMonthTableData] = useState<any[]>([]);
 
-  const weekColumns: Array<Column<any>> = useMemo(
-    () => [
-      {
-        Header: 'WEEKS',
-        accessor: 'week',
-      },
-      {
-        Header: 'Available',
-        accessor: 'available',
-      },
-      {
-        Header: 'Delta',
-        accessor: 'dalta',
-      },
-      {
-        Header: 'TOTAL',
-        accessor: 'total',
-      },
-      {
-        Header: 'ATU M25',
-        accessor: 'atum25',
-      },
-      {
-        Header: 'AMZ MHG9',
-        accessor: 'amzmhg9',
-      },
-      {
-        Header: 'AMZ XDEY',
-        accessor: 'amzxdey',
-      },
-      {
-        Header: 'AMZ ZDEJ',
-        accessor: 'amzzdej',
-      },
-      {
-        Header: 'IKEA',
-        accessor: 'ikea',
-      },
-      {
-        Header: 'COTA',
-        accessor: 'cota',
-      },
-    ],
-    [],
-  );
-  const weekData: Array<any> = useMemo(
-    () => [
-      {
-        week: 'Σ',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-        amzzdej: '5',
-        ikea: '5',
-        cota: '5',
-      },
-      {
-        week: '1',
-        available: '5',
-      },
-      {
-        week: '2',
-        available: '5',
-        dalta: '5',
-      },
-      {
-        week: '3',
-        available: '5',
-        dalta: '5',
-        total: '5',
-      },
-      {
-        week: '4',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-      },
-      {
-        week: '5',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-      },
-      {
-        week: '6',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-      },
-    ],
-    [],
-  );
-  const monthColumns: Array<Column<any>> = useMemo(
-    () => [
-      {
-        Header: 'MONTHS',
-        accessor: 'month',
-      },
-      {
-        Header: 'Available',
-        accessor: 'available',
-      },
-      {
-        Header: 'Delta',
-        accessor: 'dalta',
-      },
-      {
-        Header: 'TOTAL',
-        accessor: 'total',
-      },
-      {
-        Header: 'ATU M25',
-        accessor: 'atum25',
-      },
-      {
-        Header: 'AMZ MHG9',
-        accessor: 'amzmhg9',
-      },
-      {
-        Header: 'AMZ XDEY',
-        accessor: 'amzxdey',
-      },
-      {
-        Header: 'AMZ ZDEJ',
-        accessor: 'amzzdej',
-      },
-      {
-        Header: 'IKEA',
-        accessor: 'ikea',
-      },
-      {
-        Header: 'COTA',
-        accessor: 'cota',
-      },
-    ],
-    [],
-  );
-  const monthData: Array<any> = useMemo(
-    () => [
-      {
-        month: 'Σ',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-        amzzdej: '5',
-        ikea: '5',
-        cota: '5',
-      },
-      {
-        month: 'J',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-        amzzdej: '5',
-        ikea: '5',
-        cota: '5',
-      },
-      {
-        month: 'F',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-        amzzdej: '5',
-      },
-      {
-        month: 'M',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-        amzmhg9: '5',
-        amzxdey: '5',
-      },
-      {
-        month: 'A',
-        available: '5',
-        dalta: '5',
-        total: '5',
-        atum25: '5',
-      },
-      {
-        month: 'M',
-        available: '5',
-        dalta: '5',
-        total: '5',
-      },
-      {
-        month: 'J',
-        available: '5',
-        dalta: '5',
-      },
-    ],
-    [],
-  );
+  const [_sendWeekProduct, sendingWeekProduct, sendWeekProductRes, sendWeekProductErr, resetSendWeekProduct] = useRequest(sendWeekProduct);
+  const [_sendMonthProduct, sendingMonthProduct, sendMonthProductRes, sendMonthProductErr, resetSendMonthProduct] =
+    useRequest(sendMonthProduct);
+
+  const account = useRecoilValue(accountState);
+  React.useEffect(() => {
+    if (weekTableData.length === 0) {
+      setLoaded(false);
+
+      const user_id = account?.user.user_id;
+      user_id && _sendWeekProduct(user_id);
+    }
+  }, []);
+  React.useEffect(() => {
+    if (sendWeekProductRes && sendWeekProductRes.data.length > 0) {
+      const newHeader = weekTableHeader;
+      const newData = weekTableData;
+      sendWeekProductRes.data.map(item => {
+        if (item.client_id === -1) {
+          const WeekWeekHeader: TableHeader = {
+            Header: 'WEEKS',
+            accessor: 'week',
+          };
+          const WeekAvailableHeader: TableHeader = {
+            Header: item.client_name,
+            accessor: item.client_name.toLowerCase().replace(/\s+/g, ''),
+          };
+          const WeekDeltaColumn: TableHeader = {
+            Header: 'Delta',
+            accessor: 'delta',
+          };
+          const WeekTotalColumn: TableHeader = {
+            Header: 'TOTAL',
+            accessor: 'total',
+          };
+          newHeader.push(WeekWeekHeader);
+          newHeader.push(WeekAvailableHeader);
+          newHeader.push(WeekDeltaColumn);
+          newHeader.push(WeekTotalColumn);
+        } else {
+          const HeaderItem: TableHeader = {
+            Header: item.client_name,
+            accessor: item.client_name.toLowerCase().replace(/\s+/g, ''),
+          };
+          newHeader.push(HeaderItem);
+        }
+      });
+      setWeekTableHeader(newHeader);
+      const ItemsSum: any = {};
+      sendWeekProductRes.data.map(item => {
+        const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+        let sumValue = 0;
+        item.realWorkdays.map((cell: WeekWorkDay) => {
+          sumValue += cell.work_days;
+        });
+        ItemsSum[`${dataKey}`] = sumValue;
+      });
+      let total = 0;
+      let delta = 0;
+      for (const [key, value] of Object.entries(ItemsSum)) {
+        if (key !== 'available') {
+          total += value as number;
+        }
+      }
+      delta = ItemsSum['available'] - total;
+      for (let i = 0; i <= 52; i++) {
+        const tableDataItem: any = {};
+        sendWeekProductRes.data.map(item => {
+          const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+          tableDataItem['week'] = i === 0 ? 'Σ' : i;
+          tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
+        });
+        let totaItem = 0;
+        let deltaItem = 0;
+        for (const [key, value] of Object.entries(tableDataItem)) {
+          if (key !== 'available' && key !== 'week') {
+            totaItem += value as number;
+          }
+        }
+        deltaItem = tableDataItem['available'] - totaItem;
+
+        tableDataItem['delta'] = i === 0 ? delta : deltaItem;
+        tableDataItem['total'] = i === 0 ? total : totaItem;
+        newData.push(tableDataItem);
+      }
+      setWeekTableData(newData);
+      setLoaded(true);
+    }
+  }, [sendWeekProductRes]);
+  React.useEffect(() => {
+    if (sendMonthProductRes && sendMonthProductRes.data.length > 0) {
+      const newHeader = monthTableHeader;
+      const newData = monthTableData;
+      sendMonthProductRes.data.map(item => {
+        if (item.client_id === -1) {
+          const MonthWeekHeader: TableHeader = {
+            Header: 'MONTHS',
+            accessor: 'month',
+          };
+          const WeekAvailableHeader: TableHeader = {
+            Header: item.client_name,
+            accessor: item.client_name.toLowerCase().replace(/\s+/g, ''),
+          };
+          const WeekDeltaColumn: TableHeader = {
+            Header: 'Delta',
+            accessor: 'delta',
+          };
+          const WeekTotalColumn: TableHeader = {
+            Header: 'TOTAL',
+            accessor: 'total',
+          };
+          newHeader.push(MonthWeekHeader);
+          newHeader.push(WeekAvailableHeader);
+          newHeader.push(WeekDeltaColumn);
+          newHeader.push(WeekTotalColumn);
+        } else {
+          const HeaderItem: TableHeader = {
+            Header: item.client_name,
+            accessor: item.client_name.toLowerCase().replace(/\s+/g, ''),
+          };
+          newHeader.push(HeaderItem);
+        }
+      });
+      setMonthTableHeader(newHeader);
+      const ItemsSum: any = {};
+      sendMonthProductRes.data.map(item => {
+        const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+        let sumValue = 0;
+        item.realWorkdays.map(cell => {
+          sumValue += cell.work_days;
+        });
+        ItemsSum[`${dataKey}`] = sumValue;
+      });
+      let total = 0;
+      let delta = 0;
+      for (const [key, value] of Object.entries(ItemsSum)) {
+        if (key !== 'available') {
+          total += value as number;
+        }
+      }
+      delta = ItemsSum['available'] - total;
+      const MonthLabel = ['Σ', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+      for (let i = 0; i <= 12; i++) {
+        const tableDataItem: any = {};
+        sendMonthProductRes.data.map(item => {
+          const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+          tableDataItem['month'] = MonthLabel[i];
+          tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
+        });
+        let totaItem = 0;
+        let deltaItem = 0;
+        for (const [key, value] of Object.entries(tableDataItem)) {
+          if (key !== 'available' && key !== 'month') {
+            totaItem += value as number;
+          }
+        }
+        deltaItem = tableDataItem['available'] - totaItem;
+
+        tableDataItem['delta'] = i === 0 ? delta : deltaItem;
+        tableDataItem['total'] = i === 0 ? total : totaItem;
+        newData.push(tableDataItem);
+      }
+      setMonthTableData(newData);
+      setLoaded(true);
+    }
+  }, [sendMonthProductRes]);
+  const onMothTable = () => {
+    if (monthTableData.length === 0) {
+      setLoaded(false);
+
+      const user_id = account?.user.user_id;
+      user_id && _sendMonthProduct(user_id);
+    }
+    setIsWeek(false);
+  };
+  const weekColumns: Array<Column<any>> = useMemo(() => weekTableHeader, [weekTableHeader]);
+  const weekData: Array<any> = useMemo(() => weekTableData, [weekTableData]);
+  const monthColumns: Array<Column<any>> = useMemo(() => monthTableHeader, [monthTableHeader]);
+  const monthData: Array<any> = useMemo(() => monthTableData, [monthTableData]);
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
@@ -236,7 +213,7 @@ function Statistics(): JSX.Element {
         </div>
         <div className='absolute right-8 z-20'>
           {isWeek && (
-            <div className='text-rouge-blue' onClick={() => setIsWeek(false)}>
+            <div className='text-rouge-blue' onClick={onMothTable}>
               Month
             </div>
           )}
@@ -245,9 +222,11 @@ function Statistics(): JSX.Element {
       <div className='my-3'>
         <span className='text-white'>{isWeek ? 'My Production' : 'My forecast'}</span>
       </div>
-      <div className='mx-4 outline outline-1 outline-white shadow-xl w-full'>
-        {isWeek ? <Table columns={weekColumns} data={weekData} /> : <Table columns={monthColumns} data={monthData} />}
-      </div>
+      {loaded && (
+        <div className='mx-4 outline outline-1 outline-white shadow-xl w-full'>
+          {isWeek ? <Table columns={weekColumns} data={weekData} /> : <Table columns={monthColumns} data={monthData} />}
+        </div>
+      )}
     </div>
   );
 }

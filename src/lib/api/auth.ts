@@ -1,6 +1,6 @@
 import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
-import { ProjectState } from '../../modules/project';
+import { ProjectState, StatisticState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
@@ -73,3 +73,8 @@ export interface ResponseProjectList {
 }
 export const sendMyProject = (creator_id: number) => apiClient.post<ResponseProjectList>('/project/get_user_projects', { creator_id });
 export const sendUpdateByUser = (params: ProjectState) => apiClient.post<ProjectState>('/project/update', params);
+
+export const sendWeekProduct = (user_id: number) =>
+  apiClient.post<{ data: StatisticState[] }>('/project/get_real_workdays/week/client', { user_id });
+export const sendMonthProduct = (user_id: number) =>
+  apiClient.post<{ data: StatisticState[] }>('/project/get_real_workdays/month/client', { user_id });

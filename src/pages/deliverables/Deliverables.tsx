@@ -52,7 +52,7 @@ function Deliverables(): JSX.Element {
         <div className='flex flex-row items-center'>
           <div className='text-xl font-bold text-white'>Priority :</div>
           <div className='ml-4'>
-            <Tag text={thisWeek > selectedWeek ? '2' : '1'} />
+            <Tag text={thisWeek > selectedWeek ? '1' : '1'} />
           </div>
         </div>
         <div className='flex flex-row items-center'>

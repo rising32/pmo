@@ -8,3 +8,18 @@ export type ProjectState = {
   actual_end_date: Date;
   description: string;
 };
+
+export interface WeekWorkDay {
+  week: number;
+  work_days: number;
+}
+export interface MonthWorkDay {
+  week: number;
+  work_days: number;
+}
+
+export interface StatisticState {
+  client_id: number;
+  client_name: string;
+  realWorkdays: WeekWorkDay[] | MonthWorkDay[];
+}
