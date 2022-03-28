@@ -61,7 +61,7 @@ function Deliverables(): JSX.Element {
     const user_id = account?.user.user_id;
     const week = getWeek(selectedDate);
     _sendPriorityByWeek(user_id, week);
-  }, [selectedDate]);
+  }, [getWeek(selectedDate)]);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
@@ -124,7 +124,7 @@ function Deliverables(): JSX.Element {
   };
   const onAddDeliverable = () => {
     if (account) {
-      const priority: PriorityState = {
+      const deliverable: DeliverableState = {
         wp_id: null,
         user_id: account?.user.user_id,
         week: selectedWeek,
