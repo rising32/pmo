@@ -20,6 +20,7 @@ import ClientItem from '../../components/task/ClientItem';
 import ProjectItem from '../../components/task/ProjectItem';
 import TaskItem from '../../components/task/TaskItem';
 import DeliverableItem from '../../components/deliverable/DeliverableItem';
+import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWeelyPriority';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -209,7 +210,9 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold truncate'>Remember your weekly priorities</span>
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
-        <PastPriorityView priorities={weeklyPriorities} />
+        {weeklyPriorities.map((item, index) => (
+          <DeliverableWeelyPriority key={index} priority={item} />
+        ))}
       </div>
 
       <ReactModal
