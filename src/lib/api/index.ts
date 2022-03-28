@@ -89,3 +89,5 @@ export const sendPriorityByWeek = (user_id: number, week: number) =>
 
 export const sendPriorityByBeforeWeek = (user_id: number, week: number) =>
   apiClient.post<ResponsePriorityList>('/priority/get/userid/week/before', { user_id, week });
+
+export const sendCreatePriority = (params: PriorityState) => apiClient.post<PriorityState>('/priority/create', params);

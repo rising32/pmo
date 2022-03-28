@@ -11,7 +11,7 @@ import {
   sendRegisterMyClient,
   sendUpdateByClient,
   updateByTask,
-} from '../../lib/api/auth';
+} from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';

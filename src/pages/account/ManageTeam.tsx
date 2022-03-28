@@ -6,7 +6,7 @@ import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
 import useRequest from '../../lib/hooks/useRequest';
-import { addMember, getTeamMembers, getUserAll } from '../../lib/api/auth';
+import { addMember, getTeamMembers, getUserAll } from '../../lib/api';
 import { EmailSelectOption, UserSelectOption } from '../../modules/setting';
 import { toast } from 'react-toastify';
 import { TeamMemberState } from '../../modules/team';

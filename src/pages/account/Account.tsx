@@ -17,7 +17,7 @@ import {
   uroSimbalThumbnail,
   workSettingThumbnail,
 } from '../../assets/images';
-import { getUserTasks, sendGetMyClients, sendMyProject, signOut } from '../../lib/api/auth';
+import { getUserTasks, sendGetMyClients, sendMyProject, signOut } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 

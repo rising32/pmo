@@ -11,7 +11,7 @@ import {
   sendRegisterMyClient,
   sendUpdateByClient,
   sendUpdateByUser,
-} from '../../lib/api/auth';
+} from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import moment, { Moment } from 'moment';

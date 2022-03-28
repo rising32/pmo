@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Column } from 'react-table';
 import Table from '../../components/common/Table';
-import { sendMonthProduct, sendWeekProduct } from '../../lib/api/auth';
+import { sendMonthProduct, sendWeekProduct } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { useRecoilValue } from 'recoil';
-import { accountState, AccountState } from '../../modules/user';
-import { defaultHeaderColum, TableHeader } from '../../modules/statistic';
+import { accountState } from '../../modules/user';
+import { TableHeader } from '../../modules/statistic';
 import { WeekWorkDay } from '../../modules/project';
 
 function Statistics(): JSX.Element {
@@ -89,11 +89,9 @@ function Statistics(): JSX.Element {
         sendWeekProductRes.data.map(item => {
           if (item.realWorkdays.length > 0) {
             const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
-            tableDataItem['week'] = i === 0 ? 'Σ' : i;
             tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
-          } else {
-            tableDataItem['week'] = i === 0 ? 'Σ' : i;
           }
+          tableDataItem['week'] = i === 0 ? 'Σ' : i;
         });
         let totaItem = 0;
         let deltaItem = 0;
@@ -105,16 +103,8 @@ function Statistics(): JSX.Element {
         deltaItem = tableDataItem['available'] - totaItem;
 
         if (i === 0) {
-          if (delta !== 0) {
-            tableDataItem['delta'] = delta;
-          }
-          if (total) {
-            tableDataItem['total'] = total;
-          }
-          if (!delta && !total) {
-            tableDataItem['delta'] = delta;
-            tableDataItem['total'] = total;
-          }
+          tableDataItem['delta'] = delta;
+          tableDataItem['total'] = total;
         } else {
           tableDataItem['delta'] = deltaItem;
           tableDataItem['total'] = totaItem;
@@ -127,6 +117,7 @@ function Statistics(): JSX.Element {
     }
   }, [sendWeekProductRes]);
   React.useEffect(() => {
+    console.log('sendMonthProductRes', sendMonthProductRes);
     if (sendMonthProductRes && sendMonthProductRes.data.length > 0) {
       const newHeader = monthTableHeader;
       const newData = monthTableData;
@@ -165,9 +156,10 @@ function Statistics(): JSX.Element {
       sendMonthProductRes.data.map(item => {
         const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
         let sumValue = 0;
-        item.realWorkdays.map(cell => {
-          sumValue += cell.work_days;
-        });
+        item.realWorkdays.length > 0 &&
+          item.realWorkdays.map(cell => {
+            sumValue += cell.work_days;
+          });
         ItemsSum[`${dataKey}`] = sumValue;
       });
       let total = 0;
@@ -182,9 +174,11 @@ function Statistics(): JSX.Element {
       for (let i = 0; i <= 12; i++) {
         const tableDataItem: any = {};
         sendMonthProductRes.data.map(item => {
-          const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+          if (item.realWorkdays.length > 0) {
+            const dataKey = item.client_name.toLowerCase().replace(/\s+/g, '');
+            tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
+          }
           tableDataItem['month'] = MonthLabel[i];
-          tableDataItem[`${dataKey}`] = i === 0 ? ItemsSum[`${dataKey}`] : item.realWorkdays[i - 1].work_days;
         });
         let totaItem = 0;
         let deltaItem = 0;
@@ -195,8 +189,14 @@ function Statistics(): JSX.Element {
         }
         deltaItem = tableDataItem['available'] - totaItem;
 
-        tableDataItem['delta'] = i === 0 ? delta : deltaItem;
-        tableDataItem['total'] = i === 0 ? total : totaItem;
+        if (i === 0) {
+          tableDataItem['delta'] = delta;
+          tableDataItem['total'] = total;
+        } else {
+          tableDataItem['delta'] = deltaItem;
+          tableDataItem['total'] = totaItem;
+        }
+
         newData.push(tableDataItem);
       }
       setMonthTableData(newData);

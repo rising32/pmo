@@ -19,7 +19,7 @@ import SignUp from './pages/auth/SignUp';
 import Statistics from './pages/statistics/Statistics';
 import Terms from './pages/other/Terms';
 import useRequest from './lib/hooks/useRequest';
-import { loginWithToken } from './lib/api/auth';
+import { loginWithToken } from './lib/api';
 import { useRecoilState } from 'recoil';
 import { accountState, AccountState } from './modules/user';
 import { toast } from 'react-toastify';

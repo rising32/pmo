@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 
 import '../../lib/styles/commonStyles.css';
 import useRequest from '../../lib/hooks/useRequest';
-import { sendAuthEmailPassword } from '../../lib/api/auth';
+import { sendAuthEmailPassword } from '../../lib/api';
 import { validateEmail } from '../../lib/utills';
 import SpinerIcon from '../../components/common/SpinerIcon';
 

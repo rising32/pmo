@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { AccountState, accountState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import { sendCreateClient, sendGetMyClients, sendRegisterMyClient, sendUpdateByClient } from '../../lib/api/auth';
+import { sendCreateClient, sendGetMyClients, sendRegisterMyClient, sendUpdateByClient } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import { ClientState } from '../../modules/client';

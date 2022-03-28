@@ -4,7 +4,7 @@ import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } fr
 import ReactModal from 'react-modal';
 import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserAll, getUserTasks, sendGetMyClients, sendMyProject } from '../../lib/api/auth';
+import { getUserAll, getUserTasks, sendGetMyClients, sendMyProject } from '../../lib/api';
 import ClientItem from '../../components/task/ClientItem';
 import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
@@ -72,7 +72,6 @@ function Tasks(): JSX.Element {
   }, [getUserAllRes]);
 
   const onSelectDay = (cloneDay: Date, dayStr: string) => {
-    // console.log('clicked!', cloneDay, dayStr);
     setSelectedDate(cloneDay);
   };
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };

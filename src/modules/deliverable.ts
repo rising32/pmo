@@ -1,4 +1,4 @@
-export interface PriorityState {
+export interface DeliverableState {
   wp_id?: number | null;
   user_id: number;
   week: number;

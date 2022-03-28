@@ -9,7 +9,7 @@ import {
   sendGetDateTimeCurrency,
   sendUserProfileUpdate,
   signOut,
-} from '../../lib/api/auth';
+} from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';

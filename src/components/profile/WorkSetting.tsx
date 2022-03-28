@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import { sendUserProfileUpdate } from '../../lib/api/auth';
+import { sendUserProfileUpdate } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import { doubleRecThumbnail, dropDownThumbnail, slideBarThumbnail } from '../../assets/images';
