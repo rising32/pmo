@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { controlThumbnail, plusThumbnail } from '../../assets/images';
 import { accountState, AccountState } from '../../modules/user';
@@ -21,6 +21,8 @@ import ProjectItem from '../../components/task/ProjectItem';
 import TaskItem from '../../components/task/TaskItem';
 import DeliverableItem from '../../components/deliverable/DeliverableItem';
 import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWeelyPriority';
+import axios from 'axios';
+import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -38,6 +40,7 @@ function Deliverables(): JSX.Element {
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<DeliverableState | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const account = useRecoilValue<AccountState | null>(accountState);
@@ -65,6 +68,7 @@ function Deliverables(): JSX.Element {
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
+      setDeliverables(sendPriorityByWeekRes.priority);
       const user_id = account?.user.user_id;
       const week = getWeek(selectedDate);
       _sendPriorityByBeforeWeek(user_id, week);
@@ -110,6 +114,10 @@ function Deliverables(): JSX.Element {
     setType('task');
     setShowModal(!showModal);
   };
+  const openDeliverables = () => {
+    setType('deliverable');
+    setShowModal(!showModal);
+  };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
     setShowModal(false);
@@ -120,6 +128,10 @@ function Deliverables(): JSX.Element {
   };
   const onSelectTask = (task: TaskState) => {
     setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
+    setShowModal(false);
+  };
+  const onSelectDeliverable = (deliverable: DeliverableState) => {
+    setSelectedDeliverable(preSelectedTask => (preSelectedTask?.wp_id === deliverable?.wp_id ? null : deliverable));
     setShowModal(false);
   };
   const onAddDeliverable = () => {
@@ -180,9 +192,10 @@ function Deliverables(): JSX.Element {
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Deliverable :</span>
+          <span className='text-white font-bold pr-2 truncate'>Deliverable :</span>
           <div className='border-dashed border-2 border-white flex-1' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='border-dashed text-rouge-blue px-2 truncate'>{selectedDeliverable?.deliverable}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openDeliverables}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
@@ -232,7 +245,7 @@ function Deliverables(): JSX.Element {
         {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
         {type === 'project' && <div className='text-lg font-bold'>Projects</div>}
         {type === 'task' && <div className='text-lg font-bold'>Tasks</div>}
-        {type === 'user' && <div className='text-lg font-bold'>Users</div>}
+        {type === 'deliverable' && <div className='text-lg font-bold'>Deliverables</div>}
         {type === 'client' &&
           clientList.map((client, index) => (
             <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
@@ -243,6 +256,15 @@ function Deliverables(): JSX.Element {
           ))}
         {type === 'task' &&
           taskList.map((task, index) => <TaskItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
+        {type === 'deliverable' &&
+          deliverables.map((deliverable, index) => (
+            <DeliverableModalItem
+              key={index}
+              deliverable={deliverable}
+              selectedDeliverable={selectedDeliverable}
+              onSelect={onSelectDeliverable}
+            />
+          ))}
       </ReactModal>
     </div>
   );
