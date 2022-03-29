@@ -4,8 +4,9 @@ export interface DeliverableState {
   week: number;
   priority_num: number | null;
   goal: string;
-  deliverable: string | null;
+  deliverable: string;
   detail: string | null;
   is_completed: number | null;
   is_weekly: null;
+  end_date: Date;
 }

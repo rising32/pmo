@@ -4,10 +4,17 @@ import { controlThumbnail, plusThumbnail } from '../../assets/images';
 import { accountState, AccountState } from '../../modules/user';
 import ReactModal from 'react-modal';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserTasks, sendGetMyClients, sendMyProject, sendPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
+import {
+  getUserTasks,
+  sendGetMyClients,
+  sendMyProject,
+  sendPriorityByBeforeWeek,
+  sendPriorityByWeek,
+  sendUpdatePriority,
+} from '../../lib/api';
 import PriorityItem from '../../components/priority/PriorityItem';
 import Tag from '../../components/common/Tag';
-import { getWeek } from 'date-fns';
+import { getWeek, isEqual, isSameDay, parseISO } from 'date-fns';
 import PastPriorityView from '../../containers/priority/PastPriorityView';
 import TaskCalender from '../../components/task/TaskCalender';
 import { DeliverablesTab } from '../../modules/tab';
@@ -17,22 +24,21 @@ import { ClientState } from '../../modules/client';
 import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
 import ClientItem from '../../components/task/ClientItem';
-import ProjectItem from '../../components/task/ProjectItem';
-import TaskItem from '../../components/task/TaskItem';
+import ProjectModalItem from '../../components/task/ProjectModalItem';
+import TaskModalItem from '../../components/task/TaskModalItem';
 import DeliverableItem from '../../components/deliverable/DeliverableItem';
 import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWeelyPriority';
 import axios from 'axios';
 import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
+import { toast } from 'react-toastify';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedDeliverableTab, setSelectedDeliverableTab] = useState('default');
-  const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
-  const [deliverables, setDeliverables] = useState<DeliverableState[]>([]);
-  const [deliverableValue, setDeliverableValue] = useState('');
-  const [detailValue, setDetailValue] = useState('');
+  const [rememberWeeklyPriorities, setRememberWeeklyPriorities] = useState<PriorityState[]>([]);
+  const [todayDeliverables, setTodayDeliverables] = useState<DeliverableState[]>([]);
+  const [weekDeliverables, setWeekDeliverables] = useState<PriorityState[]>([]);
   const [type, setType] = useState('');
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [projectList, setProjectList] = useState<ProjectState[]>([]);
@@ -40,7 +46,7 @@ function Deliverables(): JSX.Element {
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
-  const [selectedDeliverable, setSelectedDeliverable] = useState<DeliverableState | null>(null);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const account = useRecoilValue<AccountState | null>(accountState);
@@ -51,6 +57,7 @@ function Deliverables(): JSX.Element {
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
+  const [_sendUpdatePriority, , sendUpdatePriorityRes] = useRequest(sendUpdatePriority);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -61,14 +68,42 @@ function Deliverables(): JSX.Element {
     creator_id && _sendMyProject(creator_id);
   }, []);
   React.useEffect(() => {
+    if (!account) {
+      return;
+    }
+    console.log('-------', rememberWeeklyPriorities);
+    const newTodayDeliverables: DeliverableState[] = todayDeliverables;
+    rememberWeeklyPriorities.map(item => {
+      if (!item.end_date) return;
+
+      if (isSameDay(parseISO(item.end_date.toLocaleString()), selectedDate)) {
+        const completePriority: DeliverableState = {
+          wp_id: item.wp_id,
+          user_id: item.user_id,
+          week: item.week,
+          priority_num: item.priority_num,
+          goal: item.deliverable,
+          deliverable: item.deliverable,
+          detail: item.detail || null,
+          is_completed: item.is_completed,
+          is_weekly: item.is_weekly,
+          end_date: item.end_date,
+        };
+        newTodayDeliverables.push(completePriority);
+      }
+    });
+    setTodayDeliverables(newTodayDeliverables);
+  }, [rememberWeeklyPriorities]);
+  React.useEffect(() => {
     const user_id = account?.user.user_id;
     const week = getWeek(selectedDate);
     _sendPriorityByWeek(user_id, week);
   }, [getWeek(selectedDate)]);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
-      setWeeklyPriorities(sendPriorityByWeekRes.priority);
-      setDeliverables(sendPriorityByWeekRes.priority);
+      console.log('========', sendPriorityByWeekRes);
+      setRememberWeeklyPriorities(sendPriorityByWeekRes.priority);
+      setWeekDeliverables(sendPriorityByWeekRes.priority);
       const user_id = account?.user.user_id;
       const week = getWeek(selectedDate);
       _sendPriorityByBeforeWeek(user_id, week);
@@ -76,9 +111,9 @@ function Deliverables(): JSX.Element {
   }, [sendPriorityByWeekRes]);
   React.useEffect(() => {
     if (sendPriorityByBeforeWeekRes) {
-      const oldWeelyPriorities = weeklyPriorities;
+      const oldWeelyPriorities = rememberWeeklyPriorities;
       sendPriorityByBeforeWeekRes.priority.map(item => oldWeelyPriorities.push(item));
-      setWeeklyPriorities(oldWeelyPriorities);
+      setRememberWeeklyPriorities(oldWeelyPriorities);
     }
   }, [sendPriorityByBeforeWeekRes]);
   React.useEffect(() => {
@@ -130,36 +165,52 @@ function Deliverables(): JSX.Element {
     setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
     setShowModal(false);
   };
-  const onSelectDeliverable = (deliverable: DeliverableState) => {
-    setSelectedDeliverable(preSelectedTask => (preSelectedTask?.wp_id === deliverable?.wp_id ? null : deliverable));
+  const onSelectDeliverable = (deliverable: PriorityState) => {
+    setSelectedDeliverable(deliverable);
     setShowModal(false);
   };
   const onAddDeliverable = () => {
+    if (!selectedDeliverable) {
+      toast.error('select deliverable!');
+      return;
+    }
     if (account) {
       const deliverable: DeliverableState = {
-        wp_id: null,
+        wp_id: selectedDeliverable?.wp_id,
         user_id: account?.user.user_id,
-        week: selectedWeek,
+        week: getWeek(selectedDate),
         priority_num: 1,
-        goal: deliverableValue,
-        deliverable: deliverableValue,
-        detail: detailValue,
-        is_completed: null,
+        goal: selectedDeliverable.deliverable,
+        deliverable: selectedDeliverable?.deliverable,
+        detail: selectedDeliverable?.detail || null,
+        is_completed: 1,
         is_weekly: null,
+        end_date: selectedDate,
       };
-      // _sendCreatePriority(priority);
+      _sendUpdatePriority(deliverable);
     }
   };
+  React.useEffect(() => {
+    if (sendUpdatePriorityRes) {
+      const newDeliverables = todayDeliverables;
+      newDeliverables.push(sendUpdatePriorityRes);
+      setTodayDeliverables(newDeliverables);
+      setSelectedClient(null);
+      setSelectedProject(null);
+      setSelectedTask(null);
+      setSelectedDeliverableTab('default');
+    }
+  }, [sendUpdatePriorityRes]);
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
       <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
-        <span className='text-white'>90%</span>
+        <span className='text-white'>{todayDeliverables.length * 50 + '%'}</span>
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
-        {deliverables.map((item, index) => (
+        {todayDeliverables.map((item, index) => (
           <DeliverableItem key={index} index={index} deliverable={item} />
         ))}
       </div>
@@ -223,7 +274,7 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold truncate'>Remember your weekly priorities</span>
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
-        {weeklyPriorities.map((item, index) => (
+        {rememberWeeklyPriorities.map((item, index) => (
           <DeliverableWeelyPriority key={index} priority={item} />
         ))}
       </div>
@@ -252,12 +303,12 @@ function Deliverables(): JSX.Element {
           ))}
         {type === 'project' &&
           projectList.map((project, index) => (
-            <ProjectItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         {type === 'task' &&
-          taskList.map((task, index) => <TaskItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
+          taskList.map((task, index) => <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
         {type === 'deliverable' &&
-          deliverables.map((deliverable, index) => (
+          weekDeliverables.map((deliverable, index) => (
             <DeliverableModalItem
               key={index}
               deliverable={deliverable}

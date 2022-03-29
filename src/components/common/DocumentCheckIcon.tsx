@@ -4,7 +4,7 @@ import { CheckSvg, CrossSvg } from '../../assets/svg';
 import { PriorityState } from '../../modules/weekPriority';
 
 interface Props {
-  isCompleted: number | null;
+  isCompleted?: number | null;
 }
 const DocumentCheckIcon = ({ isCompleted }: Props) => {
   return (

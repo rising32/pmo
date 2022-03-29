@@ -13,3 +13,9 @@ export interface TaskState {
   is_add_all: boolean;
   is_active: boolean;
 }
+
+export interface PriorityTaskState {
+  client_id: number;
+  client_name: string;
+  task: TaskState[];
+}

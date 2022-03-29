@@ -97,6 +97,7 @@ function Priorities(): JSX.Element {
         detail: detailValue,
         is_completed: null,
         is_weekly: null,
+        end_date: null,
       };
       _sendCreatePriority(priority);
     }
@@ -109,6 +110,7 @@ function Priorities(): JSX.Element {
       setDetailValue('');
       setSelectedPriorityTab('default');
       newWeeklyPriorities.push(sendCreatePriorityRes);
+      setWeeklyPriorities(newWeeklyPriorities);
     }
   }, [sendCreatePriorityRes]);
 

@@ -1,12 +1,11 @@
 import React from 'react';
-import { ClientState } from '../../modules/client';
-import { DeliverableState } from '../../modules/deliverable';
+import { PriorityState } from '../../modules/weekPriority';
 import CheckIcon from '../task/CheckIcon';
 
 interface Props {
-  deliverable: DeliverableState;
-  selectedDeliverable: DeliverableState | null;
-  onSelect: (deliverable: DeliverableState) => void;
+  deliverable: PriorityState;
+  selectedDeliverable: PriorityState | null;
+  onSelect: (deliverable: PriorityState) => void;
 }
 const DeliverableModalItem = ({ deliverable, selectedDeliverable, onSelect }: Props) => {
   return (

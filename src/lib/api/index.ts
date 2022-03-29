@@ -1,7 +1,8 @@
 import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
+import { DeliverableState } from '../../modules/deliverable';
 import { ProjectState, StatisticState } from '../../modules/project';
-import { TaskState } from '../../modules/task';
+import { PriorityTaskState, TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
 import { PriorityState } from '../../modules/weekPriority';
@@ -91,3 +92,19 @@ export const sendPriorityByBeforeWeek = (user_id: number, week: number) =>
   apiClient.post<ResponsePriorityList>('/priority/get/userid/week/before', { user_id, week });
 
 export const sendCreatePriority = (params: PriorityState) => apiClient.post<PriorityState>('/priority/create', params);
+export const sendUpdatePriority = (params: DeliverableState) => apiClient.post<DeliverableState>('/priority/update', params);
+
+interface UCTPParams {
+  member_id?: number;
+  client_id?: number;
+  project_id?: number;
+  planned_end_date?: Date;
+}
+export interface ResponseUCTP {
+  week: number;
+  client_id: number;
+  client_name: string;
+  member_id: number;
+  task: TaskState[];
+}
+export const sendUCTP = (params: UCTPParams) => apiClient.post<ResponseUCTP[]>('/project/task/get_ucpt', params);

@@ -4,19 +4,60 @@ import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } fr
 import ReactModal from 'react-modal';
 import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserAll, getUserTasks, sendGetMyClients, sendMyProject } from '../../lib/api';
+import { getUserAll, getUserTasks, ResponseUCTP, sendGetMyClients, sendMyProject, sendUCTP } from '../../lib/api';
 import ClientItem from '../../components/task/ClientItem';
 import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
-import { TaskState } from '../../modules/task';
-import TaskItem from '../../components/task/TaskItem';
+import { PriorityTaskState, TaskState } from '../../modules/task';
+import TaskModalItem from '../../components/task/TaskModalItem';
 import UserItem from '../../components/task/UserItem';
 import CustomCalender from '../../components/common/CustomCalender';
 import { Moment } from 'moment';
 import { ProjectState } from '../../modules/project';
-import ProjectItem from '../../components/task/ProjectItem';
+import ProjectModalItem from '../../components/task/ProjectModalItem';
+import TaskItem from '../../components/task/TaskItem';
+import { getWeek } from 'date-fns';
 
 ReactModal.setAppElement('#root');
+
+const initValue: PriorityTaskState[] = [
+  {
+    client_id: 2,
+    client_name: 'Amazon co',
+    task: [
+      {
+        task_id: 14,
+        task_name: 'fasdfsdf',
+        creator_id: 3,
+        project_id: 2,
+        priority: 1,
+        description: 'dfsdfsd',
+        planned_start_date: null,
+        planned_end_date: null,
+        actual_start_date: null,
+        actual_end_date: null,
+        hourly_rate: 323,
+        is_add_all: false,
+        is_active: false,
+      },
+      {
+        task_id: 15,
+        task_name: 'fasdfsdfsddfsdf',
+        creator_id: 3,
+        project_id: 2,
+        priority: 1,
+        description: 'dfsdfsd',
+        planned_start_date: null,
+        planned_end_date: null,
+        actual_start_date: null,
+        actual_end_date: null,
+        hourly_rate: 323,
+        is_add_all: false,
+        is_active: false,
+      },
+    ],
+  },
+];
 
 function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -32,6 +73,7 @@ function Tasks(): JSX.Element {
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
   const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
+  const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
 
   const account = useRecoilValue<AccountState | null>(accountState);
 
@@ -39,8 +81,10 @@ function Tasks(): JSX.Element {
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
+  const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
 
   React.useEffect(() => {
+    _sendUCTP();
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
 
@@ -51,6 +95,19 @@ function Tasks(): JSX.Element {
     _getUserAll();
   }, []);
   React.useEffect(() => {
+    console.log('&&&&&&&&&&&&&&&', sendUCTPRes);
+    if (sendUCTPRes) {
+      setWeekTask(sendUCTPRes);
+    }
+  }, [sendUCTPRes]);
+  React.useEffect(() => {
+    console.log('&&&&&&&&&&&&&&&', sendUCTPErr);
+    if (sendUCTPErr) {
+      setWeekTask([]);
+    }
+  }, [sendUCTPErr]);
+  React.useEffect(() => {
+    console.log('getMyClientsRes=', getMyClientsRes);
     if (getMyClientsRes) {
       setClientList(getMyClientsRes.clients);
     }
@@ -117,6 +174,16 @@ function Tasks(): JSX.Element {
     setType('');
     setShowCalendar(false);
   };
+  const onTaskSearch = () => {
+    const params = {
+      member_id: null,
+      client_id: selectedClient?.client_id,
+      project_id: selectedProject?.project_id,
+      planned_end_date: selectedDate,
+    };
+    console.log(params);
+    _sendUCTP(params);
+  };
 
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
@@ -179,60 +246,23 @@ function Tasks(): JSX.Element {
           </div>
         )}
         <div className='flex items-center justify-end'>
-          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl'>
+          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onTaskSearch}>
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>
       </div>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
-        <span className='text-white font-bold'>JEF tasks week 27</span>
+        <span className='text-white font-bold'>{account?.user.display_name + ' tasks week ' + getWeek(selectedDate)}</span>
       </div>
       <div className='mx-4 px-4 pt-4 pb-10 bg-card-gray rounded-md w-full relative'>
-        <div className='flex flex-col justify-center items-center mb-3'>
-          <span className='text-white font-bold mb-2'>Amazon</span>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Define the action plan </span>
+        {weekTasks.map(item => (
+          <div key={item.client_id} className='flex flex-col justify-center items-center mb-3'>
+            <span className='text-white font-bold mb-2'>{item.client_name}</span>
+            {item.task.map(task => (
+              <TaskItem key={task.task_id} task={task} />
+            ))}
           </div>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Recruit a new PMO </span>
-          </div>
-        </div>
-        <div className='flex flex-col justify-center items-center mb-3'>
-          <span className='text-white font-bold mb-2'>Coty</span>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Analyze the results</span>
-          </div>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Communicate the goal</span>
-          </div>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Check the origins</span>
-          </div>
-        </div>
-        <div className='flex flex-col justify-center items-center mb-3'>
-          <span className='text-white font-bold mb-2'>Ikea</span>
-          <div className='flex items-center w-full'>
-            <div className='w-6 h-6 flex items-center justify-center mr-2'>
-              <img src={documentThumbnail} className='h-4 w-auto' />
-            </div>
-            <span className='text-white font-bold pr-2'>JEF - W27 : Provide the training</span>
-          </div>
-        </div>
+        ))}
         <div className='absolute bottom-4 right-4'>
           <div className='flex items-center justify-center bg-white rounded-full w-8 h-8 outline outline-1 shadow-xl'>
             <img src={minusThumbnail} className='h-auto w-4' />
@@ -264,10 +294,10 @@ function Tasks(): JSX.Element {
           ))}
         {type === 'project' &&
           projectList.map((project, index) => (
-            <ProjectItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         {type === 'task' &&
-          taskList.map((task, index) => <TaskItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
+          taskList.map((task, index) => <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
         {type === 'user' &&
           users.map((user, index) => <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />)}
       </ReactModal>
