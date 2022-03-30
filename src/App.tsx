@@ -26,6 +26,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import PriorityContainer from './containers/priority/PriorityContainer';
 import PriorityAgenda from './pages/priorities/PriorityAgenda';
+import PrioritySupport from './pages/priorities/PrioritySupport';
 
 function App(): JSX.Element {
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
@@ -48,7 +49,7 @@ function App(): JSX.Element {
   return (
     <>
       <Routes>
-        <Route path='/' element={<HomeContainer />}>
+        <Route element={<HomeContainer />}>
           <Route path='login' element={<Login />} />
           <Route path='signup' element={<SignUp />} />
           <Route element={<PrivateRoute />}>
@@ -56,6 +57,7 @@ function App(): JSX.Element {
             <Route path='priorities/' element={<PriorityContainer />}>
               <Route path='' element={<Priorities />} />
               <Route path='agenda' element={<PriorityAgenda />} />
+              <Route path='support' element={<PrioritySupport />} />
             </Route>
             <Route path='deliverables' element={<Deliverables />} />
             <Route path='statistics' element={<Statistics />} />

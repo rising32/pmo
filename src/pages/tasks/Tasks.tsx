@@ -18,6 +18,7 @@ import ProjectModalItem from '../../components/task/ProjectModalItem';
 import TaskItem from '../../components/task/TaskItem';
 import { getWeek } from 'date-fns';
 import MainResponsive from '../../containers/main/MainResponsive';
+import GroupItemView from '../../containers/main/GroupItemView';
 
 ReactModal.setAppElement('#root');
 
@@ -151,50 +152,50 @@ function Tasks(): JSX.Element {
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
         <span className='text-white'>On time: 90%</span>
       </div>
-      <div className='mx-4 p-4 border-rouge-blue border-4 bg-card-gray shadow-xl w-full'>
+      <GroupItemView className='mx-4 p-4 border-rouge-blue border-4 bg-card-gray'>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Client :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedClient?.client_name}</div>
+          <span className='text-white text-lg font-bold pr-2'>Client :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedClient?.client_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Project :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedProject?.project_name}</div>
+          <span className='text-white text-lg font-bold pr-2'>Project :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedProject?.project_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openProjects}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Task :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedTask?.task_name}</div>
+          <span className='text-white text-lg font-bold pr-2'>Task :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedTask?.task_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Deliverable :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
+          <span className='text-white text-lg font-bold pr-2'>Deliverable :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Who :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedUser?.display_name}</div>
+          <span className='text-white text-lg font-bold pr-2'>Who :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedUser?.display_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openUsers}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>When :</span>
-          <div className='border-dashed border-2 border-rouge-blue flex-1' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedMoment?.format('YYYY-MM-DD')}</div>
+          <span className='text-white text-lg font-bold pr-2'>When :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedMoment?.format('YYYY-MM-DD')}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openCalendar}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
@@ -209,11 +210,11 @@ function Tasks(): JSX.Element {
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>
-      </div>
+      </GroupItemView>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
         <span className='text-white font-bold'>{account?.user.display_name + ' tasks week ' + getWeek(selectedDate)}</span>
       </div>
-      <div className='mx-4 px-4 pt-4 pb-10 bg-card-gray rounded-md w-full relative'>
+      <GroupItemView className='mx-4 px-4 pt-4 pb-10 rounded-md relative'>
         {weekTasks.map(item => (
           <div key={item.client_id} className='flex flex-col justify-center items-center mb-3'>
             <span className='text-white font-bold mb-2'>{item.client_name}</span>
@@ -227,7 +228,7 @@ function Tasks(): JSX.Element {
             <img src={minusThumbnail} className='h-auto w-4' />
           </div>
         </div>
-      </div>
+      </GroupItemView>
 
       <ReactModal
         isOpen={showModal}

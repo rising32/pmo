@@ -70,6 +70,9 @@ function Priorities(): JSX.Element {
     if (key === 'agenda') {
       navigate('/priorities/agenda');
     }
+    if (key === 'support') {
+      navigate('/priorities/support');
+    }
     setSelectedPriorityTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const changePriorityValue = (event: React.FormEvent<HTMLInputElement>) => {

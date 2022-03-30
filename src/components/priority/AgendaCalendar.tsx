@@ -25,33 +25,9 @@ const AgendaCalendar = ({ selectedDate, onSelectDay }: Props) => {
     let days = [];
     let day = startDate;
     let formattedDate = '';
-    let formattedLetter = '';
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         formattedDate = format(day, dateFormat);
-        switch (i) {
-          case 0:
-            formattedLetter = 'L';
-            break;
-          case 1:
-            formattedLetter = 'M';
-            break;
-          case 2:
-            formattedLetter = 'W';
-            break;
-          case 3:
-            formattedLetter = 'J';
-            break;
-          case 4:
-            formattedLetter = 'V';
-            break;
-          case 5:
-            formattedLetter = 'S';
-            break;
-          case 6:
-            formattedLetter = 'D';
-            break;
-        }
         const cloneDay = day;
         days.push(
           <div
@@ -62,8 +38,11 @@ const AgendaCalendar = ({ selectedDate, onSelectDay }: Props) => {
               onSelectDay(cloneDay, dayStr);
             }}
           >
-            <span style={isSameDay(selectedDate, cloneDay) ? { color: '#365B9D', fontWeight: 700 } : { color: 'white' }}>
-              {formattedLetter}
+            <span
+              style={isSameDay(selectedDate, cloneDay) ? { color: '#365B9D', fontWeight: 700 } : { color: 'white' }}
+              className='capitalize'
+            >
+              {new Date(cloneDay).toLocaleDateString('fr', { weekday: 'short' }).charAt(0)}
             </span>
             <div
               className='text-white w-8 h-8 rounded-full flex items-center justify-center'

@@ -25,33 +25,9 @@ const TaskCalender = ({ selectedDate, onSelectDay }: Props) => {
     let days = [];
     let day = startDate;
     let formattedDate = '';
-    let formattedLetter = '';
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         formattedDate = format(day, dateFormat);
-        switch (i) {
-          case 0:
-            formattedLetter = 'L';
-            break;
-          case 1:
-            formattedLetter = 'M';
-            break;
-          case 2:
-            formattedLetter = 'W';
-            break;
-          case 3:
-            formattedLetter = 'J';
-            break;
-          case 4:
-            formattedLetter = 'V';
-            break;
-          case 5:
-            formattedLetter = 'S';
-            break;
-          case 6:
-            formattedLetter = 'D';
-            break;
-        }
         const cloneDay = day;
         days.push(
           <div
@@ -62,8 +38,8 @@ const TaskCalender = ({ selectedDate, onSelectDay }: Props) => {
               onSelectDay(cloneDay, dayStr);
             }}
           >
-            <span style={isSameDay(selectedDate, cloneDay) ? { color: 'red', fontWeight: 700 } : { color: 'black' }}>
-              {formattedLetter}
+            <span style={isSameDay(selectedDate, cloneDay) ? { color: 'red', fontWeight: 700 } : { color: 'black' }} className='capitalize'>
+              {new Date(cloneDay).toLocaleDateString('fr', { weekday: 'short' }).charAt(0)}
             </span>
             <span style={isSameDay(selectedDate, cloneDay) ? { color: 'red', fontWeight: 700 } : { color: 'black' }}>{formattedDate}</span>
           </div>,
@@ -72,7 +48,7 @@ const TaskCalender = ({ selectedDate, onSelectDay }: Props) => {
       }
 
       rows.push(
-        <div className='flex flex-row justify-between items-center bg-white py-2' key={day.toDateString()}>
+        <div className='flex flex-row justify-between items-center bg-white py-2 rounded-md' key={day.toDateString()}>
           <div className='flex-1 flex items-center justify-center' onClick={() => changeWeekHandle('prev')}>
             <img src={previewThumbnail} className='h-4 w-auto' />
           </div>
