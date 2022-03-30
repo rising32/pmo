@@ -7,10 +7,10 @@ export interface UserState {
   phone_number: string;
   display_name: string;
   password: string;
-  avatar?: string | null;
-  birthday?: string | null;
-  is_project_manager?: number | 0;
-  registration_time?: string | null;
+  avatar?: string;
+  birthday?: string;
+  is_project_manager: number;
+  registration_time?: string;
 }
 export interface AccountState {
   login_id: number;

@@ -101,8 +101,9 @@ const Account = () => {
       </div>
 
       <div className='w-full mt-4 p-1 bg-white'>
-        <div className='flex flex-row items-center justify-between px-12 py-3'>
+        <div className='flex flex-row items-center justify-between px-12 py-3' onClick={() => navigate('/account/company-profile')}>
           <div className='text-lg text-black font-bold'>COMPANY PROFILE</div>
+          <img src={crayon} className='h-4 w-auto' />
         </div>
         <div className='flex flex-row py-2 pr-4 mb-2 rounded-md items-center justify-between bg-light-gray'>
           <div className='w-10 h-6 flex items-center justify-center'>

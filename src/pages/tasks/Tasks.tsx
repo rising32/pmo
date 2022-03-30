@@ -21,14 +21,19 @@ import MainResponsive from '../../containers/main/MainResponsive';
 import GroupItemView from '../../containers/main/GroupItemView';
 import { useSpring, animated } from 'react-spring';
 import useResizeObserver from 'use-resize-observer';
+import AnimatedDropView from '../../components/common/AnimatedDropView';
 
 ReactModal.setAppElement('#root');
 
 function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showModal, setShowModal] = useState(false);
+
+  const [showClient, setShowClient] = useState(false);
+  const [showProject, setShowProject] = useState(false);
+  const [showTask, setShowTask] = useState(false);
+  const [showUser, setShowUser] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [type, setType] = useState('');
+
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [projectList, setProjectList] = useState<ProjectState[]>([]);
   const [taskList, setTaskList] = useState<TaskState[]>([]);
@@ -51,7 +56,7 @@ function Tasks(): JSX.Element {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
   React.useEffect(() => {
-    // onTaskSearch();
+    onTaskSearch();
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
 
@@ -62,6 +67,7 @@ function Tasks(): JSX.Element {
     _getUserAll();
   }, []);
   React.useEffect(() => {
+    console.log('+++++', sendUCTPRes);
     if (sendUCTPRes) {
       setWeekTask(sendUCTPRes);
     }
@@ -98,44 +104,38 @@ function Tasks(): JSX.Element {
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
 
   const openClients = () => {
-    setType('client');
-    setShowModal(!showModal);
+    setShowClient(!showClient);
   };
   const openProjects = () => {
-    setType('project');
-    setShowModal(!showModal);
+    setShowProject(!showProject);
   };
   const openTasks = () => {
-    setType('task');
-    setShowModal(!showModal);
+    setShowTask(!showTask);
   };
   const openCalendar = () => {
-    setType('calendar');
     setShowCalendar(!showCalendar);
   };
   const openUsers = () => {
-    setType('user');
-    setShowModal(!showModal);
+    setShowUser(!showUser);
   };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
-    setShowModal(false);
+    setShowClient(false);
   };
   const onSelectProject = (project: ProjectState) => {
     setSelectedProject(preSelectedProject => (preSelectedProject?.project_id === project?.project_id ? null : project));
-    setShowModal(false);
+    setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
     setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
-    setShowModal(false);
+    setShowTask(false);
   };
   const onSelectUser = (user: UserState) => {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
-    setShowModal(false);
+    setShowUser(false);
   };
   const onSelectDate = (moment: Moment) => {
     setSelectedMoment(moment);
-    setType('');
     setShowCalendar(false);
   };
   const onTaskSearch = () => {
@@ -146,10 +146,20 @@ function Tasks(): JSX.Element {
       project_id: selectedProject?.project_id,
       planned_end_date: selectedDate,
     };
+    console.log('------', params);
     _sendUCTP(params);
   };
-  const props = useSpring({
-    height: showModal ? height : 0,
+  const clientProps = useSpring({
+    height: showClient ? height : 0,
+  });
+  const projectProps = useSpring({
+    height: showProject ? height : 0,
+  });
+  const taskProps = useSpring({
+    height: showTask ? height : 0,
+  });
+  const userProps = useSpring({
+    height: showUser ? height : 0,
   });
 
   return (
@@ -168,28 +178,12 @@ function Tasks(): JSX.Element {
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        <animated.div
-          style={{
-            ...props,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-          className='menu'
-        >
-          <div ref={ref}>
-            {clientList.map((client, index) => (
-              <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-            ))}
-          </div>
-        </animated.div>
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white text-lg font-bold pr-2'>Client :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedClient?.client_name}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
-          </div>
-        </div>
+        <AnimatedDropView show={showClient}>
+          {clientList.map((client, index) => (
+            <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+          ))}
+        </AnimatedDropView>
+
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Project :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -198,6 +192,12 @@ function Tasks(): JSX.Element {
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
+        <AnimatedDropView show={showProject}>
+          {projectList.map((project, index) => (
+            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+          ))}
+        </AnimatedDropView>
+
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Task :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -206,6 +206,12 @@ function Tasks(): JSX.Element {
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
+        <AnimatedDropView show={showTask}>
+          {taskList.map((task, index) => (
+            <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
+          ))}
+        </AnimatedDropView>
+
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Deliverable :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -221,6 +227,12 @@ function Tasks(): JSX.Element {
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
+        <AnimatedDropView show={showUser}>
+          {users.map((user, index) => (
+            <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />
+          ))}
+        </AnimatedDropView>
+
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>When :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -229,7 +241,7 @@ function Tasks(): JSX.Element {
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        {type === 'calendar' && showCalendar && (
+        {showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
             <CustomCalender onSelect={onSelectDate} selectedMoment={selectedMoment} />
           </div>
@@ -258,38 +270,6 @@ function Tasks(): JSX.Element {
           </div>
         </div>
       </GroupItemView>
-
-      {/* <ReactModal
-        isOpen={showModal}
-        onRequestClose={() => setShowModal(false)}
-        id={type}
-        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
-        style={{
-          overlay: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.5)',
-          },
-        }}
-      >
-        {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
-        {type === 'project' && <div className='text-lg font-bold'>Projects</div>}
-        {type === 'task' && <div className='text-lg font-bold'>Tasks</div>}
-        {type === 'user' && <div className='text-lg font-bold'>Users</div>}
-        {type === 'client' &&
-          clientList.map((client, index) => (
-            <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-          ))}
-        {type === 'project' &&
-          projectList.map((project, index) => (
-            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
-          ))}
-        {type === 'task' &&
-          taskList.map((task, index) => <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
-        {type === 'user' &&
-          users.map((user, index) => <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />)}
-      </ReactModal> */}
     </MainResponsive>
   );
 }

@@ -76,84 +76,17 @@ const UserProfile = () => {
             <div className='text-base text-link font-normal truncate'>{account?.user.email}</div>
           </div>
           <div
-            className='flex flex-row py-2 mb-2 pr-4 rounded-md items-center justify-between bg-light-gray'
-            onClick={() => setIsEditWorkSetting(true)}
-          >
-            <div className='w-10 h-6 flex items-center justify-center'>
-              <img src={workSettingThumbnail} className='h-4 w-auto' />
-            </div>
-            <div className='flex flex-1 flex-row justify-between'>
-              <div className='text-base text-black font-normal flex-1'>Work Setting</div>
-            </div>
-            <div className='w-auto h-6 flex items-center justify-end'>
-              <img src={rightArrowThumbnail} className='h-4 w-auto' />
-            </div>
-          </div>
-          <div
             className='flex flex-row py-2 mb-2 rounded-md items-center justify-center bg-light-gray text-base text-black font-normal'
             onClick={onSignOut}
           >
             Sign Out
           </div>
 
-          <div className='flex flex-row items-center justify-between px-8 py-3'>
-            <div className='text-lg text-black font-bold'>SETTINGS</div>
-          </div>
-          <div
-            className='flex flex-row py-2 mb-2 pr-4 rounded-md items-center justify-between bg-light-gray'
-            onClick={() => setIsEditDateTimeCurrency(true)}
-          >
-            <div className='w-10 h-6 flex items-center justify-center'>
-              <img src={dateTimeCurrencyThumbnail} className='h-4 w-auto' />
-            </div>
-            <div className='flex flex-1 flex-row justify-between'>
-              <div className='text-base text-black font-normal flex-1'>Date, time and currency</div>
-            </div>
-            <div className='w-auto h-6 flex items-center justify-end'>
-              <img src={rightArrowThumbnail} className='h-4 w-auto' />
-            </div>
-          </div>
-          <div
-            className='flex flex-row py-2 mb-2 pr-4 rounded-md items-center justify-between bg-light-gray'
-            onClick={() => setIsEditOrganization(true)}
-          >
-            <div className='w-10 h-6 flex items-center justify-center'>
-              <img src={organizationThumbnail} className='h-4 w-auto' />
-            </div>
-            <div className='flex flex-1 flex-row justify-between'>
-              <div className='text-base text-black font-normal flex-1'>Organization</div>
-            </div>
-            <div className='w-auto h-6 flex items-center justify-end'>
-              <img src={rightArrowThumbnail} className='h-4 w-auto' />
-            </div>
-          </div>
           <div className='flex flex-row py-2 mb-2 rounded-md items-center justify-center bg-light-gray text-base text-black font-normal'>
             View Terms & Privacy Policy
           </div>
-          <div className='flex flex-row items-center justify-between px-8 py-3'>
-            <div className='text-lg text-black font-bold'>MANAGE</div>
-          </div>
-          <div
-            className='flex flex-row py-2 mb-2 pr-4 rounded-md items-center justify-between bg-light-gray'
-            onClick={() => navigate('/account/manage-team')}
-          >
-            <div className='w-10 h-6 flex items-center justify-center'>
-              <img src={teamMemberThumbnail} className='h-3 w-auto' />
-            </div>
-            <div className='flex flex-1 flex-row justify-between'>
-              <div className='text-base text-black font-normal flex-1'>{teamMemberNum + ' Team member'}</div>
-            </div>
-            <div className='w-auto h-6 flex items-center justify-end'>
-              <img src={rightArrowThumbnail} className='h-4 w-auto' />
-            </div>
-          </div>
         </div>
-        {isEditOrganization && <OrganizationUpdate isEditOrganization={isEditOrganization} onClose={() => setIsEditOrganization(false)} />}
         {isEditProfile && <EditUserNameEmail isEditProfile={isEditProfile} onClose={() => setIsEditProfile(false)} />}
-        {isEditWorkSetting && <WorkSetting isEditWorkSetting={isEditWorkSetting} onClose={() => setIsEditWorkSetting(false)} />}
-        {isEditDateTimeCurrency && (
-          <DateTimeCurrency isEditDateTimeCurrency={isEditDateTimeCurrency} onClose={() => setIsEditDateTimeCurrency(false)} />
-        )}
       </div>
     </MainResponsive>
   );
