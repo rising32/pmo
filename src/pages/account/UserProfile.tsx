@@ -20,6 +20,7 @@ import EditUserNameEmail from '../../components/profile/EditUserNameEmail';
 import DateTimeCurrency from '../../components/profile/DateTimeCurrency';
 import OrganizationUpdate from '../../components/profile/OrganizationUpdate';
 import WorkSetting from '../../components/profile/WorkSetting';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const UserProfile = () => {
   const [isEditProfile, setIsEditProfile] = React.useState(false);
@@ -56,7 +57,7 @@ const UserProfile = () => {
     _sendSignOut(user_id);
   };
   return (
-    <div className='items-center flex flex-col flex-1 p-4 w-full h-full mb-32'>
+    <MainResponsive>
       <div className='flex flex-row w-full h-12 px-4 mb-4 items-center justify-between bg-light-gray'>
         <div className='text-sm text-rouge-blue font-normal'></div>
         <div className='text-lg text-rouge-blue font-bold'>Your Account</div>
@@ -154,7 +155,7 @@ const UserProfile = () => {
           <DateTimeCurrency isEditDateTimeCurrency={isEditDateTimeCurrency} onClose={() => setIsEditDateTimeCurrency(false)} />
         )}
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

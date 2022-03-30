@@ -17,6 +17,7 @@ import { ProjectState } from '../../modules/project';
 import ProjectModalItem from '../../components/task/ProjectModalItem';
 import TaskItem from '../../components/task/TaskItem';
 import { getWeek } from 'date-fns';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 ReactModal.setAppElement('#root');
 
@@ -144,7 +145,7 @@ function Tasks(): JSX.Element {
   };
 
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
@@ -259,7 +260,7 @@ function Tasks(): JSX.Element {
         {type === 'user' &&
           users.map((user, index) => <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />)}
       </ReactModal>
-    </div>
+    </MainResponsive>
   );
 }
 

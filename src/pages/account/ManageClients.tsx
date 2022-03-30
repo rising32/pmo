@@ -7,6 +7,7 @@ import { sendCreateClient, sendGetMyClients, sendRegisterMyClient, sendUpdateByC
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import { ClientState } from '../../modules/client';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const ManageClients = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -109,7 +110,7 @@ const ManageClients = () => {
   };
 
   return (
-    <div className='items-center flex flex-col flex-1 p-4 w-full h-full mb-32'>
+    <MainResponsive>
       <div
         className='flex flex-row items-center w-full justify-between py-6 px-4 bg-light-gray'
         // onClick={() => user?.member.isAdmin && navigate('/account/company-profile')}
@@ -159,7 +160,7 @@ const ManageClients = () => {
           </div>
         </BottomUpAnimatedView>
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

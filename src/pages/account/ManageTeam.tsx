@@ -10,6 +10,7 @@ import { addMember, getTeamMembers, getUserAll } from '../../lib/api';
 import { EmailSelectOption, UserSelectOption } from '../../modules/setting';
 import { toast } from 'react-toastify';
 import { TeamMemberState } from '../../modules/team';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const ManageTeam = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -119,7 +120,7 @@ const ManageTeam = () => {
     }
   };
   return (
-    <div className='items-center flex flex-col flex-1 p-4 w-full h-full mb-32'>
+    <MainResponsive>
       <div className='flex flex-row w-full h-12 px-4 mb-4 items-center justify-between bg-light-gray'>
         <div className='text-sm text-rouge-blue font-normal'></div>
         <div className='text-lg text-rouge-blue font-bold'>Your Account</div>
@@ -191,7 +192,7 @@ const ManageTeam = () => {
           </div>
         </BottomUpAnimatedView>
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 function Terms(): JSX.Element {
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <div className='flex flex-row bg-white w-full py-2 relative'>
         <div className='flex flex-1 items-center justify-center z-10'>
           <span className='font-bold text-2xl'>Terms of Use</span>
@@ -159,7 +160,7 @@ function Terms(): JSX.Element {
           www.abatone.com/PMO
         </div>
       </div>
-    </div>
+    </MainResponsive>
   );
 }
 

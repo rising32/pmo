@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { plusThumbnail } from '../../assets/images';
 import { accountState, AccountState } from '../../modules/user';
@@ -12,6 +13,7 @@ import { getWeek } from 'date-fns';
 import PastPriorityView from '../../containers/priority/PastPriorityView';
 import { PrioritiesTab } from '../../modules/tab';
 import { toast } from 'react-toastify';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
@@ -30,6 +32,8 @@ function Priorities(): JSX.Element {
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
   const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
   const [_sendCreatePriority, , sendCreatePriorityRes] = useRequest(sendCreatePriority);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (textareaRef && textareaRef.current) {
@@ -63,6 +67,9 @@ function Priorities(): JSX.Element {
   };
   const onSelectPriorityTab = (key: string) => {
     if (!selectedPriority) return;
+    if (key === 'agenda') {
+      navigate('/priorities/agenda');
+    }
     setSelectedPriorityTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const changePriorityValue = (event: React.FormEvent<HTMLInputElement>) => {
@@ -129,7 +136,7 @@ function Priorities(): JSX.Element {
   };
 
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <PrioritiesCalender selectedWeek={selectedWeek} onSelectWeek={onSelectWeek} />
       <div className='flex justify-center items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold truncate'>Weekly priorities</span>
@@ -223,7 +230,7 @@ function Priorities(): JSX.Element {
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
         <PastPriorityView priorities={beforeWeeklyPriorities} />
       </div>
-    </div>
+    </MainResponsive>
   );
 }
 

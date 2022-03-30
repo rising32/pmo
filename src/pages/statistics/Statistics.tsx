@@ -7,6 +7,7 @@ import { useRecoilValue } from 'recoil';
 import { accountState } from '../../modules/user';
 import { TableHeader } from '../../modules/statistic';
 import { WeekWorkDay } from '../../modules/project';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 function Statistics(): JSX.Element {
   const [isWeek, setIsWeek] = useState(true);
@@ -216,7 +217,7 @@ function Statistics(): JSX.Element {
   const monthData: Array<any> = useMemo(() => monthTableData, [monthTableData]);
 
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <div className='flex flex-row bg-white w-full py-2 relative'>
         <div className='absolute top-0 left-0 bg-dark-gray h-full transition-all' style={{ width: `${statusValue}%` }} />
         <div className='absolute left-8 z-20'>
@@ -245,7 +246,7 @@ function Statistics(): JSX.Element {
           {isWeek ? <Table columns={weekColumns} data={weekData} /> : <Table columns={monthColumns} data={monthData} />}
         </div>
       )}
-    </div>
+    </MainResponsive>
   );
 }
 

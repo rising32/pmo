@@ -20,6 +20,7 @@ import {
 import { getUserTasks, sendGetMyClients, sendMyProject, signOut } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ const Account = () => {
   }, [getUserTasksRes]);
 
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <div className='flex flex-row w-full p-4 items-center justify-between bg-light-gray'>
         <div className='text-sm text-rouge-blue font-normal' onClick={() => navigate('/terms')}>
           Terms
@@ -202,7 +203,7 @@ const Account = () => {
           <div className='text-base text-black font-normal mr-4'>{taskNum + ' Tasks'}</div>
         </div>
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

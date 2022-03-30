@@ -16,6 +16,7 @@ import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';
 import { TaskState } from '../../modules/task';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const ManageTask = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -156,7 +157,7 @@ const ManageTask = () => {
   };
 
   return (
-    <div className='items-center flex flex-col flex-1 p-4 w-full h-full mb-32'>
+    <MainResponsive>
       <div
         className='flex flex-row items-center w-full justify-between py-6 px-4 bg-light-gray'
         // onClick={() => user?.member.isAdmin && navigate('/account/company-profile')}
@@ -221,7 +222,7 @@ const ManageTask = () => {
           </div>
         </BottomUpAnimatedView>
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

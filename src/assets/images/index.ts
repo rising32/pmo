@@ -33,3 +33,5 @@ export { default as minusThumbnail } from './minus.png';
 export { default as documentThumbnail } from './document.png';
 export { default as statisticsActiveThumbnail } from './statistics_active.png';
 export { default as statisticsInactiveThumbnail } from './statistics_inactive.png';
+export { default as searchThumbnail } from './search.png';
+export { default as agendaThumbnail } from './agenda.png';

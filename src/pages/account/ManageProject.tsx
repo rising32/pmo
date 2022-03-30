@@ -18,6 +18,7 @@ import moment, { Moment } from 'moment';
 import { ProjectState } from '../../modules/project';
 import CustomCalender from '../../components/common/CustomCalender';
 import { CalenderSvg } from '../../assets/svg';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const ManageProject = () => {
   const [isEdit, setIsEdit] = useState(false);
@@ -198,7 +199,7 @@ const ManageProject = () => {
   };
 
   return (
-    <div className='items-center flex flex-col flex-1 p-4 w-full h-full mb-32'>
+    <MainResponsive>
       <div
         className='flex flex-row items-center w-full justify-between py-6 px-4 bg-light-gray'
         // onClick={() => user?.member.isAdmin && navigate('/account/company-profile')}
@@ -297,7 +298,7 @@ const ManageProject = () => {
           </div>
         </BottomUpAnimatedView>
       </div>
-    </div>
+    </MainResponsive>
   );
 };
 

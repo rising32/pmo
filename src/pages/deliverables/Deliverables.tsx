@@ -31,6 +31,7 @@ import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWe
 import axios from 'axios';
 import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
 import { toast } from 'react-toastify';
+import MainResponsive from '../../containers/main/MainResponsive';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -201,7 +202,7 @@ function Deliverables(): JSX.Element {
   }, [sendUpdatePriorityRes]);
 
   return (
-    <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
+    <MainResponsive>
       <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
@@ -315,7 +316,7 @@ function Deliverables(): JSX.Element {
             />
           ))}
       </ReactModal>
-    </div>
+    </MainResponsive>
   );
 }
 
