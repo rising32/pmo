@@ -19,6 +19,8 @@ import TaskItem from '../../components/task/TaskItem';
 import { getWeek } from 'date-fns';
 import MainResponsive from '../../containers/main/MainResponsive';
 import GroupItemView from '../../containers/main/GroupItemView';
+import { useSpring, animated } from 'react-spring';
+import useResizeObserver from 'use-resize-observer';
 
 ReactModal.setAppElement('#root');
 
@@ -45,6 +47,8 @@ function Tasks(): JSX.Element {
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
   const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
+
+  const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
   React.useEffect(() => {
     // onTaskSearch();
@@ -144,6 +148,9 @@ function Tasks(): JSX.Element {
     };
     _sendUCTP(params);
   };
+  const props = useSpring({
+    height: showModal ? height : 0,
+  });
 
   return (
     <MainResponsive>
@@ -153,6 +160,28 @@ function Tasks(): JSX.Element {
         <span className='text-white'>On time: 90%</span>
       </div>
       <GroupItemView className='mx-4 p-4 border-rouge-blue border-4 bg-card-gray'>
+        <div className='flex justify-between items-center mb-2'>
+          <span className='text-white text-lg font-bold pr-2'>Client :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedClient?.client_name}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
+            <img src={controlThumbnail} className='h-4 w-auto' />
+          </div>
+        </div>
+        <animated.div
+          style={{
+            ...props,
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+          className='menu'
+        >
+          <div ref={ref}>
+            {clientList.map((client, index) => (
+              <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+            ))}
+          </div>
+        </animated.div>
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Client :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -230,7 +259,7 @@ function Tasks(): JSX.Element {
         </div>
       </GroupItemView>
 
-      <ReactModal
+      {/* <ReactModal
         isOpen={showModal}
         onRequestClose={() => setShowModal(false)}
         id={type}
@@ -260,7 +289,7 @@ function Tasks(): JSX.Element {
           taskList.map((task, index) => <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
         {type === 'user' &&
           users.map((user, index) => <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />)}
-      </ReactModal>
+      </ReactModal> */}
     </MainResponsive>
   );
 }
