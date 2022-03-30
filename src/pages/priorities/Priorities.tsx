@@ -62,6 +62,7 @@ function Priorities(): JSX.Element {
     requestWeelyPriorities(currentWeek);
   };
   const onSelectPriorityTab = (key: string) => {
+    if (!selectedPriority) return;
     setSelectedPriorityTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const changePriorityValue = (event: React.FormEvent<HTMLInputElement>) => {
@@ -112,11 +113,19 @@ function Priorities(): JSX.Element {
   }, [sendCreatePriorityRes]);
 
   const onSelectWeelyPriority = (priority: PriorityState) => {
-    setSelectedPriority(priority);
-    setPriorityValue(priority.goal);
-    setDeliverableValue(priority.deliverable);
-    setDetailValue(priority.detail || '');
-    setSelectedPriorityTab('details');
+    if (selectedPriority?.wp_id === priority.wp_id) {
+      setSelectedPriority(null);
+      setPriorityValue('');
+      setDeliverableValue('');
+      setDetailValue('');
+      setSelectedPriorityTab('default');
+    } else {
+      setSelectedPriority(priority);
+      setPriorityValue(priority.goal);
+      setDeliverableValue(priority.deliverable);
+      setDetailValue(priority.detail || '');
+      setSelectedPriorityTab('details');
+    }
   };
 
   return (
@@ -147,7 +156,7 @@ function Priorities(): JSX.Element {
             <input
               type='textarea'
               name='textValue'
-              className='w-full bg-card-gray text-white text-xl focus:outline-none truncate'
+              className='w-full bg-card-gray text-white text-xl font-bold focus:outline-none truncate'
               value={priorityValue}
               onChange={changePriorityValue}
             />
@@ -159,7 +168,7 @@ function Priorities(): JSX.Element {
             <input
               type='textarea'
               name='textValue'
-              className='w-full bg-card-gray text-white text-xl focus:outline-none truncate'
+              className='w-full bg-card-gray text-white text-xl font-bold focus:outline-none truncate'
               value={deliverableValue}
               onChange={changeDeliverableValue}
             />
@@ -172,7 +181,7 @@ function Priorities(): JSX.Element {
               <textarea
                 ref={textareaRef}
                 value={detailValue}
-                className='w-full bg-card-gray ml-2 text-xl font-normal text-white focus:outline-none'
+                className='w-full bg-card-gray ml-2 text-xl font-bold text-white focus:outline-none'
                 onChange={changeDetailValue}
               />
             </label>
