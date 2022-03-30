@@ -20,45 +20,6 @@ import { getWeek } from 'date-fns';
 
 ReactModal.setAppElement('#root');
 
-const initValue: PriorityTaskState[] = [
-  {
-    client_id: 2,
-    client_name: 'Amazon co',
-    task: [
-      {
-        task_id: 14,
-        task_name: 'fasdfsdf',
-        creator_id: 3,
-        project_id: 2,
-        priority: 1,
-        description: 'dfsdfsd',
-        planned_start_date: null,
-        planned_end_date: null,
-        actual_start_date: null,
-        actual_end_date: null,
-        hourly_rate: 323,
-        is_add_all: false,
-        is_active: false,
-      },
-      {
-        task_id: 15,
-        task_name: 'fasdfsdfsddfsdf',
-        creator_id: 3,
-        project_id: 2,
-        priority: 1,
-        description: 'dfsdfsd',
-        planned_start_date: null,
-        planned_end_date: null,
-        actual_start_date: null,
-        actual_end_date: null,
-        hourly_rate: 323,
-        is_add_all: false,
-        is_active: false,
-      },
-    ],
-  },
-];
-
 function Tasks(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
@@ -84,7 +45,7 @@ function Tasks(): JSX.Element {
   const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
 
   React.useEffect(() => {
-    _sendUCTP();
+    // onTaskSearch();
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
 
@@ -176,6 +137,7 @@ function Tasks(): JSX.Element {
   };
   const onTaskSearch = () => {
     const params = {
+      user_id: account?.user.user_id,
       member_id: null,
       client_id: selectedClient?.client_id,
       project_id: selectedProject?.project_id,

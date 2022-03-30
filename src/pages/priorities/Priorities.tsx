@@ -17,6 +17,7 @@ const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
   const [selectedWeek, setSelectedWeek] = useState(thisWeek);
   const [selectedPriorityTab, setSelectedPriorityTab] = useState('default');
+  const [selectedPriority, setSelectedPriority] = useState<PriorityState | null>(null);
   const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
   const [beforeWeeklyPriorities, setBeforWeeklyPriorities] = useState<PriorityState[]>([]);
   const [priorityValue, setPriorityValue] = useState('');
@@ -43,19 +44,16 @@ function Priorities(): JSX.Element {
   }, []);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
-      // console.log('---', sendPriorityByWeekRes);
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
     }
   }, [sendPriorityByWeekRes]);
   React.useEffect(() => {
     if (sendPriorityByBeforeWeekRes) {
-      // console.log('---', sendPriorityByBeforeWeekRes);
       setBeforWeeklyPriorities(sendPriorityByBeforeWeekRes.priority);
     }
   }, [sendPriorityByBeforeWeekRes]);
   const requestWeelyPriorities = (week: number) => {
     const user_id = account?.user.user_id;
-    // console.log('+++++', user_id, week);
     _sendPriorityByWeek(user_id, week);
     _sendPriorityByBeforeWeek(user_id, week);
   };
@@ -78,7 +76,6 @@ function Priorities(): JSX.Element {
   const onAddPriority = () => {
     if (!priorityValue) {
       toast.error('priority is not empty!');
-      setSelectedPriorityTab('details');
       return;
     }
     if (!deliverableValue) {
@@ -114,6 +111,14 @@ function Priorities(): JSX.Element {
     }
   }, [sendCreatePriorityRes]);
 
+  const onSelectWeelyPriority = (priority: PriorityState) => {
+    setSelectedPriority(priority);
+    setPriorityValue(priority.goal);
+    setDeliverableValue(priority.deliverable);
+    setDetailValue(priority.detail || '');
+    setSelectedPriorityTab('details');
+  };
+
   return (
     <div className='items-center flex flex-col flex-1 px-4 pt-4 pb-32'>
       <PrioritiesCalender selectedWeek={selectedWeek} onSelectWeek={onSelectWeek} />
@@ -122,7 +127,14 @@ function Priorities(): JSX.Element {
       </div>
       <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
         {weeklyPriorities.map((item, index) => (
-          <PriorityItem key={index} index={index} priority={item} thisWeek={thisWeek == selectedWeek} />
+          <PriorityItem
+            key={index}
+            index={index}
+            priority={item}
+            thisWeek={thisWeek == selectedWeek}
+            selectedPriority={selectedPriority}
+            onSelect={onSelectWeelyPriority}
+          />
         ))}
       </div>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
@@ -131,41 +143,27 @@ function Priorities(): JSX.Element {
       <div className='mx-4 px-4 pt-4 pb-14 bg-card-gray w-full border-rouge-blue border-4 relative'>
         <div className='flex flex-row items-center w-full'>
           <div className='text-xl font-bold text-white'>Priority :</div>
-          {selectedPriorityTab === 'default' && (
-            <div className='ml-4'>
-              <Tag text={thisWeek > selectedWeek ? '2' : '1'} />
-            </div>
-          )}
-          {selectedPriorityTab === 'details' && (
-            <div className='ml-4 flex flex-1 w-full'>
-              <input
-                type='textarea'
-                name='textValue'
-                className='w-full bg-card-gray text-white text-xl focus:outline-none'
-                value={priorityValue}
-                onChange={changePriorityValue}
-              />
-            </div>
-          )}
+          <div className='ml-4 flex flex-1 w-full'>
+            <input
+              type='textarea'
+              name='textValue'
+              className='w-full bg-card-gray text-white text-xl focus:outline-none truncate'
+              value={priorityValue}
+              onChange={changePriorityValue}
+            />
+          </div>
         </div>
         <div className='flex flex-row items-center'>
           <div className='text-xl font-bold text-white'>Deliverable :</div>
-          {selectedPriorityTab === 'default' && (
-            <div className='ml-4'>
-              <Tag text='Q T Y' />
-            </div>
-          )}
-          {selectedPriorityTab === 'details' && (
-            <div className='ml-4 flex flex-1 w-full'>
-              <input
-                type='textarea'
-                name='textValue'
-                className='w-full bg-card-gray text-white text-xl focus:outline-none'
-                value={deliverableValue}
-                onChange={changeDeliverableValue}
-              />
-            </div>
-          )}
+          <div className='ml-4 flex flex-1 w-full'>
+            <input
+              type='textarea'
+              name='textValue'
+              className='w-full bg-card-gray text-white text-xl focus:outline-none truncate'
+              value={deliverableValue}
+              onChange={changeDeliverableValue}
+            />
+          </div>
         </div>
         <div className='flex flex-row items-center'>
           {selectedPriorityTab === 'details' && (
