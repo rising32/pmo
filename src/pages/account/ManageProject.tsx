@@ -46,13 +46,11 @@ const ManageProject = () => {
   }, []);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      console.log('sendMyProjectRes = ', sendMyProjectRes);
       getDataList(sendMyProjectRes.res);
     }
   }, [sendMyProjectRes]);
   React.useEffect(() => {
     if (sendUpdateByUserRes) {
-      console.log('sendUpdateByUserRes = ', sendUpdateByUserRes);
       const updateProject: ProjectState = {
         project_id: sendUpdateByUserRes.project_id,
         creator_id: sendUpdateByUserRes.creator_id,
@@ -95,12 +93,10 @@ const ManageProject = () => {
       return;
     }
     if (planedStarMoment?.isSameOrAfter(planedEndMoment)) {
-      console.log('kkkkkk');
       toast.error('plan start time is after end time');
       return;
     }
     if (actualStartMoment?.isSameOrAfter(actualEndMoment)) {
-      console.log('kkkkkk');
       toast.error('actual start time is after end time');
       return;
     }
@@ -135,7 +131,6 @@ const ManageProject = () => {
   };
   React.useEffect(() => {
     if (sendCreateProjectRes) {
-      console.log('sendCreateProjectRes = ', sendCreateProjectRes);
       const updateProject: ProjectState = {
         project_id: sendCreateProjectRes.project_id,
         creator_id: sendCreateProjectRes.creator_id,

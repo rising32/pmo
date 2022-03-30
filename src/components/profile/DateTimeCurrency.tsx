@@ -54,7 +54,6 @@ const DateTimeCurrency = ({ isEditDateTimeCurrency, onClose }: Props) => {
     user_id && _sendGetDateTimeCurrency(user_id);
   }, []);
   React.useEffect(() => {
-    // console.log('dateTimeCurrencyRes = ', dateTimeCurrencyRes);
     if (dateTimeCurrencyRes && dateTimeCurrencyRes.user_id && account) {
       let date = dateFormatOptions[0],
         currency = currencyOption[0];
@@ -126,7 +125,6 @@ const DateTimeCurrency = ({ isEditDateTimeCurrency, onClose }: Props) => {
   };
   const onSelectCurrency = (newValue: SingleValue<CurrencyOption>) => {
     if (newValue) {
-      console.log('-----', newValue);
       changeState({ name: 'currency', value: newValue });
     }
   };

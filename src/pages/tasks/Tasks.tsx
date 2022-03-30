@@ -56,19 +56,16 @@ function Tasks(): JSX.Element {
     _getUserAll();
   }, []);
   React.useEffect(() => {
-    console.log('&&&&&&&&&&&&&&&', sendUCTPRes);
     if (sendUCTPRes) {
       setWeekTask(sendUCTPRes);
     }
   }, [sendUCTPRes]);
   React.useEffect(() => {
-    console.log('&&&&&&&&&&&&&&&', sendUCTPErr);
     if (sendUCTPErr) {
       setWeekTask([]);
     }
   }, [sendUCTPErr]);
   React.useEffect(() => {
-    console.log('getMyClientsRes=', getMyClientsRes);
     if (getMyClientsRes) {
       setClientList(getMyClientsRes.clients);
     }
@@ -143,7 +140,6 @@ function Tasks(): JSX.Element {
       project_id: selectedProject?.project_id,
       planned_end_date: selectedDate,
     };
-    console.log(params);
     _sendUCTP(params);
   };
 

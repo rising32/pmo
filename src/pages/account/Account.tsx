@@ -68,13 +68,11 @@ const Account = () => {
   }, []);
   React.useEffect(() => {
     if (getMyClientsRes) {
-      // console.log(getMyClientsRes);
       setClientNum(getMyClientsRes.clients.length);
     }
   }, [getMyClientsRes]);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      // console.log('sendMyProjectRes = ', sendMyProjectRes);
       setProjectNum(sendMyProjectRes.res.length);
     }
   }, [sendMyProjectRes]);
@@ -85,7 +83,6 @@ const Account = () => {
   }, []);
   React.useEffect(() => {
     if (getUserTasksRes) {
-      // console.log(getUserTasksRes.task);
       setTaskNum(getUserTasksRes.task.length);
     }
   }, [getUserTasksRes]);

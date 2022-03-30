@@ -31,7 +31,6 @@ function Statistics(): JSX.Element {
     }
   }, []);
   React.useEffect(() => {
-    console.log('+++++', sendWeekProductRes);
     if (sendWeekProductRes && sendWeekProductRes.data.length > 0) {
       const newHeader = weekTableHeader;
       const newData = weekTableData;
@@ -117,7 +116,6 @@ function Statistics(): JSX.Element {
     }
   }, [sendWeekProductRes]);
   React.useEffect(() => {
-    console.log('sendMonthProductRes', sendMonthProductRes);
     if (sendMonthProductRes && sendMonthProductRes.data.length > 0) {
       const newHeader = monthTableHeader;
       const newData = monthTableData;

@@ -38,12 +38,10 @@ const ManageTask = () => {
   }, []);
   React.useEffect(() => {
     if (getUserTasksRes) {
-      console.log(getUserTasksRes.task);
       getDataList(getUserTasksRes.task);
     }
   }, [getUserTasksRes]);
   React.useEffect(() => {
-    console.log('createTaskRes= ', createTaskRes?.task);
     setIsEdit(false);
     if (createTaskRes) {
       const updateTask: TaskState = {
@@ -69,7 +67,6 @@ const ManageTask = () => {
   }, [createTaskRes]);
   React.useEffect(() => {
     setIsEdit(false);
-    console.log('updateTaskRes= ', updateTaskRes);
     if (updateTaskRes) {
       const updateTask: TaskState = {
         task_id: updateTaskRes.task_id,

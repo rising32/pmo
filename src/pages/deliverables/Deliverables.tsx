@@ -71,7 +71,6 @@ function Deliverables(): JSX.Element {
     if (!account) {
       return;
     }
-    console.log('-------', rememberWeeklyPriorities);
     const newTodayDeliverables: DeliverableState[] = todayDeliverables;
     rememberWeeklyPriorities.map(item => {
       if (!item.end_date) return;
@@ -101,7 +100,6 @@ function Deliverables(): JSX.Element {
   }, [getWeek(selectedDate)]);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
-      console.log('========', sendPriorityByWeekRes);
       setRememberWeeklyPriorities(sendPriorityByWeekRes.priority);
       setWeekDeliverables(sendPriorityByWeekRes.priority);
       const user_id = account?.user.user_id;

@@ -45,7 +45,6 @@ const ManageTeam = () => {
     }
   }, [getUserAllRes]);
   React.useEffect(() => {
-    console.log('addMemberRes =', addMemberRes);
     if (addMemberRes) {
       setIsEdit(false);
       const owner_id = account?.user.user_id;
@@ -54,7 +53,6 @@ const ManageTeam = () => {
     }
   }, [addMemberRes]);
   React.useEffect(() => {
-    console.log('getTeamMembersRes =', getTeamMembersRes);
     if (getTeamMembersRes) {
       getDataList(getTeamMembersRes.member);
     }
@@ -103,7 +101,6 @@ const ManageTeam = () => {
     setSelectEmailOptions(emailOptions);
   };
   const onCreateUpdateMember = () => {
-    console.log(email, name);
     if (!name) {
       toast.error('member name is not null!');
       return;

@@ -29,21 +29,20 @@ function App(): JSX.Element {
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
   const [_loginWithToken, loading, loginWithTokenRes, loginWithTokenErr] = useRequest(loginWithToken);
   const navigate = useNavigate();
-  // React.useEffect(() => {
-  //   const token = localStorage.getItem('user_token') || null;
-  //   // console.log('user_token = ', token);
-  //   if (token) {
-  //     _loginWithToken(token);
-  //   }
-  // }, []);
-  // React.useEffect(() => {
-  //   if (loginWithTokenRes && loginWithTokenRes.login_id) {
-  //     localStorage.setItem('user_token', loginWithTokenRes.token);
-  //     setAccount(loginWithTokenRes);
-  //     toast.success('login successed!');
-  //     navigate('/tasks');
-  //   }
-  // }, [loginWithTokenRes]);
+  React.useEffect(() => {
+    const token = localStorage.getItem('user_token') || null;
+    if (token) {
+      _loginWithToken(token);
+    }
+  }, []);
+  React.useEffect(() => {
+    if (loginWithTokenRes && loginWithTokenRes.login_id) {
+      localStorage.setItem('user_token', loginWithTokenRes.token);
+      setAccount(loginWithTokenRes);
+      toast.success('login successed!');
+      navigate('/tasks');
+    }
+  }, [loginWithTokenRes]);
   return (
     <>
       <Routes>

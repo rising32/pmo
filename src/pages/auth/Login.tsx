@@ -41,7 +41,6 @@ const Login = () => {
 
   React.useEffect(() => {
     if (data && data.login_id) {
-      console.log('----- data', data);
       localStorage.setItem('user_token', data.token);
       setAccount(data);
       toast.success('login successed!');

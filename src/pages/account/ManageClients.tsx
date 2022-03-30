@@ -28,7 +28,6 @@ const ManageClients = () => {
   }, []);
   React.useEffect(() => {
     if (getMyClientsRes) {
-      console.log(getMyClientsRes);
       getDataList(getMyClientsRes.clients);
     }
   }, [getMyClientsRes]);
