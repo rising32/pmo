@@ -47,7 +47,7 @@ const ManageProject = () => {
   }, []);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      getDataList(sendMyProjectRes.res);
+      getDataList(sendMyProjectRes.project);
     }
   }, [sendMyProjectRes]);
   React.useEffect(() => {
@@ -55,6 +55,7 @@ const ManageProject = () => {
       const updateProject: ProjectState = {
         project_id: sendUpdateByUserRes.project_id,
         creator_id: sendUpdateByUserRes.creator_id,
+        client_id: sendUpdateByUserRes.client_id,
         project_name: sendUpdateByUserRes.project_name,
         planned_start_date: sendUpdateByUserRes.planned_start_date,
         planned_end_date: sendUpdateByUserRes.planned_end_date,
@@ -108,6 +109,7 @@ const ManageProject = () => {
       const params: ProjectState = {
         project_id: selectedItem.project_id,
         creator_id: selectedItem.creator_id,
+        client_id: null,
         project_name: projectName,
         planned_start_date: planedStarMoment,
         planned_end_date: planedEndMoment,
@@ -121,6 +123,7 @@ const ManageProject = () => {
         project_id: null,
         creator_id: account.user.user_id,
         project_name: projectName,
+        client_id: null,
         planned_start_date: planedStarMoment,
         planned_end_date: planedEndMoment,
         actual_start_date: actualStartMoment,
@@ -136,6 +139,7 @@ const ManageProject = () => {
         project_id: sendCreateProjectRes.project_id,
         creator_id: sendCreateProjectRes.creator_id,
         project_name: sendCreateProjectRes.project_name,
+        client_id: sendCreateProjectRes.client_id,
         planned_start_date: sendCreateProjectRes.planned_start_date,
         planned_end_date: sendCreateProjectRes.planned_end_date,
         actual_start_date: sendCreateProjectRes.actual_start_date,

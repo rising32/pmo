@@ -14,19 +14,21 @@ function DeliverablesPicture(): JSX.Element {
 
   return (
     <MainResponsive>
-      <div className='w-full flex flex-row justify-between items-center bg-white rounded-md py-3 px-4'>
-        <Camera
-          ref={camera}
-          aspectRatio='cover'
-          facingMode='environment'
-          numberOfCamerasCallback={setNumberOfCameras}
-          errorMessages={{
-            noCameraAccessible: 'No camera device accessible. Please connect your camera or try a different browser.',
-            permissionDenied: 'Permission denied. Please refresh and give camera permission.',
-            switchCamera: 'It is not possible to switch camera to different one because there is only one video device accessible.',
-            canvas: 'Canvas is not supported.',
-          }}
-        />
+      <div className='w-full flex flex-col justify-between items-center bg-white rounded-md py-3 px-4'>
+        <div className='w-full h-52'>
+          <Camera
+            ref={camera}
+            aspectRatio='cover'
+            facingMode='environment'
+            numberOfCamerasCallback={setNumberOfCameras}
+            errorMessages={{
+              noCameraAccessible: 'No camera device accessible. Please connect your camera or try a different browser.',
+              permissionDenied: 'Permission denied. Please refresh and give camera permission.',
+              switchCamera: 'It is not possible to switch camera to different one because there is only one video device accessible.',
+              canvas: 'Canvas is not supported.',
+            }}
+          />
+        </div>
         {image && <img src={image} alt='Image preview' />}
         <button
           onClick={() => {
@@ -36,7 +38,9 @@ function DeliverablesPicture(): JSX.Element {
               setImage(photo);
             }
           }}
-        />
+        >
+          Capture
+        </button>
         <button
           hidden={numberOfCameras <= 1}
           onClick={() => {

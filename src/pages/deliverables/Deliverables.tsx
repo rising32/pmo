@@ -123,7 +123,7 @@ function Deliverables(): JSX.Element {
   }, [getMyClientsRes]);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      setProjectList(sendMyProjectRes.res);
+      setProjectList(sendMyProjectRes.project);
     }
   }, [sendMyProjectRes]);
   React.useEffect(() => {

@@ -1,27 +1,40 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { controlThumbnail, documentThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
+import { controlThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
 import ReactModal from 'react-modal';
 import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserAll, getUserTasks, ResponseUCTP, sendGetMyClients, sendMyProject, sendUCTP } from '../../lib/api';
+import {
+  getTeamMembers,
+  getUserAll,
+  getUserTasks,
+  ResponseUCTP,
+  sendGetMyClients,
+  sendMyProject,
+  sendPriorityByWeek,
+  sendProjectWithClientId,
+  sendSetClient,
+  sendTaskWithProjectId,
+  sendUCTP,
+  updateByTask,
+} from '../../lib/api';
 import ClientItem from '../../components/task/ClientItem';
 import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
-import { PriorityTaskState, TaskState } from '../../modules/task';
+import { TaskState } from '../../modules/task';
 import TaskModalItem from '../../components/task/TaskModalItem';
 import UserItem from '../../components/task/UserItem';
 import CustomCalender from '../../components/common/CustomCalender';
-import { Moment } from 'moment';
 import { ProjectState } from '../../modules/project';
 import ProjectModalItem from '../../components/task/ProjectModalItem';
 import TaskItem from '../../components/task/TaskItem';
 import { getWeek } from 'date-fns';
 import MainResponsive from '../../containers/main/MainResponsive';
 import GroupItemView from '../../containers/main/GroupItemView';
-import { useSpring, animated } from 'react-spring';
-import useResizeObserver from 'use-resize-observer';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
+import { PriorityState } from '../../modules/weekPriority';
+import PriorityModalItem from '../../components/task/PriorityModalItem';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 ReactModal.setAppElement('#root');
 
@@ -31,16 +44,23 @@ function Tasks(): JSX.Element {
   const [showClient, setShowClient] = useState(false);
   const [showProject, setShowProject] = useState(false);
   const [showTask, setShowTask] = useState(false);
+  const [showDeliverable, setShowDeliverable] = useState(false);
   const [showUser, setShowUser] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
 
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [projectList, setProjectList] = useState<ProjectState[]>([]);
   const [taskList, setTaskList] = useState<TaskState[]>([]);
+  const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
   const [users, getUsers] = React.useState<UserState[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
   const [selectedMoment, setSelectedMoment] = useState<Date | null>(null);
   const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
@@ -49,14 +69,18 @@ function Tasks(): JSX.Element {
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
+  const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
+  const [_sendProjectWithClientId, , sendProjectWithClientIdRes] = useRequest(sendProjectWithClientId);
   const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
-
-  const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
+  const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
+  const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
+  const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
+  const [_updateByTask, , updateByTaskRes, , resetUpdateByTask] = useRequest(updateByTask);
 
   React.useEffect(() => {
-    onTaskSearch();
+    onTaskSearch(true);
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
 
@@ -64,10 +88,15 @@ function Tasks(): JSX.Element {
     creator_id && _getUserTasks(creator_id);
     creator_id && _sendMyProject(creator_id);
 
+    const week = getWeek(selectedDate);
+    _sendPriorityByWeek(user_id, week);
+
+    const owner_id = account?.user.user_id;
+    owner_id && _getTeamMembers(owner_id);
+
     _getUserAll();
   }, []);
   React.useEffect(() => {
-    console.log('+++++', sendUCTPRes);
     if (sendUCTPRes) {
       setWeekTask(sendUCTPRes);
     }
@@ -84,19 +113,32 @@ function Tasks(): JSX.Element {
   }, [getMyClientsRes]);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      setProjectList(sendMyProjectRes.res);
+      setProjectList(sendMyProjectRes.project);
     }
-  }, [sendMyProjectRes]);
+    if (sendProjectWithClientIdRes) {
+      setProjectList(sendProjectWithClientIdRes.project);
+    }
+  }, [sendMyProjectRes, sendProjectWithClientIdRes]);
   React.useEffect(() => {
     if (getUserTasksRes) {
       setTaskList(getUserTasksRes.task);
     }
-  }, [getUserTasksRes]);
-  React.useEffect(() => {
-    if (getUserAllRes) {
-      getUsers(getUserAllRes);
+    console.log(getUserTasksRes, sendTaskWithProjectIdRes);
+    if (sendTaskWithProjectIdRes) {
+      setTaskList(sendTaskWithProjectIdRes.task);
     }
-  }, [getUserAllRes]);
+  }, [getUserTasksRes, sendTaskWithProjectIdRes]);
+  React.useEffect(() => {
+    // console.log(sendPriorityByWeekRes);
+    if (sendPriorityByWeekRes) {
+      setWeeklyPriorities(sendPriorityByWeekRes.priority);
+    }
+  }, [sendPriorityByWeekRes]);
+  React.useEffect(() => {
+    if (getTeamMembersRes) {
+      getUsers(getTeamMembersRes.member);
+    }
+  }, [getTeamMembersRes]);
 
   const onSelectDay = (cloneDay: Date, dayStr: string) => {
     setSelectedDate(cloneDay);
@@ -112,6 +154,9 @@ function Tasks(): JSX.Element {
   const openTasks = () => {
     setShowTask(!showTask);
   };
+  const openDeliverable = () => {
+    setShowDeliverable(!showDeliverable);
+  };
   const openCalendar = () => {
     setShowCalendar(!showCalendar);
   };
@@ -120,15 +165,39 @@ function Tasks(): JSX.Element {
   };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
+
+    const creator_id = account?.user.user_id;
+    const client_id = client.client_id;
+    _sendProjectWithClientId(creator_id, client_id);
+
     setShowClient(false);
   };
   const onSelectProject = (project: ProjectState) => {
-    setSelectedProject(preSelectedProject => (preSelectedProject?.project_id === project?.project_id ? null : project));
+    setSelectedProject(project);
+
+    if (!project.client_id) {
+      setShowProjectModal(true);
+      return;
+    }
+
+    const creator_id = account?.user.user_id;
+    const project_id = project.project_id;
+    _sendTaskWithProjectId(creator_id, project_id);
+
     setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
-    setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
+    setSelectedTask(task);
+    if (!task.project_id) {
+      setShowTaskModal(true);
+      return;
+    }
+
     setShowTask(false);
+  };
+  const onSelectDeliverable = (priority: PriorityState) => {
+    setSelectedDeliverable(preSelectedTask => (preSelectedTask?.wp_id === priority?.wp_id ? null : priority));
+    setShowDeliverable(false);
   };
   const onSelectUser = (user: UserState) => {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
@@ -138,17 +207,75 @@ function Tasks(): JSX.Element {
     setSelectedMoment(date);
     setShowCalendar(false);
   };
-  const onTaskSearch = () => {
+  const onTaskSearch = (isFirst: boolean) => {
     const params = {
       user_id: account?.user.user_id,
       member_id: null,
       client_id: selectedClient?.client_id,
       project_id: selectedProject?.project_id,
-      planned_end_date: selectedDate,
+      planned_end_date: isFirst ? null : selectedDate,
     };
-    console.log('------', params);
+    // console.log('------', params);
     _sendUCTP(params);
   };
+  const onCancelProjectWithClient = () => {
+    setSelectedProject(null);
+    setShowProjectModal(false);
+  };
+  const onLinkProjectWithClient = () => {
+    const client_id = selectedClient?.client_id;
+    const project_id = selectedProject?.project_id;
+    _sendSetClient(client_id, project_id);
+  };
+  React.useEffect(() => {
+    if (sendSetClientRes) {
+      const newProjectList = projectList.map(project => {
+        if (project.project_id === sendSetClientRes.project_id) {
+          project.client_id = sendSetClientRes.client_id;
+        }
+        return project;
+      });
+      setProjectList(newProjectList);
+      setShowProject(false);
+    }
+  }, [sendSetClientRes]);
+  const onCancelTaskWithProject = () => {
+    setSelectedTask(null);
+    setShowTaskModal(false);
+  };
+  const onLinkTaskWithProject = () => {
+    if (!selectedTask || !selectedProject?.project_id) return;
+    const newTask: TaskState = {
+      task_id: selectedTask.task_id,
+      creator_id: selectedTask.creator_id,
+      project_id: selectedProject?.project_id,
+      task_name: selectedTask.task_name,
+      priority: selectedTask.priority,
+      deliverable: selectedTask.deliverable,
+      description: selectedTask.description,
+      planned_start_date: null,
+      planned_end_date: null,
+      actual_start_date: null,
+      actual_end_date: null,
+      hourly_rate: selectedTask.hourly_rate,
+      is_add_all: selectedTask.is_add_all,
+      is_active: selectedTask.is_active,
+    };
+    _updateByTask(newTask);
+  };
+  React.useEffect(() => {
+    console.log('********', updateByTaskRes);
+    if (updateByTaskRes) {
+      setShowTaskModal(false);
+      const newTaskList = taskList.map(task => {
+        if (task.task_id === updateByTaskRes.task_id) {
+          return updateByTaskRes;
+        }
+        return task;
+      });
+      setTaskList(newTaskList);
+    }
+  }, [updateByTaskRes]);
 
   return (
     <MainResponsive>
@@ -203,10 +330,17 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Deliverable :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'>
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedDeliverable?.deliverable}</div>
+          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openDeliverable}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
+        <AnimatedDropView show={showDeliverable}>
+          {weeklyPriorities.map((priority, index) => (
+            <PriorityModalItem key={index} priority={priority} selectedPriority={selectedDeliverable} onSelect={onSelectDeliverable} />
+          ))}
+        </AnimatedDropView>
+
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Who :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
@@ -235,7 +369,10 @@ function Tasks(): JSX.Element {
           </div>
         )}
         <div className='flex items-center justify-end'>
-          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onTaskSearch}>
+          <div
+            className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl'
+            onClick={() => onTaskSearch(false)}
+          >
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>
@@ -258,6 +395,69 @@ function Tasks(): JSX.Element {
           </div>
         </div>
       </GroupItemView>
+
+      <ReactModal
+        isOpen={showProjectModal}
+        // onRequestClose={onCancelProjectWithClient}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>Do you want to link this project with client</div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Client:</div>
+          <div className='font-bold'>{selectedClient?.client_name}</div>
+        </div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Project:</div>
+          <div className='font-bold'>{selectedProject?.project_name}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelProjectWithClient}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onLinkProjectWithClient}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
+      <ReactModal
+        isOpen={showTaskModal}
+        // onRequestClose={onCancelProjectWithClient}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>Do you want to link this task with project</div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Project:</div>
+          <div className='font-bold'>{selectedProject?.project_name}</div>
+        </div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Task:</div>
+          <div className='font-bold'>{selectedTask?.task_name}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelTaskWithProject}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onLinkTaskWithProject}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
     </MainResponsive>
   );
 }

@@ -99,7 +99,7 @@ const WorkSetting = () => {
         </AnimatedDropView>
         <div className='flex flex-row items-center justify-between px-1 py-2 w-full'>
           <div className='text-base text-blue font-bold w-1/5 flex items-center justify-center'>Week</div>
-          <div className='text-base text-blue font-bold w-2/5 flex items-center justify-center'>First Day of Week</div>
+          <div className='text-base text-blue font-bold w-2/5 flex items-center justify-center text-center'>First Day of Week</div>
           <div className='text-base text-blue font-bold w-2/5 flex items-center justify-center'>Work on Week</div>
         </div>
         {displayWorkSettingList.map(displayWorkSetting => (

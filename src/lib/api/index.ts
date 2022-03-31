@@ -1,7 +1,7 @@
 import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
 import { DeliverableState } from '../../modules/deliverable';
-import { ProjectState, StatisticState } from '../../modules/project';
+import { ClientProjectState, ProjectState, StatisticState } from '../../modules/project';
 import { PriorityTaskState, TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
@@ -56,7 +56,11 @@ export interface ResponseTask {
   task: TaskState;
 }
 export const sendCreateTask = (params: TaskState) => apiClient.post<ResponseTask>('/project/task/create', params);
+export const sendSetClient = (client_id: number, project_id: number) =>
+  apiClient.post<ClientProjectState>('/project/set_Client', { client_id, project_id });
 export const getUserTasks = (creator_id: number) => apiClient.post<ResponseTasks>('/project/task/get_user_tasks', { creator_id });
+export const sendTaskWithProjectId = (creator_id: number, project_id: number) =>
+  apiClient.post<ResponseTasks>('/project/task/get_by_pna', { creator_id, project_id });
 export const updateByTask = (params: TaskState) => apiClient.post<TaskState>('/project/task/update', params);
 
 export const getUserAll = () => apiClient.get<UserState[]>('/user/all');
@@ -71,9 +75,11 @@ export const getTeamMembers = (owner_id: number) => apiClient.post<ResponseMembe
 export const sendCreateProject = (params: ProjectState) => apiClient.post<ProjectState>('/project/create', params);
 
 export interface ResponseProjectList {
-  res: ProjectState[];
+  project: ProjectState[];
 }
 export const sendMyProject = (creator_id: number) => apiClient.post<ResponseProjectList>('/project/get_user_projects', { creator_id });
+export const sendProjectWithClientId = (creator_id: number, client_id: number) =>
+  apiClient.post<ResponseProjectList>('/project/get/client_no_assign', { creator_id, client_id });
 export const sendUpdateByUser = (params: ProjectState) => apiClient.post<ProjectState>('/project/update', params);
 
 export const sendWeekProduct = (user_id: number) =>

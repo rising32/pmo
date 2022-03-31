@@ -74,7 +74,7 @@ const Account = () => {
   }, [getMyClientsRes]);
   React.useEffect(() => {
     if (sendMyProjectRes) {
-      setProjectNum(sendMyProjectRes.res.length);
+      setProjectNum(sendMyProjectRes.project.length);
     }
   }, [sendMyProjectRes]);
 

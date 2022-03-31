@@ -1,6 +1,7 @@
 export type ProjectState = {
   project_id: number | null;
   creator_id: number;
+  client_id: number | null;
   project_name: string;
   planned_start_date: Date;
   planned_end_date: Date;
@@ -22,4 +23,10 @@ export interface StatisticState {
   client_id: number;
   client_name: string;
   realWorkdays: WeekWorkDay[] | MonthWorkDay[];
+}
+
+export interface ClientProjectState {
+  cp_id: number | null;
+  project_id: number;
+  client_id: number;
 }

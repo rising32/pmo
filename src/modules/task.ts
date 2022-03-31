@@ -3,6 +3,7 @@ export interface TaskState {
   creator_id: number;
   project_id: number | null;
   task_name: string;
+  deliverable: string | null;
   priority: number;
   description: string;
   planned_start_date: Date | null;
