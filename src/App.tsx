@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import PriorityContainer from './containers/priority/PriorityContainer';
 import PriorityAgenda from './pages/priorities/PriorityAgenda';
 import PrioritySupport from './pages/priorities/PrioritySupport';
+import WorkSetting from './pages/account/WorkSetting';
 
 function App(): JSX.Element {
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
@@ -64,6 +65,7 @@ function App(): JSX.Element {
             <Route path='account/' element={<AccountContainer />}>
               <Route path='' element={<Account />} />
               <Route path='company-profile' element={<CompanyProfile />} />
+              <Route path='work-setting' element={<WorkSetting />} />
               <Route path='manage-team' element={<ManageTeam />} />
               <Route path='manage-client' element={<ManageClients />} />
               <Route path='manage-project' element={<ManageProject />} />

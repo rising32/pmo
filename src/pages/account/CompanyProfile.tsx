@@ -4,7 +4,6 @@ import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
 import {
   dateTimeCurrencyThumbnail,
-  doubleRecThumbnail,
   organizationThumbnail,
   personGrayThumbnail,
   rightArrowThumbnail,
@@ -77,7 +76,7 @@ const CompanyProfile = () => {
           </div>
           <div
             className='flex flex-row py-2 mb-2 pr-4 rounded-md items-center justify-between bg-light-gray'
-            onClick={() => setIsEditWorkSetting(true)}
+            onClick={() => navigate('/account/work-setting')}
           >
             <div className='w-10 h-6 flex items-center justify-center'>
               <img src={workSettingThumbnail} className='h-4 w-auto' />

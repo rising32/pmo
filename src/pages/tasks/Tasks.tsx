@@ -42,7 +42,7 @@ function Tasks(): JSX.Element {
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
-  const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
+  const [selectedMoment, setSelectedMoment] = useState<Date | null>(null);
   const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
 
   const account = useRecoilValue<AccountState | null>(accountState);
@@ -134,8 +134,8 @@ function Tasks(): JSX.Element {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
     setShowUser(false);
   };
-  const onSelectDate = (moment: Moment) => {
-    setSelectedMoment(moment);
+  const onSelectDate = (date: Date) => {
+    setSelectedMoment(date);
     setShowCalendar(false);
   };
   const onTaskSearch = () => {
@@ -149,18 +149,6 @@ function Tasks(): JSX.Element {
     console.log('------', params);
     _sendUCTP(params);
   };
-  const clientProps = useSpring({
-    height: showClient ? height : 0,
-  });
-  const projectProps = useSpring({
-    height: showProject ? height : 0,
-  });
-  const taskProps = useSpring({
-    height: showTask ? height : 0,
-  });
-  const userProps = useSpring({
-    height: showUser ? height : 0,
-  });
 
   return (
     <MainResponsive>
@@ -236,14 +224,14 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>When :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedMoment?.format('YYYY-MM-DD')}</div>
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedMoment?.toDateString()}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openCalendar}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         {showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
-            <CustomCalender onSelect={onSelectDate} selectedMoment={selectedMoment} />
+            <CustomCalender onSelect={onSelectDate} selectedDate={selectedMoment} />
           </div>
         )}
         <div className='flex items-center justify-end'>

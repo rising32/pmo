@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Range, getTrackBackground } from 'react-range';
 import { IRenderTrackParams } from 'react-range/lib/types';
 
-const MultiRangeSlider = () => {
+interface Props {
+  values: number[];
+  onSetValue: (values: number[]) => void;
+}
+const MultiRangeSlider = ({ values, onSetValue }: Props) => {
   const STEP = 1;
-  const MIN = 10;
-  const MAX = 100;
-  const [values, setValues] = useState([25, 75]);
+  const MIN = 0;
+  const MAX = 24;
 
   return (
     <Range
@@ -16,7 +19,7 @@ const MultiRangeSlider = () => {
       min={MIN}
       max={MAX}
       onChange={values => {
-        setValues(values);
+        onSetValue(values);
       }}
       renderTrack={({ props, children }: IRenderTrackParams) => (
         <div

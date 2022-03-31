@@ -3,8 +3,8 @@ import moment, { Moment } from 'moment';
 import { nextThumbnail, previewThumbnail } from '../../assets/images';
 
 interface Props {
-  onSelect: (date: Moment) => void;
-  selectedMoment: Moment | null;
+  onSelect: (date: Date) => void;
+  selectedDate?: Date | null;
 }
 type State = {
   showCalendarTable: boolean;
@@ -205,7 +205,7 @@ class CustomCalender extends React.Component<Props, State> {
       },
       () => {
         const dateObject = Object.assign({}, this.state.dateObject);
-        this.props.onSelect(moment(dateObject).set('date', d));
+        this.props.onSelect(moment(dateObject).set('date', d).toDate());
       },
     );
   };
@@ -230,7 +230,7 @@ class CustomCalender extends React.Component<Props, State> {
     for (let d = 1; d <= this.daysInMonth(); d++) {
       const dateObject = Object.assign({}, this.state.dateObject);
       const currentDay = moment(dateObject).set('date', d).isSame(this.state.today);
-      const selected = moment(dateObject).set('date', d).isSame(this.props.selectedMoment);
+      const selected = moment(dateObject).set('date', d).isSame(this.props.selectedDate);
       daysInMonth.push(
         <td key={d} className='flex flex-1 items-center justify-center'>
           <div
@@ -313,7 +313,7 @@ class CustomCalender extends React.Component<Props, State> {
               <thead className='bg-main-back w-full'>
                 <tr className='flex flex-row items-center justify-between'>{weekdayshortname}</tr>
               </thead>
-              <tbody className='flex flex-col py-2'>{daysinmonth}</tbody>
+              <tbody className='flex flex-col py-2 bg-white'>{daysinmonth}</tbody>
             </table>
           </div>
         )}

@@ -6,7 +6,7 @@ import {
   clientRougeThumbnail,
   crayon,
   dateTimeCurrencyThumbnail,
-  doubleRecThumbnail,
+  redDocumentThumbnail,
   organizationThumbnail,
   personGrayThumbnail,
   personRougeThumbnail,
@@ -132,7 +132,7 @@ const Account = () => {
             <div className='text-base text-black font-normal flex-1'>Work Setting</div>
             <div className='flex flex-1 flex-row justify-between'>
               <div className='w-10 h-6 flex flex-1 items-center'>
-                <img src={doubleRecThumbnail} className='h-4 w-auto' />
+                <img src={redDocumentThumbnail} className='h-4 w-auto' />
               </div>
               <div className='text-base text-rouge-blue font-normal pr-2'>AM/PM</div>
             </div>
@@ -149,7 +149,7 @@ const Account = () => {
             <div className='text-base text-black font-normal flex-1'>Date, time and currency</div>
             <div className='flex flex-row justify-center'>
               <div className='w-10 h-6 flex items-center'>
-                <img src={doubleRecThumbnail} className='h-4 w-auto' />
+                <img src={redDocumentThumbnail} className='h-4 w-auto' />
               </div>
               <div className='w-10 h-6 flex items-center'>
                 <img src={uroSimbalThumbnail} className='h-4 w-auto' />

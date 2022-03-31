@@ -21,7 +21,7 @@ export { default as personRougeThumbnail } from './person-rouge.png';
 export { default as projectRougeThumbnail } from './project-rouge.png';
 export { default as taskRougeThumbnail } from './task-rouge.png';
 export { default as rightArrowThumbnail } from './right-arrow.png';
-export { default as doubleRecThumbnail } from './double-rec.png';
+export { default as redDocumentThumbnail } from './red-document.png';
 export { default as uroSimbalThumbnail } from './uro-mark.png';
 export { default as slideBarThumbnail } from './slide-bar.png';
 export { default as dropDownThumbnail } from './drop-down.png';

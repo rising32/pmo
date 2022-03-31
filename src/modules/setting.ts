@@ -57,3 +57,22 @@ export interface TableDataState {
   ikea?: string;
   cota?: string;
 }
+export interface WorkSettingState {
+  ws_id?: number;
+  user_id: number;
+  week: number;
+  year: number;
+  first_day_of_week: number;
+  work_on_week: number;
+  start_work_time: number;
+  end_work_time: number;
+  remainder: number;
+}
+export interface DisplayWorkSettingState {
+  week: number;
+  first_day_of_week: Date;
+  work_on_week: number;
+  start_work_time: number;
+  end_work_time: number;
+  remainder: number;
+}

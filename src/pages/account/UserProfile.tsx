@@ -4,7 +4,6 @@ import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
 import {
   dateTimeCurrencyThumbnail,
-  doubleRecThumbnail,
   organizationThumbnail,
   personGrayThumbnail,
   rightArrowThumbnail,

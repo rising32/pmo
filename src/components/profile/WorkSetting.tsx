@@ -5,7 +5,7 @@ import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { sendUserProfileUpdate } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
-import { doubleRecThumbnail, dropDownThumbnail, slideBarThumbnail } from '../../assets/images';
+import { dropDownThumbnail, redDocumentThumbnail, slideBarThumbnail } from '../../assets/images';
 import MultiRangeSlider from '../common/MultiRangeSlider';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
 import { weekFormatOptions } from '../../modules/setting';
@@ -65,9 +65,9 @@ const WorkSetting = ({ isEditWorkSetting, onClose }: Props) => {
           <div className='text-base text-black font-normal'>DAILY WORK ROUTINE</div>
           <div className='text-base text-black font-normal'>09:00</div>
         </div>
-        <div className='flex justify-center m-4 px-8'>
+        {/* <div className='flex justify-center m-4 px-8'>
           <MultiRangeSlider />
-        </div>
+        </div> */}
         <div className='flex flex-row'>
           <div className='flex-1'>
             <div className='text-lg text-black font-bold'>Reminders</div>
@@ -75,11 +75,11 @@ const WorkSetting = ({ isEditWorkSetting, onClose }: Props) => {
           </div>
           <div className='flex-2'>
             <div className='flex flex-row text-base text-black font-normal items-center'>
-              <img src={doubleRecThumbnail} className='h-4 w-auto mr-2' />
+              <img src={redDocumentThumbnail} className='h-4 w-auto mr-2' />
               <div className='text-base text-black font-normal'>Priorities</div>
             </div>
             <div className='flex flex-row text-base text-black font-normal items-center'>
-              <img src={doubleRecThumbnail} className='h-4 w-auto mr-2' />
+              <img src={redDocumentThumbnail} className='h-4 w-auto mr-2' />
               <div className='text-base text-black font-normal'>Deliverables</div>
             </div>
           </div>

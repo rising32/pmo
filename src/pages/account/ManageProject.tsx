@@ -28,12 +28,12 @@ const ManageProject = () => {
   const [projectDec, setProjectDec] = useState('');
   const [popTitle, setPopTitle] = useState('Create Client');
   const [actionTitle, setActionTitle] = useState('Create');
-  const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
+  const [selectedMoment, setSelectedMoment] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [planedStarMoment, setPlanedStartMoment] = useState<Moment | null>(null);
-  const [planedEndMoment, setPlanedEndMoment] = useState<Moment | null>(null);
-  const [actualStartMoment, setActualStartMoment] = useState<Moment | null>(null);
-  const [actualEndMoment, setActualEndMoment] = useState<Moment | null>(null);
+  const [planedStarMoment, setPlanedStartMoment] = useState<Date | null>(null);
+  const [planedEndMoment, setPlanedEndMoment] = useState<Date | null>(null);
+  const [actualStartMoment, setActualStartMoment] = useState<Date | null>(null);
+  const [actualEndMoment, setActualEndMoment] = useState<Date | null>(null);
   const [dateType, setDateType] = useState('ps');
 
   const account = useRecoilValue<AccountState | null>(accountState);
@@ -82,10 +82,10 @@ const ManageProject = () => {
     setSelectedItem(project);
     setPopTitle('Edit Project');
     setActionTitle('Save');
-    setPlanedStartMoment(moment(project.planned_start_date));
-    setPlanedEndMoment(moment(project.planned_end_date));
-    setActualStartMoment(moment(project.actual_start_date));
-    setActualEndMoment(moment(project.actual_end_date));
+    setPlanedStartMoment(project.planned_start_date);
+    setPlanedEndMoment(project.planned_end_date);
+    setActualStartMoment(project.actual_start_date);
+    setActualEndMoment(project.actual_end_date);
     setProjectName(project.project_name);
     setIsEdit(true);
   };
@@ -93,14 +93,14 @@ const ManageProject = () => {
     if (!planedStarMoment || !planedEndMoment || !actualStartMoment || !actualEndMoment) {
       return;
     }
-    if (planedStarMoment?.isSameOrAfter(planedEndMoment)) {
-      toast.error('plan start time is after end time');
-      return;
-    }
-    if (actualStartMoment?.isSameOrAfter(actualEndMoment)) {
-      toast.error('actual start time is after end time');
-      return;
-    }
+    // if (planedStarMoment?.isSameOrAfter(planedEndMoment)) {
+    //   toast.error('plan start time is after end time');
+    //   return;
+    // }
+    // if (actualStartMoment?.isSameOrAfter(actualEndMoment)) {
+    //   toast.error('actual start time is after end time');
+    //   return;
+    // }
     if (!account) {
       return;
     }
@@ -109,10 +109,10 @@ const ManageProject = () => {
         project_id: selectedItem.project_id,
         creator_id: selectedItem.creator_id,
         project_name: projectName,
-        planned_start_date: planedStarMoment.toDate(),
-        planned_end_date: planedEndMoment.toDate(),
-        actual_start_date: actualStartMoment.toDate(),
-        actual_end_date: actualEndMoment.toDate(),
+        planned_start_date: planedStarMoment,
+        planned_end_date: planedEndMoment,
+        actual_start_date: actualStartMoment,
+        actual_end_date: actualEndMoment,
         description: projectDec,
       };
       _sendUpdateByUser(params);
@@ -121,10 +121,10 @@ const ManageProject = () => {
         project_id: null,
         creator_id: account.user.user_id,
         project_name: projectName,
-        planned_start_date: planedStarMoment.toDate(),
-        planned_end_date: planedEndMoment.toDate(),
-        actual_start_date: actualStartMoment.toDate(),
-        actual_end_date: actualEndMoment.toDate(),
+        planned_start_date: planedStarMoment,
+        planned_end_date: planedEndMoment,
+        actual_start_date: actualStartMoment,
+        actual_end_date: actualEndMoment,
         description: projectDec,
       };
       _sendCreateProject(params);
@@ -172,19 +172,19 @@ const ManageProject = () => {
     }
     setShowCalendar(true);
   };
-  const onSelectMoment = (moment: Moment) => {
+  const onSelectMoment = (date: Date) => {
     switch (dateType) {
       case 'ps':
-        setPlanedStartMoment(moment);
+        setPlanedStartMoment(date);
         break;
       case 'pe':
-        setPlanedEndMoment(moment);
+        setPlanedEndMoment(date);
         break;
       case 'as':
-        setActualStartMoment(moment);
+        setActualStartMoment(date);
         break;
       case 'ae':
-        setActualEndMoment(moment);
+        setActualEndMoment(date);
         break;
     }
     setShowCalendar(false);
@@ -242,7 +242,7 @@ const ManageProject = () => {
                 <div className='text-sm text-black font-bold px-2 pt-2 text-center'>PLANED START DATE</div>
                 <div className='mx-4 py-1 my-2 bg-light-gray flex items-center justify-center'>
                   {planedStarMoment ? (
-                    <div className='text-sm text-rouge-blue font-bold text-center'>{planedStarMoment.format('YYYY-MM-DD')}</div>
+                    <div className='text-sm text-rouge-blue font-bold text-center'>{planedStarMoment.toDateString()}</div>
                   ) : (
                     <CalenderSvg />
                   )}
@@ -252,7 +252,7 @@ const ManageProject = () => {
                 <div className='text-sm text-black font-bold px-2 pt-2 text-center'>PLANED END DATE</div>
                 <div className='mx-4 py-1 my-2 bg-light-gray flex items-center justify-center'>
                   {planedEndMoment ? (
-                    <div className='text-sm text-rouge-blue font-bold text-center'>{planedEndMoment.format('YYYY-MM-DD')}</div>
+                    <div className='text-sm text-rouge-blue font-bold text-center'>{planedEndMoment.toDateString()}</div>
                   ) : (
                     <CalenderSvg />
                   )}
@@ -264,7 +264,7 @@ const ManageProject = () => {
                 <div className='text-sm text-black font-bold px-2 pt-2 text-center'>ACTUAL START DATE</div>
                 <div className='mx-4 py-1 my-2 bg-light-gray flex items-center justify-center'>
                   {actualStartMoment ? (
-                    <div className='text-sm text-rouge-blue font-bold text-center'>{actualStartMoment.format('YYYY-MM-DD')}</div>
+                    <div className='text-sm text-rouge-blue font-bold text-center'>{actualStartMoment.toDateString()}</div>
                   ) : (
                     <CalenderSvg />
                   )}
@@ -274,7 +274,7 @@ const ManageProject = () => {
                 <div className='text-sm text-black font-bold px-2 pt-2 text-center'>ACTUAL END DATE</div>
                 <div className='mx-4 py-1 my-2 bg-light-gray flex items-center justify-center'>
                   {actualEndMoment ? (
-                    <div className='text-sm text-rouge-blue font-bold text-center'>{actualEndMoment.format('YYYY-MM-DD')}</div>
+                    <div className='text-sm text-rouge-blue font-bold text-center'>{actualEndMoment.toDateString()}</div>
                   ) : (
                     <CalenderSvg />
                   )}
@@ -283,7 +283,7 @@ const ManageProject = () => {
             </div>
             {showCalendar && (
               <div className='flex justify-between items-center my-2 bg-white'>
-                <CustomCalender onSelect={onSelectMoment} selectedMoment={selectedMoment} />
+                <CustomCalender onSelect={onSelectMoment} selectedDate={selectedMoment} />
               </div>
             )}
             <div className='text-sm text-black font-bold px-2 mt-4'>DESCRIPTION</div>
