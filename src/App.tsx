@@ -28,6 +28,8 @@ import PriorityContainer from './containers/priority/PriorityContainer';
 import PriorityAgenda from './pages/priorities/PriorityAgenda';
 import PrioritySupport from './pages/priorities/PrioritySupport';
 import WorkSetting from './pages/account/WorkSetting';
+import DeliverableContainer from './containers/deliverables/DeliverableContainer';
+import DeliverablesPicture from './pages/deliverables/DeliverablesPicture';
 
 function App(): JSX.Element {
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
@@ -60,7 +62,10 @@ function App(): JSX.Element {
               <Route path='agenda' element={<PriorityAgenda />} />
               <Route path='support' element={<PrioritySupport />} />
             </Route>
-            <Route path='deliverables' element={<Deliverables />} />
+            <Route path='deliverables/' element={<DeliverableContainer />}>
+              <Route path='' element={<Deliverables />} />
+              <Route path='camera' element={<DeliverablesPicture />} />
+            </Route>
             <Route path='statistics' element={<Statistics />} />
             <Route path='account/' element={<AccountContainer />}>
               <Route path='' element={<Account />} />

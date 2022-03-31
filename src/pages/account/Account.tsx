@@ -100,8 +100,8 @@ const Account = () => {
         </div>
       </div>
 
-      <div className='w-full mt-4 p-1 bg-white'>
-        <div className='flex flex-row items-center justify-between px-12 py-3' onClick={() => navigate('/account/company-profile')}>
+      <div className='w-full mt-4 p-1 bg-white' onClick={() => navigate('/account/company-profile')}>
+        <div className='flex flex-row items-center justify-between px-12 py-3'>
           <div className='text-lg text-black font-bold'>COMPANY PROFILE</div>
           <img src={crayon} className='h-4 w-auto' />
         </div>
@@ -128,7 +128,7 @@ const Account = () => {
           <div className='w-10 h-6 flex items-center justify-center'>
             <img src={workSettingThumbnail} className='h-4 w-auto' />
           </div>
-          <div className='flex flex-1 flex-row justify-between'>
+          <div className='flex flex-1 flex-row justify-between' onClick={() => navigate('/account/work-setting')}>
             <div className='text-base text-black font-normal flex-1'>Work Setting</div>
             <div className='flex flex-1 flex-row justify-between'>
               <div className='w-10 h-6 flex flex-1 items-center'>

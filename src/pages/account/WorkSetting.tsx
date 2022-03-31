@@ -80,6 +80,7 @@ const WorkSetting = () => {
       <div className='w-full mt-4 p-1 bg-white'>
         <div className='flex flex-row items-center justify-between px-8 py-3'>
           <div className='text-lg text-black font-bold'>Work Setting</div>
+          <div className='text-lg text-rouge-blue font-bold'>Submit</div>
         </div>
         <div className='flex flex-row items-center justify-between px-10 py-2'>
           <div className='text-lg text-rouge-blue font-bold'>Year:</div>

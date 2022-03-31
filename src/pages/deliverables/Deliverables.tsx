@@ -12,7 +12,7 @@ import {
   sendPriorityByWeek,
   sendUpdatePriority,
 } from '../../lib/api';
-import PriorityItem from '../../components/priority/PriorityItem';
+import { useNavigate } from 'react-router-dom';
 import Tag from '../../components/common/Tag';
 import { getWeek, isEqual, isSameDay, parseISO } from 'date-fns';
 import PastPriorityView from '../../containers/priority/PastPriorityView';
@@ -51,6 +51,7 @@ function Deliverables(): JSX.Element {
   const [showModal, setShowModal] = useState(false);
 
   const account = useRecoilValue<AccountState | null>(accountState);
+  const navigate = useNavigate();
 
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
@@ -134,6 +135,9 @@ function Deliverables(): JSX.Element {
     setSelectedDate(cloneDay);
   };
   const onSelectDeliverableTab = (key: string) => {
+    if (key === 'picture') {
+      navigate('/deliverables/camera');
+    }
     setSelectedDeliverableTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const openClients = () => {
@@ -197,6 +201,7 @@ function Deliverables(): JSX.Element {
       setSelectedClient(null);
       setSelectedProject(null);
       setSelectedTask(null);
+      setSelectedDeliverable(null);
       setSelectedDeliverableTab('default');
     }
   }, [sendUpdatePriorityRes]);
