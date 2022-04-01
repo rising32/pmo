@@ -13,26 +13,22 @@ import {
   sendUpdatePriority,
 } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
-import Tag from '../../components/common/Tag';
-import { getWeek, isEqual, isSameDay, parseISO } from 'date-fns';
-import PastPriorityView from '../../containers/priority/PastPriorityView';
-import TaskCalender from '../../components/task/TaskCalender';
+import { getWeek, isSameDay, parseISO } from 'date-fns';
 import { DeliverablesTab } from '../../modules/tab';
 import { PriorityState } from '../../modules/weekPriority';
 import { DeliverableState } from '../../modules/deliverable';
 import { ClientState } from '../../modules/client';
 import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
-import ClientItem from '../../components/task/ClientItem';
-import ProjectModalItem from '../../components/task/ProjectModalItem';
-import TaskModalItem from '../../components/task/TaskModalItem';
 import DeliverableItem from '../../components/deliverable/DeliverableItem';
 import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWeelyPriority';
-import axios from 'axios';
 import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
+import TaskNameItem from '../../components/items/TaskNameItem';
+import ProjectNameItem from '../../components/items/ProjectNameItem';
+import ClientNameItem from '../../components/items/ClientNameItem';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -304,14 +300,14 @@ function Deliverables(): JSX.Element {
         {type === 'deliverable' && <div className='text-lg font-bold'>Deliverables</div>}
         {type === 'client' &&
           clientList.map((client, index) => (
-            <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+            <ClientNameItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
           ))}
         {type === 'project' &&
           projectList.map((project, index) => (
-            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+            <ProjectNameItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         {type === 'task' &&
-          taskList.map((task, index) => <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
+          taskList.map((task, index) => <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
         {type === 'deliverable' &&
           weekDeliverables.map((deliverable, index) => (
             <DeliverableModalItem

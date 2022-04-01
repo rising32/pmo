@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTransition, config, animated } from 'react-spring';
 
 const SpinerIcon = () => {
   return (

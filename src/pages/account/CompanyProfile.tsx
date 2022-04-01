@@ -18,7 +18,6 @@ import { toast } from 'react-toastify';
 import EditUserNameEmail from '../../components/profile/EditUserNameEmail';
 import DateTimeCurrency from '../../components/profile/DateTimeCurrency';
 import OrganizationUpdate from '../../components/profile/OrganizationUpdate';
-import WorkSetting from '../../components/profile/WorkSetting';
 import MainResponsive from '../../containers/main/MainResponsive';
 
 const CompanyProfile = () => {
@@ -149,7 +148,6 @@ const CompanyProfile = () => {
         </div>
         {isEditOrganization && <OrganizationUpdate isEditOrganization={isEditOrganization} onClose={() => setIsEditOrganization(false)} />}
         {isEditProfile && <EditUserNameEmail isEditProfile={isEditProfile} onClose={() => setIsEditProfile(false)} />}
-        {isEditWorkSetting && <WorkSetting isEditWorkSetting={isEditWorkSetting} onClose={() => setIsEditWorkSetting(false)} />}
         {isEditDateTimeCurrency && (
           <DateTimeCurrency isEditDateTimeCurrency={isEditDateTimeCurrency} onClose={() => setIsEditDateTimeCurrency(false)} />
         )}

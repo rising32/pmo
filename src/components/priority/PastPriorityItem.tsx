@@ -1,6 +1,5 @@
 import React from 'react';
 import { PriorityState } from '../../modules/weekPriority';
-import DocumentCheckIcon from '../common/DocumentCheckIcon';
 
 interface Props {
   priority: PriorityState;

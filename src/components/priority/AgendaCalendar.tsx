@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { format, subMonths, addMonths, startOfWeek, addDays, isSameDay, lastDayOfWeek, getWeek, addWeeks, subWeeks } from 'date-fns';
-import { nextThumbnail, previewThumbnail } from '../../assets/images';
-
+import { format, startOfWeek, addDays, isSameDay, lastDayOfWeek, addWeeks, subWeeks } from 'date-fns';
 interface Props {
   selectedDate: Date;
   onSelectDay: (cloneDay: Date, dayStr: string) => void;

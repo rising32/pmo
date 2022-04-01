@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
-import MainResponsive from '../../containers/main/MainResponsive';
-import { addWeeks, endOfYear, format, getWeek, getYear, lastDayOfWeek, startOfWeek, startOfYear, subWeeks } from 'date-fns';
-import { DisplayWorkSettingState, WorkSettingState } from '../../modules/setting';
+import React, { useState } from 'react';
+import { DisplayWorkSettingState } from '../../modules/setting';
 import { crayon } from '../../assets/images';
 import AnimatedDropView from '../common/AnimatedDropView';
-import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
-import AgendaCalendar from '../priority/AgendaCalendar';
-import WeeklyCalendar from '../profile/WeeklyCalendar';
+import Select, { SingleValue } from 'react-select';
 import MultiRangeSlider from '../common/MultiRangeSlider';
 import RedDocumentIcon from '../common/RedDocumentIcon';
+import WeekCalendar from '../calendar/WeekCalendar';
 
 interface Props {
   displayWorkSetting: DisplayWorkSettingState;
@@ -96,7 +90,7 @@ const WorkSettingItem = ({ displayWorkSetting, onChange }: Props) => {
             <div className='text-xl font-bold text-rouge-blue pr-2'>{displayWorkSetting.week}</div>
             <div className='text-base font-normal text-black'>Week</div>
           </div>
-          <WeeklyCalendar selectedDate={selectedDate} onSelectDay={onSelectDay} />
+          <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDay} />
           <div className='text-base font-bold py-4'>DAILY WORK ROUTINE</div>
           <div className='flex flex-row justify-between px-12 w-full'>
             <div>{values[0] + ':00'}</div>

@@ -366,7 +366,6 @@ function Tasks(): JSX.Element {
         </div>
         {showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
-            {/* <FullCalendar onSelect={onSelectMoment} selectedMoment={selectedDay} /> */}
             <FullCalendar selectedDate={selectedDay || new Date()} onSelectDate={onSelectDay} />
           </div>
         )}

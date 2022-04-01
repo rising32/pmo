@@ -1,24 +1,15 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { AccountState, accountState } from '../../modules/user';
-import { documentThumbnail, rightArrowThumbnail } from '../../assets/images';
+import { documentThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import {
-  sendCreateClient,
-  sendCreateProject,
-  sendGetMyClients,
-  sendMyProject,
-  sendRegisterMyClient,
-  sendUpdateByClient,
-  sendUpdateByUser,
-} from '../../lib/api';
+import { sendCreateProject, sendMyProject, sendUpdateByUser } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
-import moment, { Moment } from 'moment';
 import { ProjectState } from '../../modules/project';
-import CustomCalender from '../../components/common/CustomCalender';
 import { CalenderSvg } from '../../assets/svg';
 import MainResponsive from '../../containers/main/MainResponsive';
+import FullCalendar from '../../components/calendar/FullCalendar';
 
 const ManageProject = () => {
   const [isEdit, setIsEdit] = useState(false);
@@ -28,7 +19,7 @@ const ManageProject = () => {
   const [projectDec, setProjectDec] = useState('');
   const [popTitle, setPopTitle] = useState('Create Client');
   const [actionTitle, setActionTitle] = useState('Create');
-  const [selectedMoment, setSelectedMoment] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [planedStarMoment, setPlanedStartMoment] = useState<Date | null>(null);
   const [planedEndMoment, setPlanedEndMoment] = useState<Date | null>(null);
@@ -163,21 +154,21 @@ const ManageProject = () => {
     setDateType(type);
     switch (type) {
       case 'ps':
-        setSelectedMoment(planedStarMoment);
+        setSelectedDate(planedStarMoment);
         break;
       case 'pe':
-        setSelectedMoment(planedEndMoment);
+        setSelectedDate(planedEndMoment);
         break;
       case 'as':
-        setSelectedMoment(actualStartMoment);
+        setSelectedDate(actualStartMoment);
         break;
       case 'ae':
-        setSelectedMoment(actualEndMoment);
+        setSelectedDate(actualEndMoment);
         break;
     }
     setShowCalendar(true);
   };
-  const onSelectMoment = (date: Date) => {
+  const onSelectDate = (date: Date) => {
     switch (dateType) {
       case 'ps':
         setPlanedStartMoment(date);
@@ -288,7 +279,7 @@ const ManageProject = () => {
             </div>
             {showCalendar && (
               <div className='flex justify-between items-center my-2 bg-white'>
-                <CustomCalender onSelect={onSelectMoment} selectedDate={selectedMoment} />
+                <FullCalendar selectedDate={selectedDate || new Date()} onSelectDate={onSelectDate} />
               </div>
             )}
             <div className='text-sm text-black font-bold px-2 mt-4'>DESCRIPTION</div>

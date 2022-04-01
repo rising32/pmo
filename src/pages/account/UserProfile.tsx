@@ -2,47 +2,20 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
-import {
-  dateTimeCurrencyThumbnail,
-  organizationThumbnail,
-  personGrayThumbnail,
-  rightArrowThumbnail,
-  slideBarThumbnail,
-  teamMemberThumbnail,
-  workSettingThumbnail,
-} from '../../assets/images';
-import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
+import { personGrayThumbnail } from '../../assets/images';
 import { getTeamMembers, signOut } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import EditUserNameEmail from '../../components/profile/EditUserNameEmail';
-import DateTimeCurrency from '../../components/profile/DateTimeCurrency';
-import OrganizationUpdate from '../../components/profile/OrganizationUpdate';
-import WorkSetting from '../../components/profile/WorkSetting';
 import MainResponsive from '../../containers/main/MainResponsive';
 
 const UserProfile = () => {
   const [isEditProfile, setIsEditProfile] = React.useState(false);
-  const [isEditOrganization, setIsEditOrganization] = React.useState(false);
-  const [isEditWorkSetting, setIsEditWorkSetting] = React.useState(false);
-  const [isEditDateTimeCurrency, setIsEditDateTimeCurrency] = React.useState(false);
   const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
-
-  const [teamMemberNum, setTeamMemberNum] = React.useState(0);
 
   const navigate = useNavigate();
   const [_sendSignOut, signOuting, signOutRes, , resetSignOut] = useRequest(signOut);
-  const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
 
-  React.useEffect(() => {
-    const owner_id = account?.user.user_id;
-    owner_id && _getTeamMembers(owner_id);
-  }, []);
-  React.useEffect(() => {
-    if (getTeamMembersRes) {
-      setTeamMemberNum(getTeamMembersRes.member.length);
-    }
-  }, [getTeamMembersRes]);
   React.useEffect(() => {
     if (signOutRes && signOutRes.user_id) {
       setAccount(null);

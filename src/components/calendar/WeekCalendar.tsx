@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  format,
-  subMonths,
-  addMonths,
-  startOfWeek,
-  addDays,
-  isSameDay,
-  startOfMonth,
-  endOfMonth,
-  endOfWeek,
-  isSameMonth,
-  lastDayOfWeek,
-} from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { NextSvg, PreviousSvg } from '../../assets/svg';
 import { nextThumbnail, previewThumbnail } from '../../assets/images';
 import { subDays } from 'date-fns/esm';

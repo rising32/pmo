@@ -1,7 +1,6 @@
 import React from 'react';
 import { CheckSvg } from '../../assets/svg';
 import { ClientState } from '../../modules/client';
-// import CheckIcon from './CheckIcon';
 
 interface Props {
   client: ClientState;

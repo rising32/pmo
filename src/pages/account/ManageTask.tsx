@@ -3,15 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { AccountState, accountState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import {
-  getUserTasks,
-  sendCreateClient,
-  sendCreateTask,
-  sendGetMyClients,
-  sendRegisterMyClient,
-  sendUpdateByClient,
-  updateByTask,
-} from '../../lib/api';
+import { getUserTasks, sendCreateTask, updateByTask } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';

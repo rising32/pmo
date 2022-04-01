@@ -4,8 +4,7 @@ import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
 import MainResponsive from '../../containers/main/MainResponsive';
 import { addWeeks, endOfYear, format, getWeek, getYear, lastDayOfWeek, startOfWeek, startOfYear, subWeeks } from 'date-fns';
-import { DisplayWorkSettingState, WorkSettingState } from '../../modules/setting';
-import { crayon } from '../../assets/images';
+import { DisplayWorkSettingState } from '../../modules/setting';
 import WorkSettingItem from '../../components/account/WorkSettingItem';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
 
