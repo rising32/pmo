@@ -6,7 +6,6 @@ import { accountState, AccountState, UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
 import {
   getTeamMembers,
-  getUserAll,
   getUserTasks,
   ResponseUCTP,
   sendGetMyClients,
@@ -34,7 +33,11 @@ import GroupItemView from '../../containers/main/GroupItemView';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
 import { PriorityState } from '../../modules/weekPriority';
 import PriorityModalItem from '../../components/task/PriorityModalItem';
-import ConfirmModal from '../../components/common/ConfirmModal';
+import ClientNameItem from '../../components/items/ClientNameItem';
+import ProjectNameItem from '../../components/items/ProjectNameItem';
+import TaskNameItem from '../../components/items/TaskNameItem';
+import DeliverableNameItem from '../../components/items/DeliverableNameItem';
+import UserNameItem from '../../components/items/UserNameItem';
 
 ReactModal.setAppElement('#root');
 
@@ -50,7 +53,6 @@ function Tasks(): JSX.Element {
 
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
 
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [projectList, setProjectList] = useState<ProjectState[]>([]);
@@ -62,7 +64,7 @@ function Tasks(): JSX.Element {
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
   const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
-  const [selectedMoment, setSelectedMoment] = useState<Date | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
 
   const account = useRecoilValue<AccountState | null>(accountState);
@@ -70,7 +72,6 @@ function Tasks(): JSX.Element {
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
-  const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
   const [_sendProjectWithClientId, , sendProjectWithClientIdRes] = useRequest(sendProjectWithClientId);
   const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
@@ -80,7 +81,6 @@ function Tasks(): JSX.Element {
   const [_updateByTask, , updateByTaskRes, , resetUpdateByTask] = useRequest(updateByTask);
 
   React.useEffect(() => {
-    onTaskSearch(true);
     const user_id = account?.user.user_id;
     user_id && _sendGetMyClients(user_id);
 
@@ -93,12 +93,14 @@ function Tasks(): JSX.Element {
 
     const owner_id = account?.user.user_id;
     owner_id && _getTeamMembers(owner_id);
-
-    _getUserAll();
   }, []);
+  React.useEffect(() => {
+    onTaskSearch();
+  }, [getWeek(selectedDate)]);
   React.useEffect(() => {
     if (sendUCTPRes) {
       setWeekTask(sendUCTPRes);
+      resetSelectedValues();
     }
   }, [sendUCTPRes]);
   React.useEffect(() => {
@@ -123,13 +125,11 @@ function Tasks(): JSX.Element {
     if (getUserTasksRes) {
       setTaskList(getUserTasksRes.task);
     }
-    console.log(getUserTasksRes, sendTaskWithProjectIdRes);
     if (sendTaskWithProjectIdRes) {
       setTaskList(sendTaskWithProjectIdRes.task);
     }
   }, [getUserTasksRes, sendTaskWithProjectIdRes]);
   React.useEffect(() => {
-    // console.log(sendPriorityByWeekRes);
     if (sendPriorityByWeekRes) {
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
     }
@@ -139,6 +139,14 @@ function Tasks(): JSX.Element {
       getUsers(getTeamMembersRes.member);
     }
   }, [getTeamMembersRes]);
+  const resetSelectedValues = () => {
+    setSelectedClient(null);
+    setSelectedProject(null);
+    setSelectedTask(null);
+    setSelectedDeliverable(null);
+    setSelectedUser(null);
+    setSelectedDay(null);
+  };
 
   const onSelectDay = (cloneDay: Date, dayStr: string) => {
     setSelectedDate(cloneDay);
@@ -204,18 +212,17 @@ function Tasks(): JSX.Element {
     setShowUser(false);
   };
   const onSelectDate = (date: Date) => {
-    setSelectedMoment(date);
+    setSelectedDay(date);
     setShowCalendar(false);
   };
-  const onTaskSearch = (isFirst: boolean) => {
+  const onTaskSearch = () => {
     const params = {
       user_id: account?.user.user_id,
       member_id: null,
       client_id: selectedClient?.client_id,
       project_id: selectedProject?.project_id,
-      planned_end_date: isFirst ? null : selectedDate,
+      planned_end_date: selectedDay || selectedDate,
     };
-    // console.log('------', params);
     _sendUCTP(params);
   };
   const onCancelProjectWithClient = () => {
@@ -264,7 +271,6 @@ function Tasks(): JSX.Element {
     _updateByTask(newTask);
   };
   React.useEffect(() => {
-    console.log('********', updateByTaskRes);
     if (updateByTaskRes) {
       setShowTaskModal(false);
       const newTaskList = taskList.map(task => {
@@ -295,7 +301,7 @@ function Tasks(): JSX.Element {
         </div>
         <AnimatedDropView show={showClient}>
           {clientList.map((client, index) => (
-            <ClientItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+            <ClientNameItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
           ))}
         </AnimatedDropView>
 
@@ -309,7 +315,7 @@ function Tasks(): JSX.Element {
         </div>
         <AnimatedDropView show={showProject}>
           {projectList.map((project, index) => (
-            <ProjectModalItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+            <ProjectNameItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         </AnimatedDropView>
 
@@ -323,7 +329,7 @@ function Tasks(): JSX.Element {
         </div>
         <AnimatedDropView show={showTask}>
           {taskList.map((task, index) => (
-            <TaskModalItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
+            <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
           ))}
         </AnimatedDropView>
 
@@ -337,7 +343,7 @@ function Tasks(): JSX.Element {
         </div>
         <AnimatedDropView show={showDeliverable}>
           {weeklyPriorities.map((priority, index) => (
-            <PriorityModalItem key={index} priority={priority} selectedPriority={selectedDeliverable} onSelect={onSelectDeliverable} />
+            <DeliverableNameItem key={index} priority={priority} selectedPriority={selectedDeliverable} onSelect={onSelectDeliverable} />
           ))}
         </AnimatedDropView>
 
@@ -351,28 +357,25 @@ function Tasks(): JSX.Element {
         </div>
         <AnimatedDropView show={showUser}>
           {users.map((user, index) => (
-            <UserItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />
+            <UserNameItem key={index} user={user} selectedUser={selectedUser} onSelect={onSelectUser} />
           ))}
         </AnimatedDropView>
 
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>When :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedMoment?.toDateString()}</div>
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedDay?.toDateString()}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openCalendar}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
         {showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
-            <CustomCalender onSelect={onSelectDate} selectedDate={selectedMoment} />
+            <CustomCalender onSelect={onSelectDate} selectedDate={selectedDay} />
           </div>
         )}
         <div className='flex items-center justify-end'>
-          <div
-            className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl'
-            onClick={() => onTaskSearch(false)}
-          >
+          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onTaskSearch}>
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>

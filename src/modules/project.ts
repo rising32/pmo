@@ -3,6 +3,7 @@ export type ProjectState = {
   creator_id: number;
   client_id: number | null;
   project_name: string;
+  project_type?: number;
   planned_start_date: Date;
   planned_end_date: Date;
   actual_start_date: Date;

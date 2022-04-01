@@ -140,6 +140,7 @@ const ManageProject = () => {
         creator_id: sendCreateProjectRes.creator_id,
         project_name: sendCreateProjectRes.project_name,
         client_id: sendCreateProjectRes.client_id,
+        project_type: 1,
         planned_start_date: sendCreateProjectRes.planned_start_date,
         planned_end_date: sendCreateProjectRes.planned_end_date,
         actual_start_date: sendCreateProjectRes.actual_start_date,

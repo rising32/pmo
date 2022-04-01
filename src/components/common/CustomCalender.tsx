@@ -230,7 +230,8 @@ class CustomCalender extends React.Component<Props, State> {
     for (let d = 1; d <= this.daysInMonth(); d++) {
       const dateObject = Object.assign({}, this.state.dateObject);
       const currentDay = moment(dateObject).set('date', d).isSame(this.state.today);
-      const selected = moment(dateObject).set('date', d).isSame(this.props.selectedDate);
+      console.log('=======', currentDay, dateObject, moment(this.props.selectedDate));
+      const selected = moment(dateObject).set('date', d).isSame(moment(this.props.selectedDate));
       daysInMonth.push(
         <td key={d} className='flex flex-1 items-center justify-center'>
           <div

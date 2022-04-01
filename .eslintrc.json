@@ -45,7 +45,8 @@
       {
         "additionalHooks": "useRecoilCallback"
       }
-    ]
+    ],
+    "@typescript-eslint/no-empty-interface": "off"
   },
   "settings": {
     "react": {

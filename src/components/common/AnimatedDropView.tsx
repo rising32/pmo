@@ -24,10 +24,11 @@ import useResizeObserver from 'use-resize-observer';
 
 interface MainResponsiveProps {
   show: boolean;
+  className?: string;
   children: React.ReactNode;
 }
 
-function AnimatedDropView({ show, children }: MainResponsiveProps): JSX.Element {
+function AnimatedDropView({ show, className, children }: MainResponsiveProps): JSX.Element {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
   const props = useSpring({
@@ -42,7 +43,9 @@ function AnimatedDropView({ show, children }: MainResponsiveProps): JSX.Element 
         position: 'relative',
       }}
     >
-      <div ref={ref}>{children}</div>
+      <div ref={ref} className={className}>
+        {children}
+      </div>
     </animated.div>
   );
 }
