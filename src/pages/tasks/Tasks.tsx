@@ -17,27 +17,22 @@ import {
   sendUCTP,
   updateByTask,
 } from '../../lib/api';
-import ClientItem from '../../components/task/ClientItem';
-import TaskCalender from '../../components/task/TaskCalender';
 import { ClientState } from '../../modules/client';
 import { TaskState } from '../../modules/task';
-import TaskModalItem from '../../components/task/TaskModalItem';
-import UserItem from '../../components/task/UserItem';
-import CustomCalender from '../../components/common/CustomCalender';
 import { ProjectState } from '../../modules/project';
-import ProjectModalItem from '../../components/task/ProjectModalItem';
 import TaskItem from '../../components/task/TaskItem';
 import { getWeek } from 'date-fns';
 import MainResponsive from '../../containers/main/MainResponsive';
 import GroupItemView from '../../containers/main/GroupItemView';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
 import { PriorityState } from '../../modules/weekPriority';
-import PriorityModalItem from '../../components/task/PriorityModalItem';
 import ClientNameItem from '../../components/items/ClientNameItem';
 import ProjectNameItem from '../../components/items/ProjectNameItem';
 import TaskNameItem from '../../components/items/TaskNameItem';
 import DeliverableNameItem from '../../components/items/DeliverableNameItem';
 import UserNameItem from '../../components/items/UserNameItem';
+import FullCalendar from '../../components/calendar/FullCalendar';
+import WeekCalendar from '../../components/calendar/WeekCalendar';
 
 ReactModal.setAppElement('#root');
 
@@ -148,9 +143,6 @@ function Tasks(): JSX.Element {
     setSelectedDay(null);
   };
 
-  const onSelectDay = (cloneDay: Date, dayStr: string) => {
-    setSelectedDate(cloneDay);
-  };
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
 
   const openClients = () => {
@@ -212,6 +204,9 @@ function Tasks(): JSX.Element {
     setShowUser(false);
   };
   const onSelectDate = (date: Date) => {
+    setSelectedDate(date);
+  };
+  const onSelectDay = (date: Date) => {
     setSelectedDay(date);
     setShowCalendar(false);
   };
@@ -285,7 +280,7 @@ function Tasks(): JSX.Element {
 
   return (
     <MainResponsive>
-      <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
+      <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
         <span className='text-white'>On time: 90%</span>
@@ -371,7 +366,8 @@ function Tasks(): JSX.Element {
         </div>
         {showCalendar && (
           <div className='flex justify-between items-center mb-2 bg-white'>
-            <CustomCalender onSelect={onSelectDate} selectedDate={selectedDay} />
+            {/* <FullCalendar onSelect={onSelectMoment} selectedMoment={selectedDay} /> */}
+            <FullCalendar selectedDate={selectedDay || new Date()} onSelectDate={onSelectDay} />
           </div>
         )}
         <div className='flex items-center justify-end'>

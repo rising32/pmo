@@ -32,6 +32,7 @@ import axios from 'axios';
 import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
+import WeekCalendar from '../../components/calendar/WeekCalendar';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -131,8 +132,8 @@ function Deliverables(): JSX.Element {
       setTaskList(getUserTasksRes.task);
     }
   }, [getUserTasksRes]);
-  const onSelectDay = (cloneDay: Date, dayStr: string) => {
-    setSelectedDate(cloneDay);
+  const onSelectDate = (date: Date) => {
+    setSelectedDate(date);
   };
   const onSelectDeliverableTab = (key: string) => {
     if (key === 'picture') {
@@ -208,7 +209,7 @@ function Deliverables(): JSX.Element {
 
   return (
     <MainResponsive>
-      <TaskCalender selectedDate={selectedDate} onSelectDay={onSelectDay} />
+      <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
         <span className='text-white'>{todayDeliverables.length * 50 + '%'}</span>
