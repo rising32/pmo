@@ -165,7 +165,7 @@ function Priorities(): JSX.Element {
             <input
               type='textarea'
               name='textValue'
-              className='w-full bg-card-gray text-white text-xl font-bold focus:outline-none truncate'
+              className='w-full bg-transparent text-white text-xl font-bold focus:outline-none truncate'
               value={priorityValue}
               onChange={changePriorityValue}
             />

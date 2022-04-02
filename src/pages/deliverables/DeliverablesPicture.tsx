@@ -27,7 +27,7 @@ function DeliverablesPicture(): JSX.Element {
 
   return (
     <MainResponsive>
-      <div className='w-full flex flex-col justify-between items-center bg-white rounded-md py-3 px-4'>
+      <div className='w-full flex flex-col justify-between items-center bg-white rounded-md'>
         <video ref={videoRef} onCanPlay={handleCanPlay} autoPlay playsInline muted />
       </div>
     </MainResponsive>

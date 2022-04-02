@@ -396,7 +396,6 @@ function Tasks(): JSX.Element {
 
       <ReactModal
         isOpen={showProjectModal}
-        // onRequestClose={onCancelProjectWithClient}
         className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
         style={{
           overlay: {
@@ -427,7 +426,6 @@ function Tasks(): JSX.Element {
       </ReactModal>
       <ReactModal
         isOpen={showTaskModal}
-        // onRequestClose={onCancelProjectWithClient}
         className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
         style={{
           overlay: {
