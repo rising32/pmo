@@ -17,7 +17,7 @@ export const PrioritiesTab = [
   },
   {
     key: 'expenses',
-    label: 'Expenses',
+    label: '?',
   },
 ];
 

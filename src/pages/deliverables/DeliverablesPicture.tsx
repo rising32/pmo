@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
-import { agendaThumbnail, menuThumbnail, searchThumbnail } from '../../assets/images';
-import AgendaCalendar from '../../components/priority/AgendaCalendar';
 import MainResponsive from '../../containers/main/MainResponsive';
 import { accountState, AccountState } from '../../modules/user';
 import { Camera, CameraType } from 'react-camera-pro';

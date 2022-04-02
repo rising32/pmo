@@ -31,3 +31,31 @@ export interface ClientProjectState {
   project_id: number;
   client_id: number;
 }
+
+export interface ProjectTypeState {
+  project_type: number;
+  project_label: string;
+}
+
+export const ProjectTypeList: ProjectTypeState[] = [
+  {
+    project_type: 1,
+    project_label: 'New Project',
+  },
+  {
+    project_type: 2,
+    project_label: 'Analysis',
+  },
+  {
+    project_type: 3,
+    project_label: 'Inventory',
+  },
+  {
+    project_type: 4,
+    project_label: 'Perform plan',
+  },
+  {
+    project_type: 5,
+    project_label: 'Removal',
+  },
+];

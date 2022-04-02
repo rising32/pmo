@@ -13,6 +13,9 @@ import PastPriorityView from '../../containers/priority/PastPriorityView';
 import { PrioritiesTab } from '../../modules/tab';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
+import Select, { SingleValue } from 'react-select';
+import { ProjectTypeList, ProjectTypeState } from '../../modules/project';
+import ProjectType from '../../components/priority/ProjectType';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
@@ -24,6 +27,7 @@ function Priorities(): JSX.Element {
   const [priorityValue, setPriorityValue] = useState('');
   const [deliverableValue, setDeliverableValue] = useState('');
   const [detailValue, setDetailValue] = useState('');
+  const [selectedProjectType, setSeletedProjectType] = useState<ProjectTypeState | null>(null);
 
   const account = useRecoilValue<AccountState | null>(accountState);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -136,6 +140,9 @@ function Priorities(): JSX.Element {
       setSelectedPriorityTab('details');
     }
   };
+  const onChangeProjectType = (projectTypeItem: ProjectTypeState) => {
+    setSeletedProjectType(projectTypeItem);
+  };
 
   return (
     <MainResponsive>
@@ -205,6 +212,27 @@ function Priorities(): JSX.Element {
               B.<span className='text-xl font-bold text-white flex ml-4'>Monthly priorities</span>
             </span>
           </div>
+        )}
+        {selectedPriorityTab === 'project' && (
+          <>
+            <div className='flex flex-row items-center'>
+              <div className='text-xl font-bold text-white pr-2'>Client :</div>
+              <div className='text-xl font-bold text-white'>IDL GRIEISHEIM</div>
+            </div>
+            <div className='flex flex-row items-start'>
+              <div className='text-xl font-bold text-white pr-2'>Project :</div>
+              <div className='flex flex-col'>
+                {ProjectTypeList.map(item => (
+                  <ProjectType
+                    key={item.project_type}
+                    projectTypeItem={item}
+                    selectedProjectType={selectedProjectType}
+                    onSelect={onChangeProjectType}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
         )}
         <div className='absolute bottom-6 right-2'>
           <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onAddPriority}>

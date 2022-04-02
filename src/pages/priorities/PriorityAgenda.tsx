@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import { agendaThumbnail, menuThumbnail, searchThumbnail } from '../../assets/images';
-import AgendaCalendar from '../../components/priority/AgendaCalendar';
+import DayScheduler from '../../components/calendar/DayScheduler';
+import WeekCalendarAgenda from '../../components/calendar/WeekCalendarAgenda';
 import MainResponsive from '../../containers/main/MainResponsive';
 import { accountState, AccountState } from '../../modules/user';
 
@@ -19,7 +20,7 @@ function PriorityAgenda(): JSX.Element {
       setShortName(short);
     }
   }, [account]);
-  const onSelectDay = (cloneDay: Date, dayStr: string) => {
+  const onSelectDate = (cloneDay: Date) => {
     setSelectedDate(cloneDay);
   };
 
@@ -37,7 +38,8 @@ function PriorityAgenda(): JSX.Element {
         </div>
       </div>
       <div className='m-4 bg-card-gray shadow-xl w-full rounded-md pt-4'>
-        <AgendaCalendar selectedDate={selectedDate} onSelectDay={onSelectDay} />
+        <WeekCalendarAgenda selectedDate={selectedDate} onSelectDate={onSelectDate} />
+        <DayScheduler selectedDate={selectedDate} />
       </div>
     </MainResponsive>
   );
