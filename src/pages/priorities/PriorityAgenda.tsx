@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
 import { agendaThumbnail, menuThumbnail, searchThumbnail } from '../../assets/images';
 import DayScheduler from '../../components/calendar/DayScheduler';
 import WeekCalendarAgenda from '../../components/calendar/WeekCalendarAgenda';
 import MainResponsive from '../../containers/main/MainResponsive';
-import { accountState, AccountState } from '../../modules/user';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 function PriorityAgenda(): JSX.Element {
   const [shortName, setShortName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
+
   useEffect(() => {
     if (account !== null && account.user.display_name) {
       const name = account.user.display_name || 'Default';

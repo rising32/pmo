@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
 import { controlThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
 import ReactModal from 'react-modal';
-import { accountState, AccountState, UserState } from '../../modules/user';
+import { UserState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
 import {
   getTeamMembers,
@@ -33,6 +32,7 @@ import DeliverableNameItem from '../../components/items/DeliverableNameItem';
 import UserNameItem from '../../components/items/UserNameItem';
 import FullCalendar from '../../components/calendar/FullCalendar';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 ReactModal.setAppElement('#root');
 
@@ -62,7 +62,7 @@ function Tasks(): JSX.Element {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
 
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);

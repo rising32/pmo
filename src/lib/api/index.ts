@@ -8,11 +8,22 @@ import { AccountState, UserState } from '../../modules/user';
 import { PriorityState } from '../../modules/weekPriority';
 import apiClient from './apiClient';
 
-export const sendAuthEmailPassword = (email: string, password: string) =>
-  apiClient.post<AccountState>('/user/login', {
-    email,
-    password,
+export const sendAuthEmailPassword = (email: string, password: string) => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .post<AccountState>('/user/login', {
+        email,
+        password,
+      })
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        console.log('error after post', err);
+        reject(err);
+      });
   });
+};
 export const loginWithToken = (token: string) => apiClient.post<AccountState>('/user/login/token', { token });
 
 export const sendSignUp = (email: string, phone_number: string, password: string, display_name: string) =>

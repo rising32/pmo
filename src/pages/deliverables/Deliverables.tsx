@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
 import { controlThumbnail, plusThumbnail } from '../../assets/images';
-import { accountState, AccountState } from '../../modules/user';
 import ReactModal from 'react-modal';
 import useRequest from '../../lib/hooks/useRequest';
 import {
@@ -30,6 +28,7 @@ import TaskNameItem from '../../components/items/TaskNameItem';
 import ProjectNameItem from '../../components/items/ProjectNameItem';
 import ClientNameItem from '../../components/items/ClientNameItem';
 import GroupItemView from '../../containers/main/GroupItemView';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -48,7 +47,7 @@ function Deliverables(): JSX.Element {
   const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
   const navigate = useNavigate();
 
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };

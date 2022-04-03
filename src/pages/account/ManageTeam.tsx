@@ -1,7 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import { accountState, AccountState, UserState } from '../../modules/user';
+import { UserState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
@@ -11,6 +9,7 @@ import { EmailSelectOption, UserSelectOption } from '../../modules/setting';
 import { toast } from 'react-toastify';
 import { TeamMemberState } from '../../modules/team';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const ManageTeam = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -22,10 +21,12 @@ const ManageTeam = () => {
   const [selectEmailOptions, setSelectEmailOptions] = React.useState<EmailSelectOption[]>([]);
   const [editTitle, setEditTitle] = React.useState('New team member');
   const [dataList, getDataList] = React.useState<UserState[]>([] as UserState[]);
-  const account = useRecoilValue<AccountState | null>(accountState);
+
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
   const [_addMember, , addMemberRes] = useRequest(addMember);
   const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
+
+  const { account } = useAuth();
 
   React.useEffect(() => {
     const owner_id = account?.user.user_id;

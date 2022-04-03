@@ -1,21 +1,14 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import CheckBox from '../../components/common/CheckBox';
-import {
-  sendDateTimeCurrencyCreate,
-  sendDateTimeCurrencyUpdate,
-  sendGetDateTimeCurrency,
-  sendUserProfileUpdate,
-  signOut,
-} from '../../lib/api';
+import { sendDateTimeCurrencyCreate, sendDateTimeCurrencyUpdate, sendGetDateTimeCurrency } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import Select, { SingleValue, components, DropdownIndicatorProps } from 'react-select';
 import { CurrencyOption, currencyOption, DateFormatOption, dateFormatOptions } from '../../modules/setting';
 import { dropDownThumbnail } from '../../assets/images';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const DropdownIndicator = (props: DropdownIndicatorProps<any, true>) => {
   return (
@@ -31,7 +24,7 @@ interface Props {
 }
 
 const DateTimeCurrency = ({ isEditDateTimeCurrency, onClose }: Props) => {
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
   const [loading, setLoading] = React.useState(false);
   const [dtcData, setDTCData] = React.useState({
     dtc_id: 0,

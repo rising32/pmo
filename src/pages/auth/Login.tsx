@@ -1,8 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { logoThumbnail, crayon, person, password } from '../../assets/images';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -13,6 +11,7 @@ import useRequest from '../../lib/hooks/useRequest';
 import { sendAuthEmailPassword } from '../../lib/api';
 import { validateEmail } from '../../lib/utills';
 import SpinerIcon from '../../components/common/SpinerIcon';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 interface IFormInputs {
   email: string;
@@ -27,9 +26,12 @@ const LoginSchema = yup
   .required();
 
 const Login = () => {
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [_sendAuthEmailPassword, loading, data, err, resetSendAuthEmail] = useRequest<AccountState>(sendAuthEmailPassword);
+  const location: any = useLocation();
+  const auth = useAuth();
+
+  const from = location.state?.from?.pathname || '/tasks';
 
   const {
     register,
@@ -39,17 +41,8 @@ const Login = () => {
     resolver: yupResolver(LoginSchema),
   });
 
-  React.useEffect(() => {
-    if (data && data.login_id) {
-      localStorage.setItem('user_token', data.token);
-      setAccount(data);
-      toast.success('login successed!');
-      navigate('/tasks');
-    }
-  }, [data]);
-
   const onLoginSubmit: SubmitHandler<IFormInputs> = data => {
-    if (account?.login_id) {
+    if (auth.account?.login_id) {
       return;
     }
     if (!validateEmail(data.email)) {
@@ -58,7 +51,9 @@ const Login = () => {
     }
     const email = data.email;
     const password = data.password;
-    _sendAuthEmailPassword(email, password);
+    auth.signin(email, password, () => {
+      navigate(from, { replace: true });
+    });
   };
 
   return (

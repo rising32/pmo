@@ -3,11 +3,10 @@ import { Column } from 'react-table';
 import Table from '../../components/common/Table';
 import { sendMonthProduct, sendWeekProduct } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
-import { useRecoilValue } from 'recoil';
-import { accountState } from '../../modules/user';
 import { TableHeader } from '../../modules/statistic';
 import { WeekWorkDay } from '../../modules/project';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 function Statistics(): JSX.Element {
   const [isWeek, setIsWeek] = useState(true);
@@ -22,7 +21,7 @@ function Statistics(): JSX.Element {
   const [_sendMonthProduct, sendingMonthProduct, sendMonthProductRes, sendMonthProductErr, resetSendMonthProduct] =
     useRequest(sendMonthProduct);
 
-  const account = useRecoilValue(accountState);
+  const { account } = useAuth();
   React.useEffect(() => {
     if (weekTableData.length === 0) {
       setLoaded(false);

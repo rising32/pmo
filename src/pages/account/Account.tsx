@@ -1,7 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import {
   clientRougeThumbnail,
   crayon,
@@ -21,10 +19,12 @@ import { getUserTasks, sendGetMyClients, sendMyProject, signOut } from '../../li
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const Account = () => {
   const navigate = useNavigate();
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const { account } = useAuth();
+
   const [clientNum, setClientNum] = React.useState(0);
   const [projectNum, setProjectNum] = React.useState(0);
   const [taskNum, setTaskNum] = React.useState(0);
@@ -36,7 +36,7 @@ const Account = () => {
 
   React.useEffect(() => {
     if (signOutRes && signOutRes.user_id) {
-      setAccount(null);
+      // setAccount(null);
       toast.success('sign out successed!');
       navigate('/tasks');
     }

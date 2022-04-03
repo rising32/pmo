@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import { documentThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { sendCreateProject, sendMyProject, sendUpdateByUser } from '../../lib/api';
@@ -10,6 +8,7 @@ import { ProjectState } from '../../modules/project';
 import { CalenderSvg } from '../../assets/svg';
 import MainResponsive from '../../containers/main/MainResponsive';
 import FullCalendar from '../../components/calendar/FullCalendar';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const ManageProject = () => {
   const [isEdit, setIsEdit] = useState(false);
@@ -27,7 +26,7 @@ const ManageProject = () => {
   const [actualEndMoment, setActualEndMoment] = useState<Date | null>(null);
   const [dateType, setDateType] = useState('ps');
 
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
   const [_sendCreateProject, , sendCreateProjectRes] = useRequest(sendCreateProject);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
   const [_sendUpdateByUser, , sendUpdateByUserRes] = useRequest(sendUpdateByUser);

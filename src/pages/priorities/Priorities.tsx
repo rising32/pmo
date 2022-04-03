@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
 import { plusThumbnail } from '../../assets/images';
-import { accountState, AccountState } from '../../modules/user';
 import useRequest from '../../lib/hooks/useRequest';
 import { sendCreatePriority, sendPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
 import PrioritiesCalender from '../../components/calendar/PrioritiesCalender';
@@ -13,10 +11,10 @@ import PastPriorityView from '../../containers/priority/PastPriorityView';
 import { PrioritiesTab } from '../../modules/tab';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
-import Select, { SingleValue } from 'react-select';
 import { ProjectTypeList, ProjectTypeState } from '../../modules/project';
 import ProjectType from '../../components/priority/ProjectType';
 import GroupItemView from '../../containers/main/GroupItemView';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
@@ -30,7 +28,6 @@ function Priorities(): JSX.Element {
   const [detailValue, setDetailValue] = useState('');
   const [selectedProjectType, setSeletedProjectType] = useState<ProjectTypeState | null>(null);
 
-  const account = useRecoilValue<AccountState | null>(accountState);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
@@ -38,6 +35,7 @@ function Priorities(): JSX.Element {
   const [_sendCreatePriority, , sendCreatePriorityRes] = useRequest(sendCreatePriority);
 
   const navigate = useNavigate();
+  const { account } = useAuth();
 
   useEffect(() => {
     if (textareaRef && textareaRef.current) {

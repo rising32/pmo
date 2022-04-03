@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
 import MainResponsive from '../../containers/main/MainResponsive';
 import { addWeeks, endOfYear, format, getWeek, getYear, lastDayOfWeek, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 import { DisplayWorkSettingState } from '../../modules/setting';
 import WorkSettingItem from '../../components/account/WorkSettingItem';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const WorkSetting = () => {
   const [year, setYear] = useState(getYear(new Date()));
@@ -14,7 +12,7 @@ const WorkSetting = () => {
   const [yearOptions, setYearOptions] = useState<number[]>([]);
   const [showYear, setShowYear] = useState(false);
 
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const { account } = useAuth();
 
   useEffect(() => {
     if (!account) return;

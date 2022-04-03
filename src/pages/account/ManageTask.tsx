@@ -1,6 +1,4 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { getUserTasks, sendCreateTask, updateByTask } from '../../lib/api';
@@ -9,6 +7,7 @@ import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';
 import { TaskState } from '../../modules/task';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const ManageTask = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -19,7 +18,8 @@ const ManageTask = () => {
   const [rate, setRate] = React.useState('');
   const [addAll, setAddAll] = React.useState(true);
   const [title, setTitle] = React.useState('Create Client');
-  const account = useRecoilValue<AccountState | null>(accountState);
+
+  const { account } = useAuth();
 
   const [_sendCreateTask, creatingTask, createTaskRes, , resetSendCreateTask] = useRequest(sendCreateTask);
   const [_getUserTasks, gettingUserTasks, getUserTasksRes, , resetGetUserTasks] = useRequest(getUserTasks);

@@ -1,14 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggleButton from './ThemeToggleButton';
-import { useRecoilValue } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
-import ImageBlock from '../common/ImageBlock';
 import Logo from './Logo';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 function Header(): JSX.Element {
   const navigate = useNavigate();
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
   const goLogin = () => {
     navigate('/');
   };

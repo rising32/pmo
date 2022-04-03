@@ -1,19 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
-import {
-  attachThumbnail,
-  backThumbnail,
-  downThumbnail,
-  dropDownThumbnail,
-  dropThumbnail,
-  locationThumbnail,
-  moreThumbnail,
-} from '../../assets/images';
-import AnimatedDropView from '../../components/common/AnimatedDropView';
+import { attachThumbnail, backThumbnail, downThumbnail, locationThumbnail, moreThumbnail } from '../../assets/images';
 import MainResponsive from '../../containers/main/MainResponsive';
 import { getUserAll } from '../../lib/api';
+import { useAuth } from '../../lib/context/AuthProvider';
 import useRequest from '../../lib/hooks/useRequest';
-import { accountState, AccountState, UserState } from '../../modules/user';
+import { UserState } from '../../modules/user';
 
 function PrioritySupport(): JSX.Element {
   const [users, setUsers] = useState<UserState[]>([]);
@@ -22,7 +13,7 @@ function PrioritySupport(): JSX.Element {
   const [hasFocus, setFocus] = useState(false);
   const mailtoRef = useRef<HTMLInputElement>(null);
 
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
   const [_getUserAll, , getUserAllRes] = useRequest(getUserAll);
 
   React.useEffect(() => {

@@ -1,6 +1,4 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { AccountState, accountState } from '../../modules/user';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { sendCreateClient, sendGetMyClients, sendRegisterMyClient, sendUpdateByClient } from '../../lib/api';
@@ -8,6 +6,7 @@ import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import { ClientState } from '../../modules/client';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const ManageClients = () => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -16,7 +15,7 @@ const ManageClients = () => {
   const [dataList, getDataList] = React.useState<ClientState[]>([] as ClientState[]);
   const [name, setName] = React.useState<string | undefined>('');
   const [title, setTitle] = React.useState('Create Client');
-  const account = useRecoilValue<AccountState | null>(accountState);
+  const { account } = useAuth();
 
   const [_sendCreateClient, creatingClient, createClientRes, , resetSendCreateClient] = useRequest(sendCreateClient);
   const [_sendRegisterMyClient, registeringMyClient, registerMyClientRes, , resetSendRegisterMyClient] = useRequest(sendRegisterMyClient);
