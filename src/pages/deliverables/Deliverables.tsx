@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { controlThumbnail, plusThumbnail } from '../../assets/images';
 import useRequest from '../../lib/hooks/useRequest';
-import { getUserTasks, sendGetMyClients, sendMyProject, sendPriorityByBeforeWeek } from '../../lib/api';
+import {
+  getUserTasks,
+  sendCreateDeliverable,
+  sendGetMyClients,
+  sendMyProject,
+  sendPriorityByBeforeWeek,
+  sendProjectWithClientId,
+  sendSetClient,
+  sendTodayDeliverable,
+  sendUpdateTask,
+} from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
 import { DeliverablesTab } from '../../modules/tab';
 import { PriorityState } from '../../modules/weekPriority';
@@ -20,6 +30,9 @@ import GroupItemView from '../../containers/main/GroupItemView';
 import { useAuth } from '../../lib/context/AuthProvider';
 import BeforeWeekPriority from '../../components/priority/BeforeWeekPriority';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
+import { format, getWeek } from 'date-fns';
+import ReactModal from 'react-modal';
+import TodayDeliverable from '../../components/deliverable/TodayDeliverable';
 
 function Deliverables(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -38,6 +51,8 @@ function Deliverables(): JSX.Element {
   const [showClient, setShowClient] = useState(false);
   const [showProject, setShowProject] = useState(false);
   const [showTask, setShowTask] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   const { account } = useAuth();
   const navigate = useNavigate();
@@ -45,37 +60,46 @@ function Deliverables(): JSX.Element {
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
   const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
+  const [_sendProjectWithClientId, , sendProjectWithClientIdRes] = useRequest(sendProjectWithClientId);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
-  const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
+  const [_sendTodayDeliverable, , sendTodayDeliverableRes] = useRequest(sendTodayDeliverable);
+  const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
+  const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
+  const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
-    user_id && _sendGetMyClients(user_id);
+    const planned_end_date = format(selectedDate, 'yyyy-MM-dd');
+    _sendTodayDeliverable(user_id, planned_end_date);
 
-    const creator_id = account?.user.user_id;
-    creator_id && _getUserTasks(creator_id);
-    creator_id && _sendMyProject(creator_id);
-  }, []);
+    const week = getWeek(selectedDate, { weekStartsOn: 1, firstWeekContainsDate: 4 });
+    _sendPriorityByBeforeWeek(user_id, week);
+  }, [selectedDate]);
+
   React.useEffect(() => {
     if (sendPriorityByBeforeWeekRes) {
-      const oldWeelyPriorities = rememberWeeklyPriorities;
-      sendPriorityByBeforeWeekRes.priority.map(item => oldWeelyPriorities.push(item));
-      setRememberWeeklyPriorities(oldWeelyPriorities);
+      setRememberWeeklyPriorities(sendPriorityByBeforeWeekRes.priority);
     }
   }, [sendPriorityByBeforeWeekRes]);
+  React.useEffect(() => {
+    if (sendTodayDeliverableRes) {
+      setDeliverables(sendTodayDeliverableRes.deliverable);
+    }
+  }, [sendTodayDeliverableRes]);
   React.useEffect(() => {
     if (getMyClientsRes) {
       setClientList(getMyClientsRes.clients);
     }
   }, [getMyClientsRes]);
   React.useEffect(() => {
-    if (sendMyProjectRes) {
-      setProjectList(sendMyProjectRes.project);
+    if (sendProjectWithClientIdRes) {
+      setProjectList(sendProjectWithClientIdRes.project);
     }
-  }, [sendMyProjectRes]);
+  }, [sendProjectWithClientIdRes]);
   React.useEffect(() => {
     if (getUserTasksRes) {
       setTaskList(getUserTasksRes.task);
+      setShowTask(true);
     }
   }, [getUserTasksRes]);
   const onSelectDate = (date: Date) => {
@@ -88,32 +112,75 @@ function Deliverables(): JSX.Element {
     setSelectedDeliverableTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const openClients = () => {
-    setShowClient(!showClient);
+    if (showClient) {
+      setShowClient(false);
+    } else {
+      setShowClient(true);
+
+      const user_id = account?.user.user_id;
+      user_id && _sendGetMyClients(user_id);
+    }
   };
   const openProjects = () => {
-    setShowProject(!showProject);
+    if (showProject) {
+      setShowProject(false);
+    } else {
+      setSelectedTask(null);
+      setShowProject(true);
+    }
   };
   const openTasks = () => {
-    setShowTask(!showTask);
+    if (showTask) {
+      setShowTask(false);
+    } else {
+      const creator_id = account?.user.user_id;
+      creator_id && _getUserTasks(creator_id);
+    }
   };
   const openDeliverables = () => {
     // setShowModal(!showModal);
   };
   const onSelectClient = (client: ClientState) => {
-    setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
+    if (selectedClient?.client_id === client.client_id) {
+      setSelectedClient(null);
+    } else {
+      setSelectedClient(client);
+      setSelectedProject(null);
+      setSelectedTask(null);
+      const creator_id = account?.user.user_id;
+      const client_id = client.client_id;
+      _sendProjectWithClientId(creator_id, client_id);
+    }
+
     setShowClient(false);
   };
   const onSelectProject = (project: ProjectState) => {
-    setSelectedProject(preSelectedProject => (preSelectedProject?.project_id === project?.project_id ? null : project));
+    if (selectedProject?.project_id === project.project_id) {
+      setSelectedProject(null);
+    } else {
+      setSelectedProject(project);
+    }
+
+    if (!project.client_id) {
+      setShowProjectModal(true);
+      return;
+    }
     setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
-    setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
+    if (selectedTask?.task_id === task.task_id) {
+      setSelectedTask(null);
+    } else {
+      setSelectedTask(task);
+    }
+    if (!task.project_id) {
+      setShowTaskModal(true);
+      return;
+    }
     setShowTask(false);
   };
-  const onSelectDeliverable = (deliverable: PriorityState) => {
-    // setSelectedDeliverable(deliverable);
-    // setShowModal(false);
+  const onSelectDeliverable = (deliverable: DeliverableState) => {
+    setSelectedDeliverable(deliverable);
   };
   const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDeliverableValue(event.target.value);
@@ -123,22 +190,33 @@ function Deliverables(): JSX.Element {
       toast.error('select deliverable!');
       return;
     }
-    if (account) {
-      // const deliverable: DeliverableState = {
-      //   wp_id: selectedDeliverable?.wp_id,
-      //   user_id: account?.user.user_id,
-      //   week: getWeek(selectedDate),
-      //   priority_num: 1,
-      //   goal: selectedDeliverable.deliverable,
-      //   deliverable: selectedDeliverable?.deliverable,
-      //   detail: selectedDeliverable?.detail || null,
-      //   is_completed: 1,
-      //   is_weekly: null,
-      //   end_date: selectedDate,
-      // };
-      // _sendUpdatePriority(deliverable);
+    if (account && selectedTask?.task_id) {
+      const deliverable: DeliverableState = {
+        deliverable_id: null,
+        deliverable_name: deliverableValue,
+        user_id: account.user.user_id,
+        task_id: selectedTask?.task_id,
+        periority_id: null,
+        budget: 50,
+        planned_end_date: format(selectedDate, 'yyyy-MM-dd'),
+        end_date: null,
+        is_completed: false,
+      };
+      _sendCreateDeliverable(deliverable);
     }
   };
+  React.useEffect(() => {
+    if (sendCreateDeliverableRes) {
+      setSelectedClient(null);
+      setSelectedProject(null);
+      setSelectedTask(null);
+      setDeliverableValue('');
+
+      const newDeliverables = deliverables;
+      newDeliverables.push(sendCreateDeliverableRes);
+      setDeliverables(newDeliverables);
+    }
+  }, [sendCreateDeliverableRes]);
   const onSelectWeelyPriority = (priority: PriorityState) => {
     if (selectedPriority?.wp_id === priority.wp_id) {
       setSelectedPriority(null);
@@ -146,6 +224,68 @@ function Deliverables(): JSX.Element {
       setSelectedPriority(priority);
     }
   };
+  const onCancelProjectWithClient = () => {
+    setSelectedProject(null);
+    setShowProjectModal(false);
+    setShowProject(false);
+  };
+  const onLinkProjectWithClient = () => {
+    const client_id = selectedClient?.client_id;
+    const project_id = selectedProject?.project_id;
+    _sendSetClient(client_id, project_id);
+  };
+  React.useEffect(() => {
+    if (sendSetClientRes) {
+      const newProjectList = projectList.map(project => {
+        if (project.project_id === sendSetClientRes.project_id) {
+          project.client_id = sendSetClientRes.client_id;
+        }
+        return project;
+      });
+      setProjectList(newProjectList);
+      setShowProject(false);
+      setShowProjectModal(false);
+    }
+  }, [sendSetClientRes]);
+  const onCancelTaskWithProject = () => {
+    setSelectedTask(null);
+    setShowTask(false);
+    setShowTaskModal(false);
+  };
+  const onLinkTaskWithProject = () => {
+    if (!selectedTask || !selectedProject?.project_id) return;
+    const newTask: TaskState = {
+      task_id: selectedTask.task_id,
+      creator_id: selectedTask.creator_id,
+      project_id: selectedProject?.project_id,
+      task_name: selectedTask.task_name,
+      priority: selectedTask.priority,
+      deliverable: selectedTask.deliverable,
+      description: selectedTask.description,
+      planned_start_date: null,
+      planned_end_date: null,
+      actual_start_date: null,
+      actual_end_date: null,
+      hourly_rate: selectedTask.hourly_rate,
+      is_add_all: selectedTask.is_add_all,
+      is_active: selectedTask.is_active,
+    };
+    _sendUpdateTask(newTask);
+  };
+  React.useEffect(() => {
+    if (sendUpdateTaskRes) {
+      setShowTaskModal(false);
+      const newTaskList = taskList.map(task => {
+        if (task.task_id === sendUpdateTaskRes.task_id) {
+          return sendUpdateTaskRes;
+        }
+        return task;
+      });
+      setTaskList(newTaskList);
+      setShowTask(false);
+      setShowProjectModal(false);
+    }
+  }, [sendUpdateTaskRes]);
 
   return (
     <MainResponsive>
@@ -155,9 +295,7 @@ function Deliverables(): JSX.Element {
         <span className='text-white'>{deliverables.length * 50 + '%'}</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        {deliverables.map((item, index) => (
-          <DeliverableItem key={index} index={index} deliverable={item} />
-        ))}
+        <TodayDeliverable deliverables={deliverables} selectedDeliverable={selectedDeliverable} onSelect={onSelectDeliverable} />
       </GroupItemView>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
         <span className='text-white font-bold text-center'>At least 2 deliverable per day</span>
@@ -172,8 +310,8 @@ function Deliverables(): JSX.Element {
           </div>
         </div>
         <AnimatedDropView show={showClient}>
-          {clientList.map((client, index) => (
-            <ClientNameItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+          {clientList.map(client => (
+            <ClientNameItem key={client.client_id} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
           ))}
         </AnimatedDropView>
         <div className='flex flex-row items-center text-xl font-bold text-white'>
@@ -185,8 +323,8 @@ function Deliverables(): JSX.Element {
           </div>
         </div>
         <AnimatedDropView show={showProject}>
-          {projectList.map((project, index) => (
-            <ProjectNameItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+          {projectList.map(project => (
+            <ProjectNameItem key={project.project_id} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
           ))}
         </AnimatedDropView>
         <div className='flex flex-row items-center text-xl font-bold text-white'>
@@ -240,6 +378,67 @@ function Deliverables(): JSX.Element {
       <GroupItemView className='mx-4 p-4 rounded-md'>
         <BeforeWeekPriority priorities={rememberWeeklyPriorities} selectedPriority={selectedPriority} onSelect={onSelectWeelyPriority} />
       </GroupItemView>
+
+      <ReactModal
+        isOpen={showProjectModal}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>Do you want to link this project with client</div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Client:</div>
+          <div className='font-bold'>{selectedClient?.client_name}</div>
+        </div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Project:</div>
+          <div className='font-bold'>{selectedProject?.project_name}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelProjectWithClient}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onLinkProjectWithClient}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
+      <ReactModal
+        isOpen={showTaskModal}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>Do you want to link this task with project</div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Project:</div>
+          <div className='font-bold'>{selectedProject?.project_name}</div>
+        </div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Task:</div>
+          <div className='font-bold'>{selectedTask?.task_name}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelTaskWithProject}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onLinkTaskWithProject}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
     </MainResponsive>
   );
 }

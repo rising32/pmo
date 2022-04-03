@@ -14,7 +14,7 @@ import {
   sendSetClient,
   sendTaskWithProjectId,
   sendUCTP,
-  updateByTask,
+  sendUpdateTask,
 } from '../../lib/api';
 import { ClientState } from '../../modules/client';
 import { TaskState } from '../../modules/task';
@@ -73,7 +73,7 @@ function Tasks(): JSX.Element {
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
   const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
   const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
-  const [_updateByTask, , updateByTaskRes, , resetUpdateByTask] = useRequest(updateByTask);
+  const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -263,20 +263,20 @@ function Tasks(): JSX.Element {
       is_add_all: selectedTask.is_add_all,
       is_active: selectedTask.is_active,
     };
-    _updateByTask(newTask);
+    _sendUpdateTask(newTask);
   };
   React.useEffect(() => {
-    if (updateByTaskRes) {
+    if (sendUpdateTaskRes) {
       setShowTaskModal(false);
       const newTaskList = taskList.map(task => {
-        if (task.task_id === updateByTaskRes.task_id) {
-          return updateByTaskRes;
+        if (task.task_id === sendUpdateTaskRes.task_id) {
+          return sendUpdateTaskRes;
         }
         return task;
       });
       setTaskList(newTaskList);
     }
-  }, [updateByTaskRes]);
+  }, [sendUpdateTaskRes]);
 
   return (
     <MainResponsive>

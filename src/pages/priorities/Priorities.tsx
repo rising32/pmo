@@ -16,7 +16,7 @@ import { useAuth } from '../../lib/context/AuthProvider';
 import WeekPriority from '../../components/priority/WeekPriority';
 import BeforeWeekPriority from '../../components/priority/BeforeWeekPriority';
 
-const thisWeek = getWeek(new Date());
+const thisWeek = getWeek(new Date(), { weekStartsOn: 1, firstWeekContainsDate: 4 });
 function Priorities(): JSX.Element {
   const [selectedWeek, setSelectedWeek] = useState(thisWeek);
   const [selectedPriorityTab, setSelectedPriorityTab] = useState('default');

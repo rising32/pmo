@@ -18,7 +18,7 @@ const WeekPriority = ({ priorities, selectedPriority, week, onSelect }: Props) =
           className={`flex flex-row text-xl font-bold ${selectedPriority?.wp_id === priority.wp_id ? 'text-rouge-blue' : 'text-white'}`}
           onClick={() => onSelect(priority)}
         >
-          {week === getWeek(new Date()) && (
+          {week === getWeek(new Date(), { weekStartsOn: 1, firstWeekContainsDate: 4 }) && (
             <CheckImage isSelected={selectedPriority?.wp_id === priority.wp_id} isChecked={priority.is_completed} />
           )}
           <div className='flex items-center w-4'>{index + 1}</div>

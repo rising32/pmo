@@ -9,7 +9,7 @@ interface Props {
 }
 const PrioritiesCalender = ({ selectedWeek, onSelectWeek }: Props) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [currentWeek, setCurrentWeek] = useState(getWeek(currentMonth));
+  const [currentWeek, setCurrentWeek] = useState(getWeek(currentMonth, { weekStartsOn: 1, firstWeekContainsDate: 4 }));
 
   React.useEffect(() => {
     onSelectWeek(currentWeek);
@@ -17,11 +17,11 @@ const PrioritiesCalender = ({ selectedWeek, onSelectWeek }: Props) => {
   const changeWeekHandle = (btnType: string) => {
     if (btnType === 'prev') {
       setCurrentMonth(subWeeks(currentMonth, 1));
-      setCurrentWeek(getWeek(subWeeks(currentMonth, 1)));
+      setCurrentWeek(getWeek(subWeeks(currentMonth, 1), { weekStartsOn: 1, firstWeekContainsDate: 4 }));
     }
     if (btnType === 'next') {
       setCurrentMonth(addWeeks(currentMonth, 1));
-      setCurrentWeek(getWeek(addWeeks(currentMonth, 1)));
+      setCurrentWeek(getWeek(addWeeks(currentMonth, 1), { weekStartsOn: 1, firstWeekContainsDate: 4 }));
     }
   };
   return (

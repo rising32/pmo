@@ -1,7 +1,7 @@
 import React from 'react';
 import { rightArrowThumbnail } from '../../assets/images';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
-import { getUserTasks, sendCreateTask, updateByTask } from '../../lib/api';
+import { getUserTasks, sendCreateTask, sendUpdateTask } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import CheckBox from '../../components/common/CheckBox';
@@ -23,7 +23,7 @@ const ManageTask = () => {
 
   const [_sendCreateTask, creatingTask, createTaskRes, , resetSendCreateTask] = useRequest(sendCreateTask);
   const [_getUserTasks, gettingUserTasks, getUserTasksRes, , resetGetUserTasks] = useRequest(getUserTasks);
-  const [_updateByTask, updatingTask, updateTaskRes, , resetUpdateByTask] = useRequest(updateByTask);
+  const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
 
   React.useEffect(() => {
     const creator_id = account?.user.user_id;
@@ -61,22 +61,22 @@ const ManageTask = () => {
   }, [createTaskRes]);
   React.useEffect(() => {
     setIsEdit(false);
-    if (updateTaskRes) {
+    if (sendUpdateTaskRes) {
       const updateTask: TaskState = {
-        task_id: updateTaskRes.task_id,
-        creator_id: updateTaskRes.creator_id,
-        project_id: updateTaskRes.project_id,
-        task_name: updateTaskRes.task_name,
-        deliverable: updateTaskRes.deliverable,
-        priority: updateTaskRes.priority,
-        description: updateTaskRes.description,
-        planned_start_date: updateTaskRes.planned_start_date,
-        planned_end_date: updateTaskRes.planned_end_date,
-        actual_start_date: updateTaskRes.actual_start_date,
-        actual_end_date: updateTaskRes.actual_end_date,
-        hourly_rate: updateTaskRes.hourly_rate,
-        is_add_all: updateTaskRes.is_add_all,
-        is_active: updateTaskRes.is_active,
+        task_id: sendUpdateTaskRes.task_id,
+        creator_id: sendUpdateTaskRes.creator_id,
+        project_id: sendUpdateTaskRes.project_id,
+        task_name: sendUpdateTaskRes.task_name,
+        deliverable: sendUpdateTaskRes.deliverable,
+        priority: sendUpdateTaskRes.priority,
+        description: sendUpdateTaskRes.description,
+        planned_start_date: sendUpdateTaskRes.planned_start_date,
+        planned_end_date: sendUpdateTaskRes.planned_end_date,
+        actual_start_date: sendUpdateTaskRes.actual_start_date,
+        actual_end_date: sendUpdateTaskRes.actual_end_date,
+        hourly_rate: sendUpdateTaskRes.hourly_rate,
+        is_add_all: sendUpdateTaskRes.is_add_all,
+        is_active: sendUpdateTaskRes.is_active,
       };
       const newDataList = dataList.map(item => {
         if (item.project_id === updateTask.project_id) {
@@ -88,7 +88,7 @@ const ManageTask = () => {
       getDataList(newDataList);
       toast.success('task updated successfully');
     }
-  }, [updateTaskRes]);
+  }, [sendUpdateTaskRes]);
 
   const onCreateUpdateClient = () => {
     if (!name) {
@@ -134,7 +134,7 @@ const ManageTask = () => {
         is_add_all: addAll,
         is_active: selectedItem.is_active,
       };
-      _updateByTask(newTask);
+      _sendUpdateTask(newTask);
     }
   };
   const onCreateAndEdit = (task: TaskState | null) => {

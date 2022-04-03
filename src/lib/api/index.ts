@@ -72,7 +72,7 @@ export const sendSetClient = (client_id: number, project_id: number) =>
 export const getUserTasks = (creator_id: number) => apiClient.post<ResponseTasks>('/project/task/get_user_tasks', { creator_id });
 export const sendTaskWithProjectId = (creator_id: number, project_id: number) =>
   apiClient.post<ResponseTasks>('/project/task/get_by_pna', { creator_id, project_id });
-export const updateByTask = (params: TaskState) => apiClient.post<TaskState>('/project/task/update', params);
+export const sendUpdateTask = (params: TaskState) => apiClient.post<TaskState>('/project/task/update', params);
 
 export const getUserAll = () => apiClient.get<UserState[]>('/user/all');
 
@@ -125,3 +125,12 @@ export interface ResponseUCTP {
   task: TaskState[];
 }
 export const sendUCTP = (params: UCTPParams) => apiClient.post<ResponseUCTP[]>('/project/task/get_ucpt', params);
+
+export interface ResponseDeliverableList {
+  user_id: number;
+  deliverable: DeliverableState[];
+}
+export const sendTodayDeliverable = (user_id: number, planned_end_date: Date) =>
+  apiClient.post<ResponseDeliverableList>('/project/deliverable/get/planned_end_date', { user_id, planned_end_date });
+
+export const sendCreateDeliverable = (params: DeliverableState) => apiClient.post<DeliverableState>('/project/deliverable/create', params);
