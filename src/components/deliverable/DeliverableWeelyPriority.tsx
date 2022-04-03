@@ -11,7 +11,7 @@ const DeliverableWeelyPriority = ({ priority, thisWeek }: Props) => {
     <div className='flex items-center w-full'>
       {!thisWeek && <DocumentCheckIcon isCompleted={priority.is_completed} />}
       <span className='text-white font-bold pr-2'>{'W' + priority.week + ' :'}</span>
-      <span className='text-white font-bold pr-2 truncate'>{priority.deliverable}</span>
+      <span className='text-white font-bold pr-2 truncate'>{priority.priority}</span>
     </div>
   );
 };

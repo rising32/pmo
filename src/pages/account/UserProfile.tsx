@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { AccountState, accountState, UserState } from '../../modules/user';
 import { personGrayThumbnail } from '../../assets/images';
-import { getTeamMembers, signOut } from '../../lib/api';
+import { signOut } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
 import EditUserNameEmail from '../../components/profile/EditUserNameEmail';

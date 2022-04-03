@@ -15,7 +15,7 @@ const DeliverableModalItem = ({ deliverable, selectedDeliverable, onSelect }: Pr
           {selectedDeliverable && selectedDeliverable.wp_id === deliverable.wp_id ? <CheckSvg stroke='red' strokeWidth={4} /> : null}
         </span>
       </div>
-      <div className='pl-2 text-lg font-bold flex flex-1 truncate'>{deliverable.deliverable}</div>
+      <div className='pl-2 text-lg font-bold flex flex-1 truncate'>{deliverable.priority}</div>
     </div>
   );
 };

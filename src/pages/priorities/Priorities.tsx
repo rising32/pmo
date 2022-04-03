@@ -5,9 +5,7 @@ import useRequest from '../../lib/hooks/useRequest';
 import { sendCreatePriority, sendPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
 import PrioritiesCalender from '../../components/calendar/PrioritiesCalender';
 import { PriorityState } from '../../modules/weekPriority';
-import PriorityItem from '../../components/priority/PriorityItem';
 import { getWeek } from 'date-fns';
-import PastPriorityView from '../../containers/priority/PastPriorityView';
 import { PrioritiesTab } from '../../modules/tab';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
@@ -15,6 +13,8 @@ import { ProjectTypeList, ProjectTypeState } from '../../modules/project';
 import ProjectType from '../../components/priority/ProjectType';
 import GroupItemView from '../../containers/main/GroupItemView';
 import { useAuth } from '../../lib/context/AuthProvider';
+import WeekPriority from '../../components/priority/WeekPriority';
+import BeforeWeekPriority from '../../components/priority/BeforeWeekPriority';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
@@ -24,7 +24,7 @@ function Priorities(): JSX.Element {
   const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
   const [beforeWeeklyPriorities, setBeforWeeklyPriorities] = useState<PriorityState[]>([]);
   const [priorityValue, setPriorityValue] = useState('');
-  const [deliverableValue, setDeliverableValue] = useState('');
+  const [goalValue, setGoalValue] = useState('');
   const [detailValue, setDetailValue] = useState('');
   const [selectedProjectType, setSeletedProjectType] = useState<ProjectTypeState | null>(null);
 
@@ -80,8 +80,8 @@ function Priorities(): JSX.Element {
   const changePriorityValue = (event: React.FormEvent<HTMLInputElement>) => {
     setPriorityValue(event.currentTarget.value);
   };
-  const changeDeliverableValue = (event: React.FormEvent<HTMLInputElement>) => {
-    setDeliverableValue(event.currentTarget.value);
+  const changeGoalValue = (event: React.FormEvent<HTMLInputElement>) => {
+    setGoalValue(event.currentTarget.value);
   };
   const changeDetailValue = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDetailValue(event.target.value);
@@ -91,21 +91,15 @@ function Priorities(): JSX.Element {
       toast.error('priority is not empty!');
       return;
     }
-    if (!deliverableValue) {
-      toast.error('deliverable is not empty!');
-      setSelectedPriorityTab('details');
-      return;
-    }
     if (account) {
       const priority: PriorityState = {
         wp_id: null,
         user_id: account?.user.user_id,
         week: selectedWeek,
-        priority_num: 1,
-        goal: deliverableValue,
-        deliverable: deliverableValue,
+        priority: priorityValue,
+        goal: goalValue,
         detail: detailValue,
-        is_completed: null,
+        is_completed: false,
         is_weekly: null,
         end_date: null,
       };
@@ -116,7 +110,7 @@ function Priorities(): JSX.Element {
     if (sendCreatePriorityRes) {
       const newWeeklyPriorities = weeklyPriorities;
       setPriorityValue('');
-      setDeliverableValue('');
+      setGoalValue('');
       setDetailValue('');
       setSelectedPriorityTab('default');
       newWeeklyPriorities.push(sendCreatePriorityRes);
@@ -128,13 +122,13 @@ function Priorities(): JSX.Element {
     if (selectedPriority?.wp_id === priority.wp_id) {
       setSelectedPriority(null);
       setPriorityValue('');
-      setDeliverableValue('');
+      setGoalValue('');
       setDetailValue('');
       setSelectedPriorityTab('default');
     } else {
       setSelectedPriority(priority);
       setPriorityValue(priority.goal);
-      setDeliverableValue(priority.deliverable);
+      setGoalValue(priority.goal);
       setDetailValue(priority.detail || '');
       setSelectedPriorityTab('details');
     }
@@ -150,16 +144,12 @@ function Priorities(): JSX.Element {
         <span className='text-white font-bold truncate'>Weekly priorities</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        {weeklyPriorities.map((item, index) => (
-          <PriorityItem
-            key={index}
-            index={index}
-            priority={item}
-            thisWeek={thisWeek == selectedWeek}
-            selectedPriority={selectedPriority}
-            onSelect={onSelectWeelyPriority}
-          />
-        ))}
+        <WeekPriority
+          priorities={weeklyPriorities}
+          week={selectedWeek}
+          selectedPriority={selectedPriority}
+          onSelect={onSelectWeelyPriority}
+        />
       </GroupItemView>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
         <span className='text-white font-bold text-center'>Priority achieved this week with clear goal defined</span>
@@ -178,14 +168,14 @@ function Priorities(): JSX.Element {
           </div>
         </div>
         <div className='flex flex-row items-center'>
-          <div className='text-xl font-bold text-white'>Deliverable :</div>
+          <div className='text-xl font-bold text-white'>Goal :</div>
           <div className='ml-4 flex flex-1 w-full'>
             <input
               type='textarea'
               name='textValue'
               className='w-full bg-card-gray text-white text-xl font-bold focus:outline-none truncate'
-              value={deliverableValue}
-              onChange={changeDeliverableValue}
+              value={goalValue}
+              onChange={changeGoalValue}
             />
           </div>
         </div>
@@ -202,16 +192,6 @@ function Priorities(): JSX.Element {
             </label>
           )}
         </div>
-        {selectedPriorityTab === 'details' && (
-          <div className='flex flex-col mt-3'>
-            <span className='text-xl font-bold text-rouge-blue flex flex-1'>
-              A.<span className='text-xl font-bold text-white flex ml-4'>Weekly priorities</span>
-            </span>
-            <span className='text-xl font-bold text-rouge-blue flex flex-1'>
-              B.<span className='text-xl font-bold text-white flex ml-4'>Monthly priorities</span>
-            </span>
-          </div>
-        )}
         {selectedPriorityTab === 'project' && (
           <>
             <div className='flex flex-row items-center'>
@@ -258,7 +238,7 @@ function Priorities(): JSX.Element {
         <span className='text-white font-bold truncate'>Past priorities not achieved</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        <PastPriorityView priorities={beforeWeeklyPriorities} />
+        <BeforeWeekPriority priorities={beforeWeeklyPriorities} selectedPriority={selectedPriority} onSelect={onSelectWeelyPriority} />
       </GroupItemView>
     </MainResponsive>
   );

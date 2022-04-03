@@ -2,11 +2,10 @@ export interface PriorityState {
   wp_id?: number | null;
   user_id: number;
   week: number;
-  priority_num: number | null;
+  priority: string;
   goal: string;
-  deliverable: string;
   detail: string | null;
-  is_completed: number | null;
+  is_completed: boolean;
   is_weekly: null;
   end_date: Date | null;
 }

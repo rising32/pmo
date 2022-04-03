@@ -331,7 +331,7 @@ function Tasks(): JSX.Element {
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Deliverable :</span>
           <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedDeliverable?.deliverable}</div>
+          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedDeliverable?.priority}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openDeliverable}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>

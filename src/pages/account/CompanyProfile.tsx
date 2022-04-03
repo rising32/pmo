@@ -7,11 +7,9 @@ import {
   organizationThumbnail,
   personGrayThumbnail,
   rightArrowThumbnail,
-  slideBarThumbnail,
   teamMemberThumbnail,
   workSettingThumbnail,
 } from '../../assets/images';
-import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { getTeamMembers, signOut } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';

@@ -4,7 +4,7 @@ import { crayon } from '../../assets/images';
 import AnimatedDropView from '../common/AnimatedDropView';
 import Select, { SingleValue } from 'react-select';
 import MultiRangeSlider from '../common/MultiRangeSlider';
-import RedDocumentIcon from '../common/RedDocumentIcon';
+import CheckImage from '../common/CheckImage';
 import WeekCalendar from '../calendar/WeekCalendar';
 
 interface Props {
@@ -104,11 +104,11 @@ const WorkSettingItem = ({ displayWorkSetting, onChange }: Props) => {
             <div className='flex text-center'>Get a notification to start:</div>
             <div className='flex flex-col flex-1 justify-center pl-6'>
               <div className='flex flex-row' onClick={() => setIsPriorityChecked(!isPriorityChecked)}>
-                <RedDocumentIcon isChecked={isPriorityChecked} />
+                <CheckImage isSelected={isPriorityChecked} isChecked={false} />
                 <div style={isPriorityChecked ? { color: 'red' } : { color: 'black' }}>Priorities</div>
               </div>
               <div className='flex flex-row' onClick={() => setIsDeliverableChecked(!isDeliverableChecked)}>
-                <RedDocumentIcon isChecked={isDeliverableChecked} />
+                <CheckImage isSelected={isDeliverableChecked} isChecked={false} />
                 <div style={isDeliverableChecked ? { color: 'red' } : { color: 'black' }}>Deliverables</div>
               </div>
             </div>

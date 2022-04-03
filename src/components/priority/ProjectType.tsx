@@ -1,6 +1,6 @@
 import React from 'react';
-import RedDocumentIcon from '../common/RedDocumentIcon';
 import { ProjectTypeState } from '../../modules/project';
+import CheckImage from '../common/CheckImage';
 
 interface Props {
   selectedProjectType: ProjectTypeState | null;
@@ -10,7 +10,7 @@ interface Props {
 const ProjectType = ({ selectedProjectType, projectTypeItem, onSelect }: Props) => {
   return (
     <div className='flex flex-row' onClick={() => onSelect(projectTypeItem)}>
-      <RedDocumentIcon isChecked={projectTypeItem.project_type === selectedProjectType?.project_type} />
+      <CheckImage isSelected={projectTypeItem.project_type === selectedProjectType?.project_type} isChecked={false} />
       <div
         className={`text-xl font-bold ${
           projectTypeItem.project_type === selectedProjectType?.project_type ? 'text-rouge-blue rounded-full' : 'text-white'

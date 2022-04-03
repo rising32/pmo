@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MainResponsive from '../../containers/main/MainResponsive';
-import { accountState, AccountState } from '../../modules/user';
-import { Camera, CameraType } from 'react-camera-pro';
 import { useUserMedia } from '../../lib/hooks/useUserMedia';
 
 const CAPTURE_OPTIONS = {

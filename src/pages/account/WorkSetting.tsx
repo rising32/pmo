@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainResponsive from '../../containers/main/MainResponsive';
-import { addWeeks, endOfYear, format, getWeek, getYear, lastDayOfWeek, startOfWeek, startOfYear, subWeeks } from 'date-fns';
+import { addWeeks, endOfYear, getWeek, getYear, lastDayOfWeek, startOfWeek, startOfYear } from 'date-fns';
 import { DisplayWorkSettingState } from '../../modules/setting';
 import WorkSettingItem from '../../components/account/WorkSettingItem';
 import AnimatedDropView from '../../components/common/AnimatedDropView';

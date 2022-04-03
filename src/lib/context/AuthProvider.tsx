@@ -19,7 +19,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const signin = (email: string, password: string, callback: VoidFunction) => {
     sendAuthEmailPassword(email, password)
       .then(res => {
-        console.log(res);
         const newAccount = res as AccountState;
         localStorage.setItem('user_token', newAccount.token);
         setAccount(newAccount);

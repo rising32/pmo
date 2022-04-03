@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { controlThumbnail, plusThumbnail } from '../../assets/images';
-import ReactModal from 'react-modal';
 import useRequest from '../../lib/hooks/useRequest';
-import {
-  getUserTasks,
-  sendGetMyClients,
-  sendMyProject,
-  sendPriorityByBeforeWeek,
-  sendPriorityByWeek,
-  sendUpdatePriority,
-} from '../../lib/api';
+import { getUserTasks, sendGetMyClients, sendMyProject, sendPriorityByBeforeWeek } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
-import { getWeek, isSameDay, parseISO } from 'date-fns';
 import { DeliverablesTab } from '../../modules/tab';
 import { PriorityState } from '../../modules/weekPriority';
 import { DeliverableState } from '../../modules/deliverable';
@@ -19,8 +10,6 @@ import { ClientState } from '../../modules/client';
 import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
 import DeliverableItem from '../../components/deliverable/DeliverableItem';
-import DeliverableWeelyPriority from '../../components/deliverable/DeliverableWeelyPriority';
-import DeliverableModalItem from '../../components/deliverable/DeliverableModalItem';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
@@ -29,34 +18,35 @@ import ProjectNameItem from '../../components/items/ProjectNameItem';
 import ClientNameItem from '../../components/items/ClientNameItem';
 import GroupItemView from '../../containers/main/GroupItemView';
 import { useAuth } from '../../lib/context/AuthProvider';
+import BeforeWeekPriority from '../../components/priority/BeforeWeekPriority';
+import AnimatedDropView from '../../components/common/AnimatedDropView';
 
-const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDeliverableTab, setSelectedDeliverableTab] = useState('default');
+  const [selectedPriority, setSelectedPriority] = useState<PriorityState | null>(null);
   const [rememberWeeklyPriorities, setRememberWeeklyPriorities] = useState<PriorityState[]>([]);
-  const [todayDeliverables, setTodayDeliverables] = useState<DeliverableState[]>([]);
-  const [weekDeliverables, setWeekDeliverables] = useState<PriorityState[]>([]);
-  const [type, setType] = useState('');
+  const [deliverables, setDeliverables] = useState<DeliverableState[]>([]);
   const [clientList, setClientList] = useState<ClientState[]>([]);
   const [projectList, setProjectList] = useState<ProjectState[]>([]);
   const [taskList, setTaskList] = useState<TaskState[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
-  const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<DeliverableState | null>(null);
+  const [deliverableValue, setDeliverableValue] = useState('');
+  const [showClient, setShowClient] = useState(false);
+  const [showProject, setShowProject] = useState(false);
+  const [showTask, setShowTask] = useState(false);
 
   const { account } = useAuth();
   const navigate = useNavigate();
 
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-  const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
   const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
-  const [_sendUpdatePriority, , sendUpdatePriorityRes] = useRequest(sendUpdatePriority);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -66,46 +56,6 @@ function Deliverables(): JSX.Element {
     creator_id && _getUserTasks(creator_id);
     creator_id && _sendMyProject(creator_id);
   }, []);
-  React.useEffect(() => {
-    if (!account) {
-      return;
-    }
-    const newTodayDeliverables: DeliverableState[] = todayDeliverables;
-    rememberWeeklyPriorities.map(item => {
-      if (!item.end_date) return;
-
-      if (isSameDay(parseISO(item.end_date.toLocaleString()), selectedDate)) {
-        const completePriority: DeliverableState = {
-          wp_id: item.wp_id,
-          user_id: item.user_id,
-          week: item.week,
-          priority_num: item.priority_num,
-          goal: item.deliverable,
-          deliverable: item.deliverable,
-          detail: item.detail || null,
-          is_completed: item.is_completed,
-          is_weekly: item.is_weekly,
-          end_date: item.end_date,
-        };
-        newTodayDeliverables.push(completePriority);
-      }
-    });
-    setTodayDeliverables(newTodayDeliverables);
-  }, [rememberWeeklyPriorities]);
-  React.useEffect(() => {
-    const user_id = account?.user.user_id;
-    const week = getWeek(selectedDate);
-    _sendPriorityByWeek(user_id, week);
-  }, [getWeek(selectedDate)]);
-  React.useEffect(() => {
-    if (sendPriorityByWeekRes) {
-      setRememberWeeklyPriorities(sendPriorityByWeekRes.priority);
-      setWeekDeliverables(sendPriorityByWeekRes.priority);
-      const user_id = account?.user.user_id;
-      const week = getWeek(selectedDate);
-      _sendPriorityByBeforeWeek(user_id, week);
-    }
-  }, [sendPriorityByWeekRes]);
   React.useEffect(() => {
     if (sendPriorityByBeforeWeekRes) {
       const oldWeelyPriorities = rememberWeeklyPriorities;
@@ -138,80 +88,74 @@ function Deliverables(): JSX.Element {
     setSelectedDeliverableTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
   const openClients = () => {
-    setType('client');
-    setShowModal(!showModal);
+    setShowClient(!showClient);
   };
   const openProjects = () => {
-    setType('project');
-    setShowModal(!showModal);
+    setShowProject(!showProject);
   };
   const openTasks = () => {
-    setType('task');
-    setShowModal(!showModal);
+    setShowTask(!showTask);
   };
   const openDeliverables = () => {
-    setType('deliverable');
-    setShowModal(!showModal);
+    // setShowModal(!showModal);
   };
   const onSelectClient = (client: ClientState) => {
     setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
-    setShowModal(false);
+    setShowClient(false);
   };
   const onSelectProject = (project: ProjectState) => {
     setSelectedProject(preSelectedProject => (preSelectedProject?.project_id === project?.project_id ? null : project));
-    setShowModal(false);
+    setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
     setSelectedTask(preSelectedTask => (preSelectedTask?.task_id === task?.task_id ? null : task));
-    setShowModal(false);
+    setShowTask(false);
   };
   const onSelectDeliverable = (deliverable: PriorityState) => {
-    setSelectedDeliverable(deliverable);
-    setShowModal(false);
+    // setSelectedDeliverable(deliverable);
+    // setShowModal(false);
+  };
+  const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliverableValue(event.target.value);
   };
   const onAddDeliverable = () => {
-    if (!selectedDeliverable) {
+    if (!deliverableValue) {
       toast.error('select deliverable!');
       return;
     }
     if (account) {
-      const deliverable: DeliverableState = {
-        wp_id: selectedDeliverable?.wp_id,
-        user_id: account?.user.user_id,
-        week: getWeek(selectedDate),
-        priority_num: 1,
-        goal: selectedDeliverable.deliverable,
-        deliverable: selectedDeliverable?.deliverable,
-        detail: selectedDeliverable?.detail || null,
-        is_completed: 1,
-        is_weekly: null,
-        end_date: selectedDate,
-      };
-      _sendUpdatePriority(deliverable);
+      // const deliverable: DeliverableState = {
+      //   wp_id: selectedDeliverable?.wp_id,
+      //   user_id: account?.user.user_id,
+      //   week: getWeek(selectedDate),
+      //   priority_num: 1,
+      //   goal: selectedDeliverable.deliverable,
+      //   deliverable: selectedDeliverable?.deliverable,
+      //   detail: selectedDeliverable?.detail || null,
+      //   is_completed: 1,
+      //   is_weekly: null,
+      //   end_date: selectedDate,
+      // };
+      // _sendUpdatePriority(deliverable);
     }
   };
-  React.useEffect(() => {
-    if (sendUpdatePriorityRes) {
-      const newDeliverables = todayDeliverables;
-      newDeliverables.push(sendUpdatePriorityRes);
-      setTodayDeliverables(newDeliverables);
-      setSelectedClient(null);
-      setSelectedProject(null);
-      setSelectedTask(null);
-      setSelectedDeliverable(null);
-      setSelectedDeliverableTab('default');
+  const onSelectWeelyPriority = (priority: PriorityState) => {
+    if (selectedPriority?.wp_id === priority.wp_id) {
+      setSelectedPriority(null);
+    } else {
+      setSelectedPriority(priority);
     }
-  }, [sendUpdatePriorityRes]);
+  };
 
   return (
     <MainResponsive>
       <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
-        <span className='text-white'>{todayDeliverables.length * 50 + '%'}</span>
+        <span className='text-white'>{deliverables.length * 50 + '%'}</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        {todayDeliverables.map((item, index) => (
+        {deliverables.map((item, index) => (
           <DeliverableItem key={index} index={index} deliverable={item} />
         ))}
       </GroupItemView>
@@ -219,36 +163,55 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold text-center'>At least 2 deliverable per day</span>
       </div>
       <GroupItemView className='mx-4 px-4 pt-4 pb-16 border-rouge-blue border-4 bg-card-gray relative'>
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Client :</span>
-          <div className='border-dashed border-2 border-white flex-1' />
+        <div className='flex flex-row items-center text-xl font-bold text-white'>
+          <span className='pr-2'>Client :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
           <div className='border-dashed text-rouge-blue px-2'>{selectedClient?.client_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Project :</span>
-          <div className='border-dashed border-2 border-white flex-1' />
+        <AnimatedDropView show={showClient}>
+          {clientList.map((client, index) => (
+            <ClientNameItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+          ))}
+        </AnimatedDropView>
+        <div className='flex flex-row items-center text-xl font-bold text-white'>
+          <span className='pr-2'>Project :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
           <div className='border-dashed text-rouge-blue px-2'>{selectedProject?.project_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openProjects}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2'>Task :</span>
-          <div className='border-dashed border-2 border-white flex-1' />
+        <AnimatedDropView show={showProject}>
+          {projectList.map((project, index) => (
+            <ProjectNameItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+          ))}
+        </AnimatedDropView>
+        <div className='flex flex-row items-center text-xl font-bold text-white'>
+          <span className='pr-2'>Task :</span>
+          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
           <div className='border-dashed text-rouge-blue px-2'>{selectedTask?.task_name}</div>
           <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
             <img src={controlThumbnail} className='h-4 w-auto' />
           </div>
         </div>
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white font-bold pr-2 truncate'>Deliverable :</span>
-          <div className='border-dashed border-2 border-white flex-1' />
-          <div className='border-dashed text-rouge-blue px-2 truncate'>{selectedDeliverable?.deliverable}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openDeliverables}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
+        <AnimatedDropView show={showTask}>
+          {taskList.map((task, index) => (
+            <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
+          ))}
+        </AnimatedDropView>
+        <div className='flex flex-row items-center text-xl font-bold text-white'>
+          <div>Deliverable :</div>
+          <div className='ml-4 flex flex-1 w-full'>
+            <input
+              type='textarea'
+              name='textValue'
+              className='w-full bg-card-gray focus:outline-none truncate'
+              value={deliverableValue}
+              onChange={changeDeliverableValue}
+            />
           </div>
         </div>
         <div className='absolute -bottom-1 left-0 w-full flex flex-row justify-evenly items-center'>
@@ -275,49 +238,8 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold truncate'>Remember your weekly priorities</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        {rememberWeeklyPriorities.map((item, index) => (
-          <DeliverableWeelyPriority key={index} priority={item} />
-        ))}
+        <BeforeWeekPriority priorities={rememberWeeklyPriorities} selectedPriority={selectedPriority} onSelect={onSelectWeelyPriority} />
       </GroupItemView>
-
-      <ReactModal
-        isOpen={showModal}
-        onRequestClose={() => setShowModal(false)}
-        id={type}
-        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
-        style={{
-          overlay: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.5)',
-          },
-        }}
-      >
-        {type === 'client' && <div className='text-lg font-bold'>Clients</div>}
-        {type === 'project' && <div className='text-lg font-bold'>Projects</div>}
-        {type === 'task' && <div className='text-lg font-bold'>Tasks</div>}
-        {type === 'deliverable' && <div className='text-lg font-bold'>Deliverables</div>}
-        {type === 'client' &&
-          clientList.map((client, index) => (
-            <ClientNameItem key={index} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-          ))}
-        {type === 'project' &&
-          projectList.map((project, index) => (
-            <ProjectNameItem key={index} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
-          ))}
-        {type === 'task' &&
-          taskList.map((task, index) => <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />)}
-        {type === 'deliverable' &&
-          weekDeliverables.map((deliverable, index) => (
-            <DeliverableModalItem
-              key={index}
-              deliverable={deliverable}
-              selectedDeliverable={selectedDeliverable}
-              onSelect={onSelectDeliverable}
-            />
-          ))}
-      </ReactModal>
     </MainResponsive>
   );
 }

@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { format, startOfWeek, addDays, isSameDay, startOfDay, addHours, getHours, getMinutes } from 'date-fns';
-import { NextSvg, PreviousSvg } from '../../assets/svg';
-import { nextThumbnail, previewThumbnail } from '../../assets/images';
-import { subDays } from 'date-fns/esm';
+import { format, startOfDay, addHours, getHours, getMinutes } from 'date-fns';
 import { ScheduleState } from '../../modules/schedule';
 
 interface Props {

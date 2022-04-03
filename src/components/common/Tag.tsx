@@ -1,7 +1,4 @@
 import React from 'react';
-import { documentThumbnail } from '../../assets/images';
-import { CheckSvg, CrossSvg } from '../../assets/svg';
-import { PriorityState } from '../../modules/weekPriority';
 
 interface Props {
   text: string;

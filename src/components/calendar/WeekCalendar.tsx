@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
-import { NextSvg, PreviousSvg } from '../../assets/svg';
 import { nextThumbnail, previewThumbnail } from '../../assets/images';
 import { subDays } from 'date-fns/esm';
 

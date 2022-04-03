@@ -1,12 +1,10 @@
 export interface DeliverableState {
-  wp_id?: number | null;
-  user_id: number;
-  week: number;
-  priority_num: number | null;
-  goal: string;
-  deliverable: string;
-  detail: string | null;
-  is_completed: number | null;
-  is_weekly: null;
+  deliverable_id?: number | null;
+  deliverable_name: string;
+  task_id: number;
+  periority_id: number;
+  budget: string;
+  planned_end_date: Date;
   end_date: Date;
+  is_completed: boolean;
 }
