@@ -20,14 +20,14 @@ const DayScheduler = ({ selectedDate }: Props) => {
       description: '',
     },
     {
-      id: 1,
+      id: 2,
       name: 'JF',
       start_time: new Date(2022, 4, 2, 2, 20),
       end_time: new Date(2022, 4, 2, 3, 20),
       description: '',
     },
     {
-      id: 1,
+      id: 3,
       name: 'LU-JF',
       start_time: new Date(2022, 4, 2, 5, 20),
       end_time: new Date(2022, 4, 2, 7, 10),
@@ -67,8 +67,6 @@ const DayScheduler = ({ selectedDate }: Props) => {
   return (
     <section className='w-full flex flex-row p-2'>
       {getTimes()}
-      <div className='flex w-12 relative px-2'>{scheduleList.map(item => getItem(item))}</div>
-      <div className='flex w-12 relative px-2'>{scheduleList.map(item => getItem(item))}</div>
       <div className='flex w-12 relative px-2'>{scheduleList.map(item => getItem(item))}</div>
     </section>
   );

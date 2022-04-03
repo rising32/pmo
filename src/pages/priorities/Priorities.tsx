@@ -16,6 +16,7 @@ import MainResponsive from '../../containers/main/MainResponsive';
 import Select, { SingleValue } from 'react-select';
 import { ProjectTypeList, ProjectTypeState } from '../../modules/project';
 import ProjectType from '../../components/priority/ProjectType';
+import GroupItemView from '../../containers/main/GroupItemView';
 
 const thisWeek = getWeek(new Date());
 function Priorities(): JSX.Element {
@@ -150,7 +151,7 @@ function Priorities(): JSX.Element {
       <div className='flex justify-center items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold truncate'>Weekly priorities</span>
       </div>
-      <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
+      <GroupItemView className='mx-4 p-4 rounded-md'>
         {weeklyPriorities.map((item, index) => (
           <PriorityItem
             key={index}
@@ -161,11 +162,11 @@ function Priorities(): JSX.Element {
             onSelect={onSelectWeelyPriority}
           />
         ))}
-      </div>
+      </GroupItemView>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
         <span className='text-white font-bold text-center'>Priority achieved this week with clear goal defined</span>
       </div>
-      <div className='mx-4 px-4 pt-4 pb-14 bg-card-gray w-full border-rouge-blue border-4 relative'>
+      <GroupItemView className='mx-4 px-4 pt-4 pb-10 border-rouge-blue border-4 bg-card-gray relative'>
         <div className='flex flex-row items-center w-full'>
           <div className='text-xl font-bold text-white'>Priority :</div>
           <div className='ml-4 flex flex-1 w-full'>
@@ -253,13 +254,14 @@ function Priorities(): JSX.Element {
             </div>
           ))}
         </div>
-      </div>
+      </GroupItemView>
+
       <div className='flex justify-center items-center px-4 pt-6 pb-2 w-full'>
         <span className='text-white font-bold truncate'>Past priorities not achieved</span>
       </div>
-      <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
+      <GroupItemView className='mx-4 p-4 rounded-md'>
         <PastPriorityView priorities={beforeWeeklyPriorities} />
-      </div>
+      </GroupItemView>
     </MainResponsive>
   );
 }

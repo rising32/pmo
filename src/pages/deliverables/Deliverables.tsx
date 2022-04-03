@@ -29,6 +29,7 @@ import WeekCalendar from '../../components/calendar/WeekCalendar';
 import TaskNameItem from '../../components/items/TaskNameItem';
 import ProjectNameItem from '../../components/items/ProjectNameItem';
 import ClientNameItem from '../../components/items/ClientNameItem';
+import GroupItemView from '../../containers/main/GroupItemView';
 
 const thisWeek = getWeek(new Date());
 function Deliverables(): JSX.Element {
@@ -210,15 +211,15 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
         <span className='text-white'>{todayDeliverables.length * 50 + '%'}</span>
       </div>
-      <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
+      <GroupItemView className='mx-4 p-4 rounded-md'>
         {todayDeliverables.map((item, index) => (
           <DeliverableItem key={index} index={index} deliverable={item} />
         ))}
-      </div>
+      </GroupItemView>
       <div className='flex justify-center items-center p-2 mt-4 w-full'>
         <span className='text-white font-bold text-center'>At least 2 deliverable per day</span>
       </div>
-      <div className='mx-4 px-4 pt-4 pb-14 bg-card-gray w-full border-rouge-blue border-4 relative'>
+      <GroupItemView className='mx-4 px-4 pt-4 pb-16 border-rouge-blue border-4 bg-card-gray relative'>
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white font-bold pr-2'>Client :</span>
           <div className='border-dashed border-2 border-white flex-1' />
@@ -270,15 +271,15 @@ function Deliverables(): JSX.Element {
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>
-      </div>
+      </GroupItemView>
       <div className='flex justify-center items-center px-4 pt-6 pb-2 w-full'>
         <span className='text-white font-bold truncate'>Remember your weekly priorities</span>
       </div>
-      <div className='mx-4 p-4 bg-card-gray shadow-xl w-full rounded-md'>
+      <GroupItemView className='mx-4 p-4 rounded-md'>
         {rememberWeeklyPriorities.map((item, index) => (
           <DeliverableWeelyPriority key={index} priority={item} />
         ))}
-      </div>
+      </GroupItemView>
 
       <ReactModal
         isOpen={showModal}
