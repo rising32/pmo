@@ -42,8 +42,6 @@ const ManageTask = () => {
         creator_id: createTaskRes.task.creator_id,
         project_id: createTaskRes.task.project_id,
         task_name: createTaskRes.task.task_name,
-        deliverable: createTaskRes.task.deliverable,
-        priority: createTaskRes.task.priority,
         description: createTaskRes.task.description,
         planned_start_date: createTaskRes.task.planned_start_date,
         planned_end_date: createTaskRes.task.planned_end_date,
@@ -52,6 +50,7 @@ const ManageTask = () => {
         hourly_rate: createTaskRes.task.hourly_rate,
         is_add_all: createTaskRes.task.is_add_all,
         is_active: createTaskRes.task.is_active,
+        is_deleted: 0,
       };
       const newDataList = dataList;
       newDataList.unshift(updateTask);
@@ -67,8 +66,6 @@ const ManageTask = () => {
         creator_id: sendUpdateTaskRes.creator_id,
         project_id: sendUpdateTaskRes.project_id,
         task_name: sendUpdateTaskRes.task_name,
-        deliverable: sendUpdateTaskRes.deliverable,
-        priority: sendUpdateTaskRes.priority,
         description: sendUpdateTaskRes.description,
         planned_start_date: sendUpdateTaskRes.planned_start_date,
         planned_end_date: sendUpdateTaskRes.planned_end_date,
@@ -77,6 +74,7 @@ const ManageTask = () => {
         hourly_rate: sendUpdateTaskRes.hourly_rate,
         is_add_all: sendUpdateTaskRes.is_add_all,
         is_active: sendUpdateTaskRes.is_active,
+        is_deleted: 0,
       };
       const newDataList = dataList.map(item => {
         if (item.project_id === updateTask.project_id) {
@@ -105,9 +103,7 @@ const ManageTask = () => {
         creator_id: account?.user.user_id,
         project_id: null,
         task_name: name,
-        priority: 1,
         description: 'test task',
-        deliverable: null,
         planned_start_date: null,
         planned_end_date: null,
         actual_start_date: null,
@@ -115,6 +111,7 @@ const ManageTask = () => {
         hourly_rate: parseInt(rate),
         is_add_all: false,
         is_active: true,
+        is_deleted: 0,
       };
       _sendCreateTask(newTask);
     } else if (selectedItem && account) {
@@ -122,9 +119,7 @@ const ManageTask = () => {
         task_id: selectedItem.task_id,
         creator_id: account?.user.user_id,
         project_id: selectedItem.project_id,
-        deliverable: selectedItem.deliverable,
         task_name: name,
-        priority: selectedItem.priority,
         description: selectedItem.description,
         planned_start_date: selectedItem.planned_start_date,
         planned_end_date: selectedItem.planned_end_date,
@@ -133,6 +128,7 @@ const ManageTask = () => {
         hourly_rate: parseInt(rate),
         is_add_all: addAll,
         is_active: selectedItem.is_active,
+        is_deleted: 0,
       };
       _sendUpdateTask(newTask);
     }

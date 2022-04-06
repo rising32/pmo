@@ -2,7 +2,7 @@ import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
 import { DeliverableState } from '../../modules/deliverable';
 import { ClientProjectState, ProjectState, StatisticState } from '../../modules/project';
-import { PriorityTaskState, TaskState } from '../../modules/task';
+import { PriorityTaskState, TaskAssignState, TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
 import { AccountState, UserState } from '../../modules/user';
 import { PriorityState } from '../../modules/weekPriority';
@@ -73,6 +73,7 @@ export const getUserTasks = (creator_id: number) => apiClient.post<ResponseTasks
 export const sendTaskWithProjectId = (creator_id: number, project_id: number) =>
   apiClient.post<ResponseTasks>('/project/task/get_by_pna', { creator_id, project_id });
 export const sendUpdateTask = (params: TaskState) => apiClient.post<TaskState>('/project/task/update', params);
+export const sendAssignTask = (params: TaskAssignState) => apiClient.post<ResponseTask>('/project/task/assign', params);
 
 export const getUserAll = () => apiClient.get<UserState[]>('/user/all');
 

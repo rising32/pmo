@@ -259,8 +259,6 @@ function Deliverables(): JSX.Element {
       creator_id: selectedTask.creator_id,
       project_id: selectedProject?.project_id,
       task_name: selectedTask.task_name,
-      priority: selectedTask.priority,
-      deliverable: selectedTask.deliverable,
       description: selectedTask.description,
       planned_start_date: null,
       planned_end_date: null,
@@ -269,6 +267,7 @@ function Deliverables(): JSX.Element {
       hourly_rate: selectedTask.hourly_rate,
       is_add_all: selectedTask.is_add_all,
       is_active: selectedTask.is_active,
+      is_deleted: 0,
     };
     _sendUpdateTask(newTask);
   };

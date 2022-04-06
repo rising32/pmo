@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { controlThumbnail, minusThumbnail, plusThumbnail } from '../../assets/images';
 import ReactModal from 'react-modal';
 import { UserState } from '../../modules/user';
@@ -7,6 +7,8 @@ import {
   getTeamMembers,
   getUserTasks,
   ResponseUCTP,
+  sendAssignTask,
+  sendCreateTask,
   sendGetMyClients,
   sendMyProject,
   sendPriorityByWeek,
@@ -17,10 +19,10 @@ import {
   sendUpdateTask,
 } from '../../lib/api';
 import { ClientState } from '../../modules/client';
-import { TaskState } from '../../modules/task';
+import { TaskAssignState, TaskState } from '../../modules/task';
 import { ProjectState } from '../../modules/project';
 import TaskItem from '../../components/task/TaskItem';
-import { getWeek } from 'date-fns';
+import { format, getWeek } from 'date-fns';
 import MainResponsive from '../../containers/main/MainResponsive';
 import GroupItemView from '../../containers/main/GroupItemView';
 import AnimatedDropView from '../../components/common/AnimatedDropView';
@@ -33,6 +35,7 @@ import UserNameItem from '../../components/items/UserNameItem';
 import FullCalendar from '../../components/calendar/FullCalendar';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
 import { useAuth } from '../../lib/context/AuthProvider';
+import { toast } from 'react-toastify';
 
 ReactModal.setAppElement('#root');
 
@@ -57,12 +60,15 @@ function Tasks(): JSX.Element {
   const [selectedClient, setSelectedClient] = useState<ClientState | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectState | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskState | null>(null);
-  const [selectedDeliverable, setSelectedDeliverable] = useState<PriorityState | null>(null);
+  const [deliverableValue, setDeliverableValue] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserState | null>(null);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [weekTasks, setWeekTask] = useState<ResponseUCTP[]>([]);
+  const [taskValue, setTaskValue] = React.useState('');
+  const [hasFocus, setFocus] = useState(false);
 
   const { account } = useAuth();
+  const taskRef = useRef<HTMLInputElement>(null);
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
@@ -74,35 +80,20 @@ function Tasks(): JSX.Element {
   const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
   const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
   const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
+  const [_sendCreateTask, , createTaskRes] = useRequest(sendCreateTask);
+  const [_sendAssignTask, , sendAssignTaskRes] = useRequest(sendAssignTask);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
-    user_id && _sendGetMyClients(user_id);
-
+    // user_id && _sendGetMyClients(user_id);
     const creator_id = account?.user.user_id;
     creator_id && _getUserTasks(creator_id);
-    creator_id && _sendMyProject(creator_id);
-
+    // creator_id && _sendMyProject(creator_id);
     const week = getWeek(selectedDate);
     _sendPriorityByWeek(user_id, week);
-
     const owner_id = account?.user.user_id;
     owner_id && _getTeamMembers(owner_id);
   }, []);
-  React.useEffect(() => {
-    onTaskSearch();
-  }, [getWeek(selectedDate)]);
-  React.useEffect(() => {
-    if (sendUCTPRes) {
-      setWeekTask(sendUCTPRes);
-      resetSelectedValues();
-    }
-  }, [sendUCTPRes]);
-  React.useEffect(() => {
-    if (sendUCTPErr) {
-      setWeekTask([]);
-    }
-  }, [sendUCTPErr]);
   React.useEffect(() => {
     if (getMyClientsRes) {
       setClientList(getMyClientsRes.clients);
@@ -112,18 +103,17 @@ function Tasks(): JSX.Element {
     if (sendMyProjectRes) {
       setProjectList(sendMyProjectRes.project);
     }
+  }, [sendMyProjectRes]);
+  React.useEffect(() => {
     if (sendProjectWithClientIdRes) {
       setProjectList(sendProjectWithClientIdRes.project);
     }
-  }, [sendMyProjectRes, sendProjectWithClientIdRes]);
+  }, [sendProjectWithClientIdRes]);
   React.useEffect(() => {
     if (getUserTasksRes) {
       setTaskList(getUserTasksRes.task);
     }
-    if (sendTaskWithProjectIdRes) {
-      setTaskList(sendTaskWithProjectIdRes.task);
-    }
-  }, [getUserTasksRes, sendTaskWithProjectIdRes]);
+  }, [getUserTasksRes]);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
@@ -138,7 +128,7 @@ function Tasks(): JSX.Element {
     setSelectedClient(null);
     setSelectedProject(null);
     setSelectedTask(null);
-    setSelectedDeliverable(null);
+    setDeliverableValue('');
     setSelectedUser(null);
     setSelectedDay(null);
   };
@@ -146,16 +136,21 @@ function Tasks(): JSX.Element {
   const options: Intl.DateTimeFormatOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
 
   const openClients = () => {
-    setShowClient(!showClient);
+    if (showClient) {
+      setShowClient(false);
+    } else {
+      setShowClient(true);
+
+      const user_id = account?.user.user_id;
+      user_id && _sendGetMyClients(user_id);
+    }
   };
   const openProjects = () => {
-    setShowProject(!showProject);
-  };
-  const openTasks = () => {
-    setShowTask(!showTask);
-  };
-  const openDeliverable = () => {
-    setShowDeliverable(!showDeliverable);
+    if (showProject) {
+      setShowProject(false);
+    } else {
+      setShowProject(true);
+    }
   };
   const openCalendar = () => {
     setShowCalendar(!showCalendar);
@@ -164,40 +159,49 @@ function Tasks(): JSX.Element {
     setShowUser(!showUser);
   };
   const onSelectClient = (client: ClientState) => {
-    setSelectedClient(preSelectedClient => (preSelectedClient?.client_id === client?.client_id ? null : client));
+    if (selectedClient?.client_id === client.client_id) {
+      setSelectedClient(null);
+    } else {
+      setSelectedClient(client);
+      setSelectedProject(null);
+      setSelectedTask(null);
+      setDeliverableValue('');
+      setSelectedUser(null);
+      setSelectedDay(null);
 
-    const creator_id = account?.user.user_id;
-    const client_id = client.client_id;
-    _sendProjectWithClientId(creator_id, client_id);
+      const creator_id = account?.user.user_id;
+      const client_id = client.client_id;
+      _sendProjectWithClientId(creator_id, client_id);
+    }
 
     setShowClient(false);
   };
   const onSelectProject = (project: ProjectState) => {
-    setSelectedProject(project);
+    if (selectedProject?.project_id === project.project_id) {
+      setSelectedProject(null);
+    } else {
+      setSelectedProject(project);
+    }
 
     if (!project.client_id) {
       setShowProjectModal(true);
       return;
     }
-
-    const creator_id = account?.user.user_id;
-    const project_id = project.project_id;
-    _sendTaskWithProjectId(creator_id, project_id);
-
     setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
-    setSelectedTask(task);
-    if (!task.project_id) {
-      setShowTaskModal(true);
-      return;
-    }
-
-    setShowTask(false);
-  };
-  const onSelectDeliverable = (priority: PriorityState) => {
-    setSelectedDeliverable(preSelectedTask => (preSelectedTask?.wp_id === priority?.wp_id ? null : priority));
-    setShowDeliverable(false);
+    setFocus(false);
+    setTaskValue(task.task_name);
+    // if (selectedTask?.task_id === task.task_id) {
+    //   setSelectedTask(null);
+    // } else {
+    //   setSelectedTask(task);
+    // }
+    // if (!task.project_id) {
+    //   setShowTaskModal(true);
+    //   return;
+    // }
+    // setShowTask(false);
   };
   const onSelectUser = (user: UserState) => {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
@@ -210,15 +214,88 @@ function Tasks(): JSX.Element {
     setSelectedDay(date);
     setShowCalendar(false);
   };
-  const onTaskSearch = () => {
-    const params = {
-      user_id: account?.user.user_id,
-      member_id: null,
-      client_id: selectedClient?.client_id,
-      project_id: selectedProject?.project_id,
-      planned_end_date: selectedDay || selectedDate,
-    };
-    _sendUCTP(params);
+  const onAddTask = () => {
+    if (!account) return;
+    if (!selectedClient) {
+      toast.error('select client');
+      return;
+    }
+    if (!selectedProject) {
+      toast.error('select project');
+      return;
+    }
+    if (!selectedUser) {
+      toast.error('select user');
+      return;
+    }
+    if (!selectedDay) {
+      toast.error('select date');
+      return;
+    }
+    if (!taskValue) {
+      toast.error('select task');
+      return;
+    }
+
+    if (!selectedTask) {
+      const newTask: TaskState = {
+        task_id: null,
+        creator_id: account?.user.user_id,
+        project_id: null,
+        task_name: taskValue,
+        description: 'test task',
+        planned_start_date: null,
+        planned_end_date: format(selectedDay, 'yyyy-MM-dd'),
+        actual_start_date: null,
+        actual_end_date: null,
+        hourly_rate: 50,
+        is_add_all: false,
+        is_active: true,
+        is_deleted: 0,
+      };
+      _sendCreateTask(newTask);
+    }
+  };
+  React.useEffect(() => {
+    if (createTaskRes && createTaskRes.task.task_id) {
+      const updateTask: TaskState = {
+        task_id: createTaskRes.task.task_id,
+        creator_id: createTaskRes.task.creator_id,
+        project_id: createTaskRes.task.project_id,
+        task_name: createTaskRes.task.task_name,
+        description: createTaskRes.task.description,
+        planned_start_date: createTaskRes.task.planned_start_date,
+        planned_end_date: createTaskRes.task.planned_end_date,
+        actual_start_date: createTaskRes.task.actual_start_date,
+        actual_end_date: createTaskRes.task.actual_end_date,
+        hourly_rate: createTaskRes.task.hourly_rate,
+        is_add_all: createTaskRes.task.is_add_all,
+        is_active: createTaskRes.task.is_active,
+        is_deleted: 0,
+      };
+      const newTaskList = taskList;
+      newTaskList.unshift(updateTask);
+      setTaskList(newTaskList);
+
+      if (selectedUser) {
+        const newAssign: TaskAssignState = {
+          assign_id: null,
+          task_id: createTaskRes.task.task_id,
+          member_id: selectedUser?.user_id,
+          role_id: 3,
+        };
+        _sendAssignTask(newAssign);
+      }
+    }
+  }, [createTaskRes]);
+  React.useEffect(() => {
+    if (sendAssignTaskRes) {
+      resetSelectedValues();
+      toast.success('new task successfully');
+    }
+  }, [sendAssignTaskRes]);
+  const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliverableValue(event.target.value);
   };
   const onCancelProjectWithClient = () => {
     setSelectedProject(null);
@@ -238,6 +315,7 @@ function Tasks(): JSX.Element {
         return project;
       });
       setProjectList(newProjectList);
+      setShowProjectModal(false);
       setShowProject(false);
     }
   }, [sendSetClientRes]);
@@ -252,8 +330,6 @@ function Tasks(): JSX.Element {
       creator_id: selectedTask.creator_id,
       project_id: selectedProject?.project_id,
       task_name: selectedTask.task_name,
-      priority: selectedTask.priority,
-      deliverable: selectedTask.deliverable,
       description: selectedTask.description,
       planned_start_date: null,
       planned_end_date: null,
@@ -262,6 +338,7 @@ function Tasks(): JSX.Element {
       hourly_rate: selectedTask.hourly_rate,
       is_add_all: selectedTask.is_add_all,
       is_active: selectedTask.is_active,
+      is_deleted: 0,
     };
     _sendUpdateTask(newTask);
   };
@@ -277,6 +354,10 @@ function Tasks(): JSX.Element {
       setTaskList(newTaskList);
     }
   }, [sendUpdateTaskRes]);
+  const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
+    setTaskValue(event.currentTarget.value);
+  };
+  const filtered = !taskValue ? taskList : taskList.filter(task => task.task_name.toLowerCase().includes(taskValue.toLowerCase()));
 
   return (
     <MainResponsive>
@@ -314,33 +395,38 @@ function Tasks(): JSX.Element {
           ))}
         </AnimatedDropView>
 
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white text-lg font-bold pr-2'>Task :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedTask?.task_name}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
+        <div className='flex justify-between items-center mb-2 text-white font-bold'>
+          <span className='text-lg font-bold pr-2'>Task :</span>
+          <div className='ml-4 flex flex-1 w-full relative'>
+            <input
+              ref={taskRef}
+              type='text'
+              value={taskValue}
+              onChange={handleSearchChange}
+              onFocus={() => setFocus(true)}
+              onBlur={() => setFocus(false)}
+              className='w-full bg-card-gray focus:outline-none truncate'
+            />
           </div>
         </div>
-        <AnimatedDropView show={showTask}>
-          {taskList.map((task, index) => (
+        <AnimatedDropView show={hasFocus}>
+          {filtered.map((task, index) => (
             <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
           ))}
         </AnimatedDropView>
 
-        <div className='flex justify-between items-center mb-2'>
-          <span className='text-white text-lg font-bold pr-2'>Deliverable :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='text-rouge-blue text-lg font-bold px-2'>{selectedDeliverable?.priority}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openDeliverable}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
+        <div className='flex flex-row items-center text-xl font-bold text-white'>
+          <div>Deliverable :</div>
+          <div className='ml-4 flex flex-1 w-full'>
+            <input
+              type='text'
+              name='textValue'
+              className='w-full bg-card-gray focus:outline-none truncate'
+              value={deliverableValue}
+              onChange={changeDeliverableValue}
+            />
           </div>
         </div>
-        <AnimatedDropView show={showDeliverable}>
-          {weeklyPriorities.map((priority, index) => (
-            <DeliverableNameItem key={index} priority={priority} selectedPriority={selectedDeliverable} onSelect={onSelectDeliverable} />
-          ))}
-        </AnimatedDropView>
 
         <div className='flex justify-between items-center mb-2'>
           <span className='text-white text-lg font-bold pr-2'>Who :</span>
@@ -370,7 +456,7 @@ function Tasks(): JSX.Element {
           </div>
         )}
         <div className='flex items-center justify-end'>
-          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onTaskSearch}>
+          <div className='flex items-center justify-end bg-white rounded-full p-2 outline outline-1 shadow-xl' onClick={onAddTask}>
             <img src={plusThumbnail} className='h-5 w-auto' />
           </div>
         </div>
