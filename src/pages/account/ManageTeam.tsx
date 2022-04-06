@@ -35,7 +35,6 @@ const ManageTeam = () => {
   }, []);
   React.useEffect(() => {
     if (getUserAllRes) {
-      console.log(getUserAllRes);
       const newUser: UserState[] = [];
       getUserAllRes.map(user => {
         let isIncluded = false;
@@ -44,6 +43,9 @@ const ManageTeam = () => {
             isIncluded = true;
           }
         });
+        if (user.user_id === account?.user.user_id) {
+          isIncluded = true;
+        }
         if (!isIncluded) {
           newUser.push(user);
         }
