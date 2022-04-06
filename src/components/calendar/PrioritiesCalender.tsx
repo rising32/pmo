@@ -4,10 +4,9 @@ import { nextThumbnail, previewThumbnail } from '../../assets/images';
 import { CalenderSvg } from '../../assets/svg';
 
 interface Props {
-  selectedWeek: number;
   onSelectWeek: (currentWeek: number) => void;
 }
-const PrioritiesCalender = ({ selectedWeek, onSelectWeek }: Props) => {
+const PrioritiesCalender = ({ onSelectWeek }: Props) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(getWeek(currentMonth, { weekStartsOn: 1, firstWeekContainsDate: 4 }));
 

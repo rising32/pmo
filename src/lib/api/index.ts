@@ -135,3 +135,4 @@ export const sendTodayDeliverable = (user_id: number, planned_end_date: Date) =>
   apiClient.post<ResponseDeliverableList>('/project/deliverable/get/planned_end_date', { user_id, planned_end_date });
 
 export const sendCreateDeliverable = (params: DeliverableState) => apiClient.post<DeliverableState>('/project/deliverable/create', params);
+export const sendUpdateDeliverable = (params: DeliverableState) => apiClient.post<DeliverableState>('/project/deliverable/update', params);

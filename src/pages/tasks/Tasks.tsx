@@ -83,14 +83,27 @@ function Tasks(): JSX.Element {
   const [_sendCreateTask, , createTaskRes] = useRequest(sendCreateTask);
   const [_sendAssignTask, , sendAssignTaskRes] = useRequest(sendAssignTask);
   const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
+  const [_sendUCTP, , sendUCTPRes] = useRequest(sendUCTP);
 
   React.useEffect(() => {
-    const user_id = account?.user.user_id;
-    const week = getWeek(selectedDate);
-    _sendPriorityByWeek(user_id, week);
     const owner_id = account?.user.user_id;
     owner_id && _getTeamMembers(owner_id);
   }, []);
+  React.useEffect(() => {
+    const params = {
+      user_id: account?.user.user_id,
+      member_id: null,
+      client_id: selectedClient?.client_id,
+      project_id: selectedProject?.project_id,
+      planned_end_date: selectedDay || selectedDate,
+    };
+    _sendUCTP(params);
+  }, [getWeek(selectedDate)]);
+  React.useEffect(() => {
+    if (sendUCTPRes) {
+      setWeekTask(sendUCTPRes);
+    }
+  }, [sendUCTPRes]);
   React.useEffect(() => {
     if (getMyClientsRes) {
       setClientList(getMyClientsRes.clients);
@@ -111,11 +124,6 @@ function Tasks(): JSX.Element {
       setTaskList(sendTaskWithProjectIdRes.task);
     }
   }, [sendTaskWithProjectIdRes]);
-  React.useEffect(() => {
-    if (sendPriorityByWeekRes) {
-      setWeeklyPriorities(sendPriorityByWeekRes.priority);
-    }
-  }, [sendPriorityByWeekRes]);
   React.useEffect(() => {
     if (getTeamMembersRes) {
       getUsers(getTeamMembersRes.member);
@@ -315,7 +323,7 @@ function Tasks(): JSX.Element {
             budget: 50,
             planned_end_date: format(selectedDay, 'yyyy-MM-dd'),
             end_date: null,
-            is_completed: false,
+            is_completed: 0,
           };
           _sendCreateDeliverable(deliverable);
         }

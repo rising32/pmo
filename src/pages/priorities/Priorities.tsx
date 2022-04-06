@@ -127,7 +127,7 @@ function Priorities(): JSX.Element {
       setSelectedPriorityTab('default');
     } else {
       setSelectedPriority(priority);
-      setPriorityValue(priority.goal);
+      setPriorityValue(priority.priority);
       setGoalValue(priority.goal);
       setDetailValue(priority.detail || '');
       setSelectedPriorityTab('details');
@@ -139,7 +139,7 @@ function Priorities(): JSX.Element {
 
   return (
     <MainResponsive>
-      <PrioritiesCalender selectedWeek={selectedWeek} onSelectWeek={onSelectWeek} />
+      <PrioritiesCalender onSelectWeek={onSelectWeek} />
       <div className='flex justify-center items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold truncate'>Weekly priorities</span>
       </div>

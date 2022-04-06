@@ -23,7 +23,7 @@ const TodayDeliverable = ({ deliverables, selectedDeliverable, onSelect }: Props
           <div className='flex items-center w-4'>{index + 1}</div>
           <div className='pr-2'>{':'}</div>
           <div className='flex flex-1 truncate'>{deliverable.deliverable_name}</div>
-          <div className='ml-2 text-white text-base font-normal'>50%</div>
+          <div className='ml-2 text-white text-base font-normal'>{deliverable.is_completed === 0 ? '0%' : '50%'}</div>
         </div>
       ))}
     </div>

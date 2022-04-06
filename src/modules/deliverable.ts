@@ -7,5 +7,5 @@ export interface DeliverableState {
   budget: number;
   planned_end_date: string;
   end_date: Date | null;
-  is_completed: boolean;
+  is_completed: number;
 }

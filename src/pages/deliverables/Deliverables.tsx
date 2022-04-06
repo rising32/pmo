@@ -11,6 +11,7 @@ import {
   sendSetClient,
   sendTaskWithProjectId,
   sendTodayDeliverable,
+  sendUpdateDeliverable,
   sendUpdateTask,
 } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,8 @@ function Deliverables(): JSX.Element {
   const [showTask, setShowTask] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showTaskCompletedModal, setShowTaskCompletedModal] = useState(false);
+  const [percentageValue, setPercentageValue] = useState(0);
 
   const { account } = useAuth();
   const navigate = useNavigate();
@@ -62,11 +65,11 @@ function Deliverables(): JSX.Element {
   const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_sendProjectWithClientId, , sendProjectWithClientIdRes] = useRequest(sendProjectWithClientId);
-  const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendTodayDeliverable, , sendTodayDeliverableRes] = useRequest(sendTodayDeliverable);
   const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
   const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
   const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
+  const [_sendUpdateDeliverable, , sendUpdateDeliverableRes] = useRequest(sendUpdateDeliverable);
   const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
 
   React.useEffect(() => {
@@ -86,6 +89,13 @@ function Deliverables(): JSX.Element {
   React.useEffect(() => {
     if (sendTodayDeliverableRes) {
       setDeliverables(sendTodayDeliverableRes.deliverable);
+      let percentage = 0;
+      sendTodayDeliverableRes.deliverable.map(item => {
+        if (item.is_completed === 1) {
+          percentage += 50;
+        }
+      });
+      setPercentageValue(percentage);
     }
   }, [sendTodayDeliverableRes]);
   React.useEffect(() => {
@@ -135,12 +145,8 @@ function Deliverables(): JSX.Element {
     if (showTask) {
       setShowTask(false);
     } else {
-      const creator_id = account?.user.user_id;
-      creator_id && _getUserTasks(creator_id);
+      setShowTask(true);
     }
-  };
-  const openDeliverables = () => {
-    // setShowModal(!showModal);
   };
   const onSelectClient = (client: ClientState) => {
     if (selectedClient?.client_id === client.client_id) {
@@ -185,7 +191,12 @@ function Deliverables(): JSX.Element {
     setShowTask(false);
   };
   const onSelectDeliverable = (deliverable: DeliverableState) => {
-    setSelectedDeliverable(deliverable);
+    if (selectedDeliverable?.deliverable_id === deliverable.deliverable_id) {
+      setSelectedDeliverable(null);
+    } else {
+      setSelectedDeliverable(deliverable);
+      setShowTaskCompletedModal(true);
+    }
   };
   const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDeliverableValue(event.target.value);
@@ -205,7 +216,7 @@ function Deliverables(): JSX.Element {
         budget: 50,
         planned_end_date: format(selectedDate, 'yyyy-MM-dd'),
         end_date: null,
-        is_completed: false,
+        is_completed: 0,
       };
       _sendCreateDeliverable(deliverable);
     }
@@ -290,13 +301,50 @@ function Deliverables(): JSX.Element {
       setShowProjectModal(false);
     }
   }, [sendUpdateTaskRes]);
+  const onCancelDeliverableCompleted = () => {
+    setShowTaskCompletedModal(false);
+  };
+  const onCompletedDeliverable = () => {
+    if (!selectedDeliverable) return;
+    const deliverable: DeliverableState = {
+      deliverable_id: selectedDeliverable?.deliverable_id,
+      deliverable_name: selectedDeliverable?.deliverable_name,
+      user_id: selectedDeliverable.user_id,
+      task_id: selectedDeliverable.task_id,
+      periority_id: selectedDeliverable.periority_id,
+      budget: selectedDeliverable.budget,
+      planned_end_date: selectedDeliverable.planned_end_date,
+      end_date: selectedDeliverable.end_date,
+      is_completed: selectedDeliverable?.is_completed === 1 ? 0 : 1,
+    };
+    _sendUpdateDeliverable(deliverable);
+  };
+  React.useEffect(() => {
+    if (sendUpdateDeliverableRes) {
+      setShowTaskCompletedModal(false);
+      const newDeliverables = deliverables.map(deliverable => {
+        if (deliverable.deliverable_id === sendUpdateDeliverableRes.deliverable_id) {
+          return sendUpdateDeliverableRes;
+        }
+        return deliverable;
+      });
+      setDeliverables(newDeliverables);
+      let percentage = 0;
+      newDeliverables.map(item => {
+        if (item.is_completed === 1) {
+          percentage += 50;
+        }
+      });
+      setPercentageValue(percentage);
+    }
+  }, [sendUpdateDeliverableRes]);
 
   return (
     <MainResponsive>
       <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
       <div className='flex justify-between items-center px-4 pt-4 pb-2 w-full'>
         <span className='text-white font-bold flex-1 truncate'>{new Date(selectedDate).toLocaleDateString(undefined, options)}</span>
-        <span className='text-white'>{deliverables.length * 50 + '%'}</span>
+        <span className='text-white'>{percentageValue + ' %'}</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
         <TodayDeliverable deliverables={deliverables} selectedDeliverable={selectedDeliverable} onSelect={onSelectDeliverable} />
@@ -439,6 +487,34 @@ function Deliverables(): JSX.Element {
             No
           </div>
           <div className='text-lg font-bold text-rouge-blue' onClick={onLinkTaskWithProject}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
+      <ReactModal
+        isOpen={showTaskCompletedModal}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>
+          {selectedDeliverable?.is_completed === 1 ? 'Not completed this Deliverable?' : 'Completed this Deliverable?'}
+        </div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Deliverable:</div>
+          <div className='font-bold'>{selectedDeliverable?.deliverable_name}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelDeliverableCompleted}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onCompletedDeliverable}>
             Yes
           </div>
         </div>

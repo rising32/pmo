@@ -50,6 +50,7 @@ const DayScheduler = ({ selectedDate }: Props) => {
     const endMin = getMinutes(item.end_time);
     return (
       <div
+        key={format(item.start_time, 'T')}
         className='flex flex-col w-full rounded-md absolute bg-submit items-center'
         style={{
           top: `${startHour * 6 + startMin * 0.1}rem`,
