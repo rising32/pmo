@@ -9,6 +9,7 @@ import {
   sendPriorityByBeforeWeek,
   sendProjectWithClientId,
   sendSetClient,
+  sendTaskWithProjectId,
   sendTodayDeliverable,
   sendUpdateTask,
 } from '../../lib/api';
@@ -66,6 +67,7 @@ function Deliverables(): JSX.Element {
   const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
   const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
   const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
+  const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -97,11 +99,11 @@ function Deliverables(): JSX.Element {
     }
   }, [sendProjectWithClientIdRes]);
   React.useEffect(() => {
-    if (getUserTasksRes) {
-      setTaskList(getUserTasksRes.task);
+    if (sendTaskWithProjectIdRes) {
+      setTaskList(sendTaskWithProjectIdRes.task);
       setShowTask(true);
     }
-  }, [getUserTasksRes]);
+  }, [sendTaskWithProjectIdRes]);
   const onSelectDate = (date: Date) => {
     setSelectedDate(date);
   };
@@ -160,6 +162,9 @@ function Deliverables(): JSX.Element {
     } else {
       setSelectedProject(project);
     }
+    const creator_id = account?.user.user_id;
+    const project_id = project.project_id;
+    _sendTaskWithProjectId(creator_id, project_id);
 
     if (!project.client_id) {
       setShowProjectModal(true);

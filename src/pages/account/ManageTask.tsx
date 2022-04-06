@@ -21,8 +21,8 @@ const ManageTask = () => {
 
   const { account } = useAuth();
 
-  const [_sendCreateTask, creatingTask, createTaskRes, , resetSendCreateTask] = useRequest(sendCreateTask);
-  const [_getUserTasks, gettingUserTasks, getUserTasksRes, , resetGetUserTasks] = useRequest(getUserTasks);
+  const [_sendCreateTask, , createTaskRes] = useRequest(sendCreateTask);
+  const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
 
   React.useEffect(() => {

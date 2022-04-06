@@ -8,6 +8,7 @@ import {
   getUserTasks,
   ResponseUCTP,
   sendAssignTask,
+  sendCreateDeliverable,
   sendCreateTask,
   sendGetMyClients,
   sendMyProject,
@@ -36,6 +37,7 @@ import FullCalendar from '../../components/calendar/FullCalendar';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
 import { useAuth } from '../../lib/context/AuthProvider';
 import { toast } from 'react-toastify';
+import { DeliverableState } from '../../modules/deliverable';
 
 ReactModal.setAppElement('#root');
 
@@ -71,24 +73,19 @@ function Tasks(): JSX.Element {
   const taskRef = useRef<HTMLInputElement>(null);
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
-  const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
   const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
   const [_sendProjectWithClientId, , sendProjectWithClientIdRes] = useRequest(sendProjectWithClientId);
-  const [_sendUCTP, , sendUCTPRes, sendUCTPErr] = useRequest(sendUCTP);
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
   const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
   const [_sendSetClient, , sendSetClientRes] = useRequest(sendSetClient);
   const [_sendUpdateTask, , sendUpdateTaskRes] = useRequest(sendUpdateTask);
   const [_sendCreateTask, , createTaskRes] = useRequest(sendCreateTask);
   const [_sendAssignTask, , sendAssignTaskRes] = useRequest(sendAssignTask);
+  const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
-    // user_id && _sendGetMyClients(user_id);
-    const creator_id = account?.user.user_id;
-    creator_id && _getUserTasks(creator_id);
-    // creator_id && _sendMyProject(creator_id);
     const week = getWeek(selectedDate);
     _sendPriorityByWeek(user_id, week);
     const owner_id = account?.user.user_id;
@@ -110,10 +107,10 @@ function Tasks(): JSX.Element {
     }
   }, [sendProjectWithClientIdRes]);
   React.useEffect(() => {
-    if (getUserTasksRes) {
-      setTaskList(getUserTasksRes.task);
+    if (sendTaskWithProjectIdRes) {
+      setTaskList(sendTaskWithProjectIdRes.task);
     }
-  }, [getUserTasksRes]);
+  }, [sendTaskWithProjectIdRes]);
   React.useEffect(() => {
     if (sendPriorityByWeekRes) {
       setWeeklyPriorities(sendPriorityByWeekRes.priority);
@@ -125,9 +122,12 @@ function Tasks(): JSX.Element {
     }
   }, [getTeamMembersRes]);
   const resetSelectedValues = () => {
+    setProjectList([]);
+    setTaskList([]);
     setSelectedClient(null);
     setSelectedProject(null);
     setSelectedTask(null);
+    setTaskValue('');
     setDeliverableValue('');
     setSelectedUser(null);
     setSelectedDay(null);
@@ -161,6 +161,7 @@ function Tasks(): JSX.Element {
   const onSelectClient = (client: ClientState) => {
     if (selectedClient?.client_id === client.client_id) {
       setSelectedClient(null);
+      resetSelectedValues();
     } else {
       setSelectedClient(client);
       setSelectedProject(null);
@@ -182,6 +183,9 @@ function Tasks(): JSX.Element {
     } else {
       setSelectedProject(project);
     }
+    const creator_id = account?.user.user_id;
+    const project_id = project.project_id;
+    _sendTaskWithProjectId(creator_id, project_id);
 
     if (!project.client_id) {
       setShowProjectModal(true);
@@ -190,18 +194,15 @@ function Tasks(): JSX.Element {
     setShowProject(false);
   };
   const onSelectTask = (task: TaskState) => {
-    setFocus(false);
     setTaskValue(task.task_name);
-    // if (selectedTask?.task_id === task.task_id) {
-    //   setSelectedTask(null);
-    // } else {
-    //   setSelectedTask(task);
-    // }
-    // if (!task.project_id) {
-    //   setShowTaskModal(true);
-    //   return;
-    // }
-    // setShowTask(false);
+    setSelectedTask(task);
+
+    if (!task.project_id) {
+      setShowTaskModal(true);
+      return;
+    }
+
+    setFocus(false);
   };
   const onSelectUser = (user: UserState) => {
     setSelectedUser(preSelectedUser => (preSelectedUser?.user_id === user?.user_id ? null : user));
@@ -237,7 +238,7 @@ function Tasks(): JSX.Element {
       return;
     }
 
-    if (!selectedTask) {
+    if (selectedTask === null) {
       const newTask: TaskState = {
         task_id: null,
         creator_id: account?.user.user_id,
@@ -254,6 +255,16 @@ function Tasks(): JSX.Element {
         is_deleted: 0,
       };
       _sendCreateTask(newTask);
+    } else {
+      if (selectedUser && selectedTask.task_id) {
+        const newAssign: TaskAssignState = {
+          assign_id: null,
+          task_id: selectedTask.task_id,
+          member_id: selectedUser?.user_id,
+          role_id: 3,
+        };
+        _sendAssignTask(newAssign);
+      }
     }
   };
   React.useEffect(() => {
@@ -290,10 +301,33 @@ function Tasks(): JSX.Element {
   }, [createTaskRes]);
   React.useEffect(() => {
     if (sendAssignTaskRes) {
-      resetSelectedValues();
-      toast.success('new task successfully');
+      if (deliverableValue === '') {
+        resetSelectedValues();
+        toast.success('new task created successfully');
+      } else {
+        if (selectedUser && selectedTask?.task_id && selectedDay) {
+          const deliverable: DeliverableState = {
+            deliverable_id: null,
+            deliverable_name: deliverableValue,
+            user_id: selectedUser?.user_id,
+            task_id: selectedTask?.task_id,
+            periority_id: null,
+            budget: 50,
+            planned_end_date: format(selectedDay, 'yyyy-MM-dd'),
+            end_date: null,
+            is_completed: false,
+          };
+          _sendCreateDeliverable(deliverable);
+        }
+      }
     }
   }, [sendAssignTaskRes]);
+  React.useEffect(() => {
+    if (sendCreateDeliverableRes) {
+      resetSelectedValues();
+      toast.success('new deliverable created successfully');
+    }
+  }, [sendCreateDeliverableRes]);
   const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDeliverableValue(event.target.value);
   };
@@ -328,17 +362,17 @@ function Tasks(): JSX.Element {
     const newTask: TaskState = {
       task_id: selectedTask.task_id,
       creator_id: selectedTask.creator_id,
-      project_id: selectedProject?.project_id,
+      project_id: selectedTask.project_id,
       task_name: selectedTask.task_name,
       description: selectedTask.description,
-      planned_start_date: null,
-      planned_end_date: null,
-      actual_start_date: null,
-      actual_end_date: null,
+      planned_start_date: selectedTask.planned_start_date,
+      planned_end_date: selectedTask.planned_end_date,
+      actual_start_date: selectedTask.actual_start_date,
+      actual_end_date: selectedTask.actual_end_date,
       hourly_rate: selectedTask.hourly_rate,
       is_add_all: selectedTask.is_add_all,
       is_active: selectedTask.is_active,
-      is_deleted: 0,
+      is_deleted: selectedTask.is_deleted,
     };
     _sendUpdateTask(newTask);
   };
@@ -354,7 +388,8 @@ function Tasks(): JSX.Element {
       setTaskList(newTaskList);
     }
   }, [sendUpdateTaskRes]);
-  const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const handleTaskChange = (event: React.FormEvent<HTMLInputElement>) => {
+    setSelectedTask(null);
     setTaskValue(event.currentTarget.value);
   };
   const filtered = !taskValue ? taskList : taskList.filter(task => task.task_name.toLowerCase().includes(taskValue.toLowerCase()));
@@ -402,7 +437,7 @@ function Tasks(): JSX.Element {
               ref={taskRef}
               type='text'
               value={taskValue}
-              onChange={handleSearchChange}
+              onChange={handleTaskChange}
               onFocus={() => setFocus(true)}
               onBlur={() => setFocus(false)}
               className='w-full bg-card-gray focus:outline-none truncate'
