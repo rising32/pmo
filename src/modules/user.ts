@@ -9,7 +9,7 @@ export interface UserState {
   password: string;
   avatar?: string;
   birthday?: string;
-  is_project_manager: number;
+  role_id: number;
   registration_time?: string;
 }
 export interface AccountState {

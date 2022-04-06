@@ -1,10 +1,10 @@
 import React from 'react';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
+import { AccountState, UserState } from '../../modules/user';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { sendUserProfileUpdate } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 interface Props {
   isEditProfile: boolean;
@@ -12,12 +12,12 @@ interface Props {
 }
 
 const EditUserNameEmail = ({ isEditProfile, onClose }: Props) => {
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const { account, changeAccount } = useAuth();
 
   const [userName, setUserName] = React.useState<string | undefined>(account?.user.display_name);
   const [email, setEmail] = React.useState<string | undefined>(account?.user.email);
 
-  const [_sendUserProfileUpdate, profileUpdating, profileRes, , resetSendUserProfileUpdate] = useRequest(sendUserProfileUpdate);
+  const [_sendUserProfileUpdate, , profileRes] = useRequest(sendUserProfileUpdate);
 
   React.useEffect(() => {
     if (profileRes && profileRes.user_id && account) {
@@ -26,7 +26,7 @@ const EditUserNameEmail = ({ isEditProfile, onClose }: Props) => {
         token: account.token,
         user: profileRes,
       };
-      setAccount(updateAccount);
+      changeAccount(updateAccount);
       toast.success('profile update successed!');
       onClose();
     }
@@ -54,7 +54,7 @@ const EditUserNameEmail = ({ isEditProfile, onClose }: Props) => {
         password: account.user.password,
         avatar: account.user.avatar,
         birthday: account.user.birthday,
-        is_project_manager: account.user.is_project_manager,
+        role_id: 3,
         registration_time: account.user.registration_time,
       };
       _sendUserProfileUpdate(user);

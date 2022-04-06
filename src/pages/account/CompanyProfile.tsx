@@ -1,7 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
 import {
   dateTimeCurrencyThumbnail,
   organizationThumbnail,
@@ -17,18 +15,19 @@ import EditUserNameEmail from '../../components/profile/EditUserNameEmail';
 import DateTimeCurrency from '../../components/profile/DateTimeCurrency';
 import OrganizationUpdate from '../../components/profile/OrganizationUpdate';
 import MainResponsive from '../../containers/main/MainResponsive';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 const CompanyProfile = () => {
   const [isEditProfile, setIsEditProfile] = React.useState(false);
   const [isEditOrganization, setIsEditOrganization] = React.useState(false);
   const [isEditWorkSetting, setIsEditWorkSetting] = React.useState(false);
   const [isEditDateTimeCurrency, setIsEditDateTimeCurrency] = React.useState(false);
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const { account, changeAccount } = useAuth();
 
   const [teamMemberNum, setTeamMemberNum] = React.useState(0);
 
   const navigate = useNavigate();
-  const [_sendSignOut, signOuting, signOutRes, , resetSignOut] = useRequest(signOut);
+  const [_sendSignOut, , signOutRes] = useRequest(signOut);
   const [_getTeamMembers, , getTeamMembersRes] = useRequest(getTeamMembers);
 
   React.useEffect(() => {
@@ -42,7 +41,7 @@ const CompanyProfile = () => {
   }, [getTeamMembersRes]);
   React.useEffect(() => {
     if (signOutRes && signOutRes.user_id) {
-      setAccount(null);
+      changeAccount(null);
       toast.success('sign out successed!');
       navigate('/');
     }

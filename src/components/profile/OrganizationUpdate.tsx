@@ -1,10 +1,10 @@
 import React from 'react';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
+import { AccountState } from '../../modules/user';
 import BottomUpAnimatedView from '../../components/common/BottomUpAnimatedView';
 import { sendUserProfileUpdate } from '../../lib/api';
 import useRequest from '../../lib/hooks/useRequest';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 interface Props {
   isEditOrganization: boolean;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const OrganizationUpdate = ({ isEditOrganization, onClose }: Props) => {
-  const [account, setAccount] = useRecoilState<AccountState | null>(accountState);
+  const { account, changeAccount } = useAuth();
 
   const [companyName, setCompanyName] = React.useState<string>('');
 
@@ -25,7 +25,7 @@ const OrganizationUpdate = ({ isEditOrganization, onClose }: Props) => {
         token: account.token,
         user: profileRes,
       };
-      setAccount(updateAccount);
+      changeAccount(updateAccount);
       toast.success('profile update successed!');
       onClose();
     }

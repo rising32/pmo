@@ -8,6 +8,7 @@ interface AuthContextType {
   account: AccountState | null;
   signin: (email: string, password: string, callback: VoidFunction) => void;
   signout: (callback: VoidFunction) => void;
+  changeAccount: (newAccount: AccountState | null) => void;
 }
 
 const AuthContext = React.createContext<AuthContextType>(null!);
@@ -15,6 +16,10 @@ const AuthContext = React.createContext<AuthContextType>(null!);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [account, setAccount] = React.useState<AccountState | null>(null);
   const [_sendSignOut, , signOutRes] = useRequest(signOut);
+
+  const changeAccount = (newAccount: AccountState | null) => {
+    setAccount(newAccount);
+  };
 
   const signin = (email: string, password: string, callback: VoidFunction) => {
     sendAuthEmailPassword(email, password)
@@ -42,7 +47,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value = { account, signin, signout };
+  const value = { account, changeAccount, signin, signout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

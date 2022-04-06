@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoThumbnail, crayon, person, password } from '../../assets/images';
-import { useRecoilState } from 'recoil';
-import { AccountState, accountState, UserState } from '../../modules/user';
+import { AccountState } from '../../modules/user';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -13,6 +12,7 @@ import useRequest from '../../lib/hooks/useRequest';
 import { sendSignUp } from '../../lib/api';
 import SpinerIcon from '../../components/common/SpinerIcon';
 import { validateEmail } from '../../lib/utills';
+import { useAuth } from '../../lib/context/AuthProvider';
 
 interface IFormInputs {
   email: string;
@@ -31,7 +31,7 @@ const SignUpSchema = yup
   .required();
 
 const SignUp = () => {
-  const [user, setUser] = useRecoilState<AccountState | null>(accountState);
+  const { account, changeAccount } = useAuth();
   const navigate = useNavigate();
   const [_sendSignUp, loading, data, err, resetSendAuthEmail] = useRequest<AccountState>(sendSignUp);
 
@@ -45,14 +45,14 @@ const SignUp = () => {
 
   React.useEffect(() => {
     if (data && data.login_id) {
-      setUser(data);
+      changeAccount(data);
       toast.success('sign up successed!');
       navigate('/tasks');
     }
   }, [data]);
 
   const onSignUpSubmit: SubmitHandler<IFormInputs> = data => {
-    if (user?.login_id) {
+    if (account?.login_id) {
       return;
     }
     if (!validateEmail(data.email)) {

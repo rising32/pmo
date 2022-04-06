@@ -23,7 +23,7 @@ import { useAuth } from '../../lib/context/AuthProvider';
 
 const Account = () => {
   const navigate = useNavigate();
-  const { account } = useAuth();
+  const { account, changeAccount } = useAuth();
 
   const [clientNum, setClientNum] = React.useState(0);
   const [projectNum, setProjectNum] = React.useState(0);
@@ -31,14 +31,14 @@ const Account = () => {
 
   const [_sendGetMyClients, , getMyClientsRes] = useRequest(sendGetMyClients);
   const [_getUserTasks, , getUserTasksRes] = useRequest(getUserTasks);
-  const [_sendSignOut, signOuting, signOutRes, , resetSignOut] = useRequest(signOut);
+  const [_sendSignOut, , signOutRes] = useRequest(signOut);
   const [_sendMyProject, , sendMyProjectRes] = useRequest(sendMyProject);
 
   React.useEffect(() => {
     if (signOutRes && signOutRes.user_id) {
-      // setAccount(null);
+      changeAccount(null);
       toast.success('sign out successed!');
-      navigate('/tasks');
+      navigate('/');
     }
   }, [signOutRes]);
   const onSignOut = () => {
