@@ -33,6 +33,7 @@ module.exports = {
       yellow: '#FFFF00',
       'rouge-blue': '#DD0000',
       'menu-back': '#365B9D',
+      'button-blue': '#0E97C3',
     },
   },
   plugins: [],

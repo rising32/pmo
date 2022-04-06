@@ -6,6 +6,7 @@ import Select, { SingleValue } from 'react-select';
 import MultiRangeSlider from '../common/MultiRangeSlider';
 import CheckImage from '../common/CheckImage';
 import WeekCalendar from '../calendar/WeekCalendar';
+import WorkSettingWeekCalendar from '../calendar/WorkSettingWeekCalendar';
 
 interface Props {
   displayWorkSetting: DisplayWorkSettingState;
@@ -90,7 +91,7 @@ const WorkSettingItem = ({ displayWorkSetting, onChange }: Props) => {
             <div className='text-xl font-bold text-rouge-blue pr-2'>{displayWorkSetting.week}</div>
             <div className='text-base font-normal text-black'>Week</div>
           </div>
-          <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDay} />
+          <WorkSettingWeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDay} />
           <div className='text-base font-bold py-4'>DAILY WORK ROUTINE</div>
           <div className='flex flex-row justify-between px-12 w-full'>
             <div>{values[0] + ':00'}</div>

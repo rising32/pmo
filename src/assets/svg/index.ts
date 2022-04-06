@@ -7,3 +7,4 @@ export { ReactComponent as CalenderSvg } from './calender-icon.svg';
 export { ReactComponent as PreviewSvg } from './preview.svg';
 export { ReactComponent as PreviousSvg } from './previous.svg';
 export { ReactComponent as NextSvg } from './next.svg';
+export { ReactComponent as DownSvg } from './next.svg';

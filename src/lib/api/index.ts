@@ -43,8 +43,7 @@ export const sendDateTimeCurrencyCreate = (params: DateTimeCurrencyType) =>
 
 export const sendDateTimeCurrencyUpdate = (params: DateTimeCurrencyType) =>
   apiClient.post<DateTimeCurrencyType>('/user/update_date_time_currency', params);
-export const sendGetDateTimeCurrency = (user_id: number) =>
-  apiClient.post<DateTimeCurrencyType>('/user/get_date_time_currency', { user_id });
+export const sendDateTimeCurrency = (user_id: number) => apiClient.post<DateTimeCurrencyType>('/user/get_date_time_currency', { user_id });
 
 export const sendCreateClient = (client_name: string, is_active: boolean) =>
   apiClient.post<ClientState>('/admin/create_client', { client_name, is_active });
