@@ -223,6 +223,10 @@ function Deliverables(): JSX.Element {
     setDeliverableValue(event.target.value);
   };
   const onAddDeliverable = () => {
+    if (selectedDeliverableTab !== 'default') {
+      setSelectedDeliverableTab('default');
+      return;
+    }
     if (isPriority) {
       if (account && selectedPriority && selectedPriority.wp_id && selectedTask?.task_id) {
         const deliverable: DeliverableState = {

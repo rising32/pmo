@@ -26,12 +26,13 @@ export const sendAuthEmailPassword = (email: string, password: string) => {
 };
 export const loginWithToken = (token: string) => apiClient.post<AccountState>('/user/login/token', { token });
 
-export const sendSignUp = (email: string, phone_number: string, password: string, display_name: string) =>
+export const sendSignUp = (email: string, phone_number: string, password: string, display_name: string, role_id: number) =>
   apiClient.post<AccountState>('/user/signUp', {
     email,
     phone_number,
     password,
     display_name,
+    role_id,
   });
 
 export const signOut = (user_id: number) => apiClient.post('/user/logout', { user_id });

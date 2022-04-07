@@ -63,7 +63,8 @@ const SignUp = () => {
     const phone_number = data.phone;
     const password = data.password;
     const display_name = data.name;
-    _sendSignUp(email, phone_number, password, display_name);
+    const role_id = 3;
+    _sendSignUp(email, phone_number, password, display_name, role_id);
   };
 
   return (
