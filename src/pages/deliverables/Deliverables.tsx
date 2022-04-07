@@ -12,6 +12,7 @@ import {
   sendTaskWithProjectId,
   sendTodayDeliverable,
   sendUpdateDeliverable,
+  sendUpdatePriority,
   sendUpdateTask,
 } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +22,6 @@ import { DeliverableState } from '../../modules/deliverable';
 import { ClientState } from '../../modules/client';
 import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
-import DeliverableItem from '../../components/deliverable/DeliverableItem';
 import { toast } from 'react-toastify';
 import MainResponsive from '../../containers/main/MainResponsive';
 import WeekCalendar from '../../components/calendar/WeekCalendar';
@@ -57,6 +57,8 @@ function Deliverables(): JSX.Element {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showTaskCompletedModal, setShowTaskCompletedModal] = useState(false);
   const [percentageValue, setPercentageValue] = useState(0);
+  const [isDeliverableFromPriority, setIsDeliverableFromPriority] = useState(false);
+  const [isPriority, setIsPriority] = useState(false);
 
   const { account } = useAuth();
   const navigate = useNavigate();
@@ -71,6 +73,7 @@ function Deliverables(): JSX.Element {
   const [_sendCreateDeliverable, , sendCreateDeliverableRes] = useRequest(sendCreateDeliverable);
   const [_sendUpdateDeliverable, , sendUpdateDeliverableRes] = useRequest(sendUpdateDeliverable);
   const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
+  const [_sendUpdatePriority, , sendUpdatePriorityRes] = useRequest(sendUpdatePriority);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -202,23 +205,40 @@ function Deliverables(): JSX.Element {
     setDeliverableValue(event.target.value);
   };
   const onAddDeliverable = () => {
-    if (!deliverableValue) {
-      toast.error('select deliverable!');
-      return;
-    }
-    if (account && selectedTask?.task_id) {
-      const deliverable: DeliverableState = {
-        deliverable_id: null,
-        deliverable_name: deliverableValue,
-        user_id: account.user.user_id,
-        task_id: selectedTask?.task_id,
-        periority_id: null,
-        budget: 50,
-        planned_end_date: format(selectedDate, 'yyyy-MM-dd'),
-        end_date: null,
-        is_completed: 0,
-      };
-      _sendCreateDeliverable(deliverable);
+    if (isPriority) {
+      if (account && selectedPriority && selectedPriority.wp_id && selectedTask?.task_id) {
+        const deliverable: DeliverableState = {
+          deliverable_id: null,
+          deliverable_name: selectedPriority?.priority,
+          user_id: account.user.user_id,
+          task_id: selectedTask?.task_id,
+          periority_id: selectedPriority.wp_id,
+          budget: 50,
+          planned_end_date: format(selectedDate, 'yyyy-MM-dd'),
+          end_date: null,
+          is_completed: 0,
+        };
+        _sendCreateDeliverable(deliverable);
+      }
+    } else {
+      if (!deliverableValue) {
+        toast.error('select deliverable!');
+        return;
+      }
+      if (account && selectedTask?.task_id) {
+        const deliverable: DeliverableState = {
+          deliverable_id: null,
+          deliverable_name: deliverableValue,
+          user_id: account.user.user_id,
+          task_id: selectedTask?.task_id,
+          periority_id: null,
+          budget: 50,
+          planned_end_date: format(selectedDate, 'yyyy-MM-dd'),
+          end_date: null,
+          is_completed: 0,
+        };
+        _sendCreateDeliverable(deliverable);
+      }
     }
   };
   React.useEffect(() => {
@@ -231,14 +251,54 @@ function Deliverables(): JSX.Element {
       const newDeliverables = deliverables;
       newDeliverables.push(sendCreateDeliverableRes);
       setDeliverables(newDeliverables);
+
+      if (isPriority) {
+        if (account && selectedPriority) {
+          const priority: PriorityState = {
+            wp_id: selectedPriority?.wp_id,
+            user_id: selectedPriority?.user_id,
+            week: selectedPriority.week,
+            priority: selectedPriority.priority,
+            goal: selectedPriority.goal,
+            detail: selectedPriority.detail,
+            is_completed: 1,
+            is_weekly: selectedPriority.is_weekly,
+            end_date: selectedPriority.end_date,
+          };
+          _sendUpdatePriority(priority);
+        }
+      }
     }
   }, [sendCreateDeliverableRes]);
+  React.useEffect(() => {
+    if (sendUpdatePriorityRes) {
+      const newRememberWeeklyPriorities = rememberWeeklyPriorities.map(priority => {
+        if (priority.wp_id === sendUpdatePriorityRes.wp_id) {
+          return sendUpdatePriorityRes;
+        } else {
+          return priority;
+        }
+      });
+
+      setSelectedPriority(null);
+      setRememberWeeklyPriorities(newRememberWeeklyPriorities);
+    }
+  }, [sendUpdatePriorityRes]);
   const onSelectWeelyPriority = (priority: PriorityState) => {
     if (selectedPriority?.wp_id === priority.wp_id) {
       setSelectedPriority(null);
+      setIsPriority(false);
     } else {
-      setSelectedPriority(priority);
+      if (priority.is_completed !== 1) {
+        setSelectedPriority(priority);
+        setIsDeliverableFromPriority(true);
+      }
     }
+  };
+  const onCancelDeliverableFromPriority = () => {
+    setSelectedPriority(null);
+    setIsPriority(false);
+    setIsDeliverableFromPriority(false);
   };
   const onCancelProjectWithClient = () => {
     setSelectedProject(null);
@@ -339,6 +399,11 @@ function Deliverables(): JSX.Element {
     }
   }, [sendUpdateDeliverableRes]);
 
+  const onDeliverableFromPriority = () => {
+    setIsPriority(true);
+    setIsDeliverableFromPriority(false);
+  };
+
   return (
     <MainResponsive>
       <WeekCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
@@ -392,18 +457,27 @@ function Deliverables(): JSX.Element {
             <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
           ))}
         </AnimatedDropView>
-        <div className='flex flex-row items-center text-xl font-bold text-white'>
-          <div>Deliverable :</div>
-          <div className='ml-4 flex flex-1 w-full'>
-            <input
-              type='textarea'
-              name='textValue'
-              className='w-full bg-card-gray focus:outline-none truncate'
-              value={deliverableValue}
-              onChange={changeDeliverableValue}
-            />
+        {isPriority ? (
+          <div className='flex flex-row items-center text-xl font-bold text-white'>
+            <span className='pr-2'>Priority :</span>
+            <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+            <div className='border-dashed text-rouge-blue px-2 truncate'>{selectedPriority?.priority}</div>
           </div>
-        </div>
+        ) : (
+          <div className='flex flex-row items-center text-xl font-bold text-white'>
+            <div>Deliverable :</div>
+            <div className='ml-4 flex flex-1 w-full'>
+              <input
+                type='textarea'
+                name='textValue'
+                className='w-full bg-card-gray focus:outline-none truncate'
+                value={deliverableValue}
+                onChange={changeDeliverableValue}
+              />
+            </div>
+          </div>
+        )}
+
         <div className='absolute -bottom-1 left-0 w-full flex flex-row justify-evenly items-center'>
           {DeliverablesTab.map(item => (
             <div
@@ -515,6 +589,32 @@ function Deliverables(): JSX.Element {
             No
           </div>
           <div className='text-lg font-bold text-rouge-blue' onClick={onCompletedDeliverable}>
+            Yes
+          </div>
+        </div>
+      </ReactModal>
+      <ReactModal
+        isOpen={isDeliverableFromPriority}
+        className='w-4/5 max-h-96 bg-white p-4 overflow-auto rounded-sm flex flex-col items-center justify-center'
+        style={{
+          overlay: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        <div className='text-center'>Deliverable from priority?</div>
+        <div className='flex flex-row'>
+          <div className='font-bold pr-2'>Deliverable:</div>
+          <div className='font-bold'>{selectedPriority?.priority}</div>
+        </div>
+        <div className='flex flex-row items-start justify-between w-full px-8 pt-4'>
+          <div className='text-lg font-bold' onClick={onCancelDeliverableFromPriority}>
+            No
+          </div>
+          <div className='text-lg font-bold text-rouge-blue' onClick={onDeliverableFromPriority}>
             Yes
           </div>
         </div>

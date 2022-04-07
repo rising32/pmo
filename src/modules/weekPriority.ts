@@ -5,7 +5,7 @@ export interface PriorityState {
   priority: string;
   goal: string;
   detail: string | null;
-  is_completed: boolean;
+  is_completed: number;
   is_weekly: null;
   end_date: Date | null;
 }

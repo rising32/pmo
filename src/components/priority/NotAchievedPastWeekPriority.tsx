@@ -1,15 +1,12 @@
 import React from 'react';
-import { getWeek } from 'date-fns';
 import { PriorityState } from '../../modules/weekPriority';
-import CheckImage from '../common/CheckImage';
 
 interface Props {
   priorities: PriorityState[];
-  week: number;
   selectedPriority: PriorityState | null;
   onSelect: (priority: PriorityState) => void;
 }
-const WeekPriority = ({ priorities, selectedPriority, week, onSelect }: Props) => {
+const NotAchievedPastWeekPriority = ({ priorities, selectedPriority, onSelect }: Props) => {
   return (
     <div className='flex flex-col w-full'>
       {priorities.map((priority, index) => (
@@ -18,11 +15,8 @@ const WeekPriority = ({ priorities, selectedPriority, week, onSelect }: Props) =
           className={`flex flex-row text-xl font-bold ${selectedPriority?.wp_id === priority.wp_id ? 'text-rouge-blue' : 'text-white'}`}
           onClick={() => onSelect(priority)}
         >
-          {week !== getWeek(new Date(), { weekStartsOn: 1, firstWeekContainsDate: 4 }) && (
-            <CheckImage isSelected={selectedPriority?.wp_id === priority.wp_id} isChecked={priority.is_completed === 1} />
-          )}
-          <div className='flex items-center w-4'>{index + 1}</div>
-          <div className='pr-2'>{':'}</div>
+          <div className='flex items-center'>{priority.week + 'W'}</div>
+          <div className='px-2'>{':'}</div>
           <div>{priority.priority}</div>
         </div>
       ))}
@@ -30,4 +24,4 @@ const WeekPriority = ({ priorities, selectedPriority, week, onSelect }: Props) =
   );
 };
 
-export default WeekPriority;
+export default NotAchievedPastWeekPriority;

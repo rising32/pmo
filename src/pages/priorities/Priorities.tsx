@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { plusThumbnail } from '../../assets/images';
 import useRequest from '../../lib/hooks/useRequest';
-import { sendCreatePriority, sendPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
+import { sendCreatePriority, sendNotCompletedPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
 import PrioritiesCalender from '../../components/calendar/PrioritiesCalender';
 import { PriorityState } from '../../modules/weekPriority';
 import { getWeek } from 'date-fns';
@@ -14,7 +14,7 @@ import ProjectType from '../../components/priority/ProjectType';
 import GroupItemView from '../../containers/main/GroupItemView';
 import { useAuth } from '../../lib/context/AuthProvider';
 import WeekPriority from '../../components/priority/WeekPriority';
-import BeforeWeekPriority from '../../components/priority/BeforeWeekPriority';
+import NotAchievedPastWeekPriority from '../../components/priority/NotAchievedPastWeekPriority';
 
 const thisWeek = getWeek(new Date(), { weekStartsOn: 1, firstWeekContainsDate: 4 });
 function Priorities(): JSX.Element {
@@ -22,7 +22,7 @@ function Priorities(): JSX.Element {
   const [selectedPriorityTab, setSelectedPriorityTab] = useState('default');
   const [selectedPriority, setSelectedPriority] = useState<PriorityState | null>(null);
   const [weeklyPriorities, setWeeklyPriorities] = useState<PriorityState[]>([]);
-  const [beforeWeeklyPriorities, setBeforWeeklyPriorities] = useState<PriorityState[]>([]);
+  const [pastPrioritiesNotAchieved, setPastPrioritiesNotAchieved] = useState<PriorityState[]>([]);
   const [priorityValue, setPriorityValue] = useState('');
   const [goalValue, setGoalValue] = useState('');
   const [detailValue, setDetailValue] = useState('');
@@ -31,7 +31,9 @@ function Priorities(): JSX.Element {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [_sendPriorityByWeek, , sendPriorityByWeekRes] = useRequest(sendPriorityByWeek);
-  const [_sendPriorityByBeforeWeek, , sendPriorityByBeforeWeekRes] = useRequest(sendPriorityByBeforeWeek);
+  const [_sendNotCompletedPriorityByBeforeWeek, , sendNotCompletedPriorityByBeforeWeekRes] = useRequest(
+    sendNotCompletedPriorityByBeforeWeek,
+  );
   const [_sendCreatePriority, , sendCreatePriorityRes] = useRequest(sendCreatePriority);
 
   const navigate = useNavigate();
@@ -54,14 +56,14 @@ function Priorities(): JSX.Element {
     }
   }, [sendPriorityByWeekRes]);
   React.useEffect(() => {
-    if (sendPriorityByBeforeWeekRes) {
-      setBeforWeeklyPriorities(sendPriorityByBeforeWeekRes.priority);
+    if (sendNotCompletedPriorityByBeforeWeekRes) {
+      setPastPrioritiesNotAchieved(sendNotCompletedPriorityByBeforeWeekRes.priority);
     }
-  }, [sendPriorityByBeforeWeekRes]);
+  }, [sendNotCompletedPriorityByBeforeWeekRes]);
   const requestWeelyPriorities = (week: number) => {
     const user_id = account?.user.user_id;
     _sendPriorityByWeek(user_id, week);
-    _sendPriorityByBeforeWeek(user_id, week);
+    _sendNotCompletedPriorityByBeforeWeek(user_id, week);
   };
   const onSelectWeek = (currentWeek: number) => {
     setSelectedWeek(currentWeek);
@@ -99,7 +101,7 @@ function Priorities(): JSX.Element {
         priority: priorityValue,
         goal: goalValue,
         detail: detailValue,
-        is_completed: false,
+        is_completed: 0,
         is_weekly: null,
         end_date: null,
       };
@@ -238,7 +240,11 @@ function Priorities(): JSX.Element {
         <span className='text-white font-bold truncate'>Past priorities not achieved</span>
       </div>
       <GroupItemView className='mx-4 p-4 rounded-md'>
-        <BeforeWeekPriority priorities={beforeWeeklyPriorities} selectedPriority={selectedPriority} onSelect={onSelectWeelyPriority} />
+        <NotAchievedPastWeekPriority
+          priorities={pastPrioritiesNotAchieved}
+          selectedPriority={selectedPriority}
+          onSelect={onSelectWeelyPriority}
+        />
       </GroupItemView>
     </MainResponsive>
   );

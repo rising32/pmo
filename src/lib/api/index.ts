@@ -108,8 +108,11 @@ export const sendPriorityByWeek = (user_id: number, week: number) =>
 export const sendPriorityByBeforeWeek = (user_id: number, week: number) =>
   apiClient.post<ResponsePriorityList>('/priority/get/userid/week/before', { user_id, week });
 
+export const sendNotCompletedPriorityByBeforeWeek = (user_id: number, week: number) =>
+  apiClient.post<ResponsePriorityList>('/priority/get/userid/week/before/not_completed', { user_id, week });
+
 export const sendCreatePriority = (params: PriorityState) => apiClient.post<PriorityState>('/priority/create', params);
-export const sendUpdatePriority = (params: DeliverableState) => apiClient.post<DeliverableState>('/priority/update', params);
+export const sendUpdatePriority = (params: PriorityState) => apiClient.post<PriorityState>('/priority/update', params);
 
 interface UCTPParams {
   member_id?: number;
