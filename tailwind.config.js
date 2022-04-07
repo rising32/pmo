@@ -9,6 +9,7 @@ module.exports = {
         link: '#488BCF',
         blue: '#1F6C98',
         yellow: '#FFFF00',
+        svg: '#5B8EAB',
       },
     },
     screens: {

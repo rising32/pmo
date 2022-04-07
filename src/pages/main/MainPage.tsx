@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../../components/base/Header';
-import { MenuIcon } from '../../assets/svg';
+import { MenuSvg } from '../../assets/svg';
 import MobileBottom from '../../components/base/MobileBottom';
 import Sidebar from '../../components/base/Sidebar';
 import Logo from '../../components/base/Logo';
@@ -24,7 +24,7 @@ function MainPage(): JSX.Element {
           <Sidebar />
         </div>
         <div className='hidden sm:flex lg:hidden px-8 pt-6'>
-          <MenuIcon height={36} width={36} fill='#FFF' onClick={onShowMenu} />
+          <MenuSvg height={36} width={36} fill='#FFF' onClick={onShowMenu} />
         </div>
         <div className='basis-full lg:basis-3/4 justify-center flex'>
           <Outlet />

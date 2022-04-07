@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { agendaThumbnail, menuThumbnail, searchThumbnail } from '../../assets/images';
 import DayScheduler from '../../components/calendar/DayScheduler';
 import WeekCalendarAgenda from '../../components/calendar/WeekCalendarAgenda';
@@ -9,8 +10,10 @@ function PriorityAgenda(): JSX.Element {
   const [shortName, setShortName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { account } = useAuth();
+  const params = useParams();
 
   useEffect(() => {
+    console.log(params);
     if (account !== null && account.user.display_name) {
       const name = account.user.display_name || 'Default';
       const short = name

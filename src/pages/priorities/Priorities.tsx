@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { plusThumbnail } from '../../assets/images';
 import useRequest from '../../lib/hooks/useRequest';
-import { sendCreatePriority, sendNotCompletedPriorityByBeforeWeek, sendPriorityByWeek } from '../../lib/api';
+import { sendCreatePriority, sendNotCompletedPriorityByBeforeWeek, sendPriorityByWeek, sendUpdatePriority } from '../../lib/api';
 import PrioritiesCalender from '../../components/calendar/PrioritiesCalender';
 import { PriorityState } from '../../modules/weekPriority';
 import { getWeek } from 'date-fns';
@@ -35,6 +35,7 @@ function Priorities(): JSX.Element {
     sendNotCompletedPriorityByBeforeWeek,
   );
   const [_sendCreatePriority, , sendCreatePriorityRes] = useRequest(sendCreatePriority);
+  const [_sendUpdatePriority, , sendUpdatePriorityRes] = useRequest(sendUpdatePriority);
 
   const navigate = useNavigate();
   const { account } = useAuth();
@@ -72,7 +73,7 @@ function Priorities(): JSX.Element {
   const onSelectPriorityTab = (key: string) => {
     if (!selectedPriority) return;
     if (key === 'agenda') {
-      navigate('/priorities/agenda');
+      navigate(`/priorities/agenda-${selectedPriority.wp_id}`);
     }
     if (key === 'support') {
       navigate('/priorities/support');
@@ -94,18 +95,20 @@ function Priorities(): JSX.Element {
       return;
     }
     if (account) {
-      const priority: PriorityState = {
-        wp_id: null,
-        user_id: account?.user.user_id,
-        week: selectedWeek,
-        priority: priorityValue,
-        goal: goalValue,
-        detail: detailValue,
-        is_completed: 0,
-        is_weekly: null,
-        end_date: null,
-      };
-      _sendCreatePriority(priority);
+      if (!selectedPriority) {
+        const priority: PriorityState = {
+          wp_id: null,
+          user_id: account?.user.user_id,
+          week: selectedWeek,
+          priority: priorityValue,
+          goal: goalValue,
+          detail: detailValue,
+          is_completed: 0,
+          is_weekly: null,
+          end_date: null,
+        };
+        _sendCreatePriority(priority);
+      }
     }
   };
   React.useEffect(() => {

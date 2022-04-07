@@ -1,6 +1,6 @@
 import { ClientState, UserClientState } from '../../modules/client';
 import { DateTimeCurrencyType } from '../../modules/dateTimeCurrency';
-import { DeliverableState } from '../../modules/deliverable';
+import { DeliverableInfoState, DeliverableState } from '../../modules/deliverable';
 import { ClientProjectState, ProjectState, StatisticState } from '../../modules/project';
 import { PriorityTaskState, TaskAssignState, TaskState } from '../../modules/task';
 import { TeamMemberState } from '../../modules/team';
@@ -138,3 +138,5 @@ export const sendTodayDeliverable = (user_id: number, planned_end_date: Date) =>
 
 export const sendCreateDeliverable = (params: DeliverableState) => apiClient.post<DeliverableState>('/project/deliverable/create', params);
 export const sendUpdateDeliverable = (params: DeliverableState) => apiClient.post<DeliverableState>('/project/deliverable/update', params);
+export const sendDeliverableInfo = (deliverable_id: number) =>
+  apiClient.post<{ data: DeliverableInfoState }>('/project/deliverable/get_cpt_by_id', { deliverable_id });

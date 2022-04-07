@@ -14,11 +14,12 @@ import {
   sendUpdateDeliverable,
   sendUpdatePriority,
   sendUpdateTask,
+  sendDeliverableInfo,
 } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
 import { DeliverablesTab } from '../../modules/tab';
 import { PriorityState } from '../../modules/weekPriority';
-import { DeliverableState } from '../../modules/deliverable';
+import { DeliverableInfoState, deliverablesExpenseKind, DeliverableState } from '../../modules/deliverable';
 import { ClientState } from '../../modules/client';
 import { ProjectState } from '../../modules/project';
 import { TaskState } from '../../modules/task';
@@ -35,6 +36,7 @@ import AnimatedDropView from '../../components/common/AnimatedDropView';
 import { format, getWeek } from 'date-fns';
 import ReactModal from 'react-modal';
 import TodayDeliverable from '../../components/deliverable/TodayDeliverable';
+import { CarSvg } from '../../assets/svg';
 
 function Deliverables(): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -59,6 +61,9 @@ function Deliverables(): JSX.Element {
   const [percentageValue, setPercentageValue] = useState(0);
   const [isDeliverableFromPriority, setIsDeliverableFromPriority] = useState(false);
   const [isPriority, setIsPriority] = useState(false);
+  const [deliverableInfo, setDeliverableInfo] = useState<DeliverableInfoState | null>(null);
+  const [showExpensesKind, setShowExpensesKind] = useState(false);
+  const [selectedExpensesKind, setSelectedExpensesKind] = useState<{ key: string; name: string; icon: React.ElementType } | null>(null);
 
   const { account } = useAuth();
   const navigate = useNavigate();
@@ -74,6 +79,7 @@ function Deliverables(): JSX.Element {
   const [_sendUpdateDeliverable, , sendUpdateDeliverableRes] = useRequest(sendUpdateDeliverable);
   const [_sendTaskWithProjectId, , sendTaskWithProjectIdRes] = useRequest(sendTaskWithProjectId);
   const [_sendUpdatePriority, , sendUpdatePriorityRes] = useRequest(sendUpdatePriority);
+  const [_sendDeliverableInfo, , sendDeliverableInfoRes] = useRequest(sendDeliverableInfo);
 
   React.useEffect(() => {
     const user_id = account?.user.user_id;
@@ -123,6 +129,9 @@ function Deliverables(): JSX.Element {
   const onSelectDeliverableTab = (key: string) => {
     if (key === 'picture') {
       navigate('/deliverables/camera');
+    }
+    if (key === 'file') {
+      navigate('/deliverables/file-manager');
     }
     setSelectedDeliverableTab(preSelectedProject => (preSelectedProject === key ? 'default' : key));
   };
@@ -199,8 +208,17 @@ function Deliverables(): JSX.Element {
     } else {
       setSelectedDeliverable(deliverable);
       setShowTaskCompletedModal(true);
+      const deliverable_id = deliverable.deliverable_id;
+      _sendDeliverableInfo(deliverable_id);
+      setSelectedDeliverableTab('details');
     }
   };
+  React.useEffect(() => {
+    if (sendDeliverableInfoRes) {
+      console.log(sendDeliverableInfoRes);
+      setDeliverableInfo(sendDeliverableInfoRes.data);
+    }
+  }, [sendDeliverableInfoRes]);
   const changeDeliverableValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDeliverableValue(event.target.value);
   };
@@ -403,6 +421,10 @@ function Deliverables(): JSX.Element {
     setIsPriority(true);
     setIsDeliverableFromPriority(false);
   };
+  const onSelectExpensesKind = (name: { key: string; name: string; icon: React.ElementType }) => {
+    setSelectedExpensesKind(name);
+    setShowExpensesKind(false);
+  };
 
   return (
     <MainResponsive>
@@ -418,64 +440,122 @@ function Deliverables(): JSX.Element {
         <span className='text-white font-bold text-center'>At least 2 deliverable per day</span>
       </div>
       <GroupItemView className='mx-4 px-4 pt-4 pb-16 border-rouge-blue border-4 bg-card-gray relative'>
-        <div className='flex flex-row items-center text-xl font-bold text-white'>
-          <span className='pr-2'>Client :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedClient?.client_name}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
-          </div>
-        </div>
-        <AnimatedDropView show={showClient}>
-          {clientList.map(client => (
-            <ClientNameItem key={client.client_id} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
-          ))}
-        </AnimatedDropView>
-        <div className='flex flex-row items-center text-xl font-bold text-white'>
-          <span className='pr-2'>Project :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedProject?.project_name}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openProjects}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
-          </div>
-        </div>
-        <AnimatedDropView show={showProject}>
-          {projectList.map(project => (
-            <ProjectNameItem key={project.project_id} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
-          ))}
-        </AnimatedDropView>
-        <div className='flex flex-row items-center text-xl font-bold text-white'>
-          <span className='pr-2'>Task :</span>
-          <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-          <div className='border-dashed text-rouge-blue px-2'>{selectedTask?.task_name}</div>
-          <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
-            <img src={controlThumbnail} className='h-4 w-auto' />
-          </div>
-        </div>
-        <AnimatedDropView show={showTask}>
-          {taskList.map((task, index) => (
-            <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
-          ))}
-        </AnimatedDropView>
-        {isPriority ? (
-          <div className='flex flex-row items-center text-xl font-bold text-white'>
-            <span className='pr-2'>Priority :</span>
-            <div className='border-dotted border-b-4 border-white flex-1 self-end' />
-            <div className='border-dashed text-rouge-blue px-2 truncate'>{selectedPriority?.priority}</div>
-          </div>
-        ) : (
-          <div className='flex flex-row items-center text-xl font-bold text-white'>
-            <div>Deliverable :</div>
-            <div className='ml-4 flex flex-1 w-full'>
-              <input
-                type='textarea'
-                name='textValue'
-                className='w-full bg-card-gray focus:outline-none truncate'
-                value={deliverableValue}
-                onChange={changeDeliverableValue}
-              />
+        {selectedDeliverableTab === 'default' ? (
+          <>
+            <div className='flex flex-row items-center text-xl font-bold text-white'>
+              <span className='pr-2'>Client :</span>
+              <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+              <div className='border-dashed text-rouge-blue px-2'>{selectedClient?.client_name}</div>
+              <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openClients}>
+                <img src={controlThumbnail} className='h-4 w-auto' />
+              </div>
             </div>
-          </div>
+            <AnimatedDropView show={showClient}>
+              {clientList.map(client => (
+                <ClientNameItem key={client.client_id} client={client} selectedClient={selectedClient} onSelect={onSelectClient} />
+              ))}
+            </AnimatedDropView>
+            <div className='flex flex-row items-center text-xl font-bold text-white'>
+              <span className='pr-2'>Project :</span>
+              <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+              <div className='border-dashed text-rouge-blue px-2'>{selectedProject?.project_name}</div>
+              <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openProjects}>
+                <img src={controlThumbnail} className='h-4 w-auto' />
+              </div>
+            </div>
+            <AnimatedDropView show={showProject}>
+              {projectList.map(project => (
+                <ProjectNameItem key={project.project_id} project={project} selectedProject={selectedProject} onSelect={onSelectProject} />
+              ))}
+            </AnimatedDropView>
+            <div className='flex flex-row items-center text-xl font-bold text-white'>
+              <span className='pr-2'>Task :</span>
+              <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+              <div className='border-dashed text-rouge-blue px-2'>{selectedTask?.task_name}</div>
+              <div className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue' onClick={openTasks}>
+                <img src={controlThumbnail} className='h-4 w-auto' />
+              </div>
+            </div>
+            <AnimatedDropView show={showTask}>
+              {taskList.map((task, index) => (
+                <TaskNameItem key={index} task={task} selectedTask={selectedTask} onSelect={onSelectTask} />
+              ))}
+            </AnimatedDropView>
+            {isPriority ? (
+              <div className='flex flex-row items-center text-xl font-bold text-white'>
+                <span className='pr-2'>Priority :</span>
+                <div className='border-dotted border-b-4 border-white flex-1 self-end' />
+                <div className='border-dashed text-rouge-blue px-2 truncate'>{selectedPriority?.priority}</div>
+              </div>
+            ) : (
+              <div className='flex flex-row items-center text-xl font-bold text-white'>
+                <div>Deliverable :</div>
+                <div className='ml-4 flex flex-1 w-full'>
+                  <input
+                    type='textarea'
+                    name='textValue'
+                    className='w-full bg-card-gray focus:outline-none truncate'
+                    value={deliverableValue}
+                    onChange={changeDeliverableValue}
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className='flex flex-row items-center text-xl font-normal text-white'>
+              <span className='pr-2'>Client :</span>
+              <span className='pr-2'>{deliverableInfo?.client_name}</span>
+            </div>
+            <div className='flex flex-row items-center text-xl font-normal text-white'>
+              <span className='pr-2'>Project :</span>
+              <span className='pr-2'>{deliverableInfo?.project_name}</span>
+            </div>
+            <div className='flex flex-row items-center text-xl font-normal text-white'>
+              <span className='pr-2'>Task :</span>
+              <span className='pr-2'>{deliverableInfo?.task_name}</span>
+            </div>
+            <div className='flex flex-row items-center text-xl font-normal text-white'>
+              <span className='pr-2'>Deliverable :</span>
+              <span className='pr-2'>{deliverableInfo?.deliverable_name}</span>
+            </div>
+            {selectedDeliverableTab === 'expenses' && (
+              <>
+                <div className='flex flex-row items-center text-xl font-normal text-white mt-8'>
+                  <span className=' text-rouge-blue'>Expensives cost</span>
+                  <span className='px-2'>:</span>
+                  <span className=''>€ 20,1</span>
+                </div>
+                <div className='flex flex-row items-center text-xl font-normal text-white'>
+                  <span className=' text-rouge-blue'>What</span>
+                  <span className='px-2'>:</span>
+                  {selectedExpensesKind ? <selectedExpensesKind.icon className='w-6 h-6 mr-4' /> : <CarSvg className='w-6 h-6 mr-4' />}
+                  <span className='flex flex-1'>{selectedExpensesKind ? selectedExpensesKind.name : deliverablesExpenseKind[0].name}</span>
+                  <div
+                    className='w-6 h-6 flex items-center justify-center outline outline-1 ml-2 bg-rouge-blue'
+                    onClick={() => setShowExpensesKind(!showExpensesKind)}
+                  >
+                    <img src={controlThumbnail} className='h-4 w-auto' />
+                  </div>
+                </div>
+                <AnimatedDropView show={showExpensesKind}>
+                  {deliverablesExpenseKind.map(item => (
+                    <div key={item.key} className='px-4 text-white flex flex-row items-center' onClick={() => onSelectExpensesKind(item)}>
+                      {/* <img src={item.icon} className='h-4 w-auto mr-2' /> */}
+                      <item.icon className='w-4 h-4 mr-4' />
+                      <div>{item.name}</div>
+                    </div>
+                  ))}
+                </AnimatedDropView>
+                <div className='flex flex-row text-xl font-normal text-white'>
+                  <span className=' text-rouge-blue'>Info</span>
+                  <span className='px-2'>:</span>
+                  <span className=''>Day return 67 km between Frankfurt to Hammersbach</span>
+                </div>
+              </>
+            )}
+          </>
         )}
 
         <div className='absolute -bottom-1 left-0 w-full flex flex-row justify-evenly items-center'>

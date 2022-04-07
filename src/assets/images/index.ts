@@ -41,3 +41,4 @@ export { default as downThumbnail } from './dropdown-down.png';
 export { default as dropThumbnail } from './dropdown-up.png';
 export { default as locationThumbnail } from './location.png';
 export { default as moreThumbnail } from './more.png';
+export { default as carThumbnail } from './car.png';

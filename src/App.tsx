@@ -24,6 +24,7 @@ import WorkSetting from './pages/account/WorkSetting';
 import DeliverablesPicture from './pages/deliverables/DeliverablesPicture';
 import RequireAuth from './lib/router/RequireAuth';
 import AuthProvider, { useAuth } from './lib/context/AuthProvider';
+import FileManager from './pages/deliverables/FileManager';
 
 function App(): JSX.Element {
   return (
@@ -51,7 +52,7 @@ function App(): JSX.Element {
             }
           />
           <Route
-            path='priorities/agenda'
+            path='priorities/agenda-:wp_id'
             element={
               <RequireAuth>
                 <PriorityAgenda />
@@ -79,6 +80,14 @@ function App(): JSX.Element {
             element={
               <RequireAuth>
                 <DeliverablesPicture />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path='deliverables/file-manager'
+            element={
+              <RequireAuth>
+                <FileManager />
               </RequireAuth>
             }
           />
